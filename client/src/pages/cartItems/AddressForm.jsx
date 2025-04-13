@@ -33,7 +33,7 @@ const AddressForm = ({
           const filteredValue = e.target.value.replace(/[0-9]/g, ""); // Remove numeric characters
           handleInputChange({ target: { name: "name", value: filteredValue } }); // Pass filtered value
         }}
-          autoFocus
+         // autoFocus
         />
 
         <label htmlFor="contactNo">Contact Number</label>

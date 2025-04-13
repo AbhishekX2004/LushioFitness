@@ -25,6 +25,8 @@ import ShopCategory from "./pages/shopCategory/ShopCategory";
 import ReferAndEarn from "./pages/ReferAndEarn/ReferAndEarn";
 import BuyNow from "./pages/BuyNow/BuyNow";
 import Search from "./pages/search/Search";
+import About from "./pages/about/About";
+import Contact from "./pages/contact/Contact";
 
 // Admin Panel
 import AdminPanel from "./pages/admin/AdminPanel";
@@ -99,6 +101,8 @@ function App() {
     <Route path="/women" element={<ShopCategory banner={women_banner} category="women" />} />
     <Route path="/accessories" element={<ShopCategory banner={accessories_banner} category="accessories" />} />
     <Route path="/search" element={<Search/>}/>
+    <Route path="/about" element={<About/>}/>
+    <Route path="/contact" element={<Contact/>}/>
     
     {/* Authentication */}
     <Route path="/register" element={<Register />} />

@@ -214,6 +214,31 @@
         color: #666666;
         cursor: not-allowed;
       }
+      .final-submit-button {
+        background-color: black;
+        color: white;
+        font-size: 16px;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+      
+      .final-submit-button:hover {
+        background-color: #333;
+        transform: scale(1.05);
+      }
+      
+      .final-submit-button:active {
+        background-color: #555;
+        transform: scale(1);
+      }
+      
+      .final-submit-button:disabled {
+        background-color: #777;
+        cursor: not-allowed;
+      }
       
       @media (max-width: 480px) {
         .order-title h2{

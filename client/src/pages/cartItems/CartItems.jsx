@@ -174,8 +174,14 @@ const getTotalForCOD = () => {
           const { displayName } = product; // Extract `name`
         
           // Ensure `height` has a default value of "normal" if it's null
-          const normalizedHeight = height || "normal";
-        
+          let normalizedHeight = height || "normal";
+         
+         if (normalizedHeight === "aboveHeight") {
+          normalizedHeight = "above";
+        }
+        if (normalizedHeight === "belowHeight") {
+          normalizedHeight = "below";
+        }
           // Add details and IDs separately
           details.push({ productId, color, heightType: normalizedHeight, quantity, size, productName: displayName });
           ids.push(id);

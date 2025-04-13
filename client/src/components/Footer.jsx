@@ -41,17 +41,30 @@ const handleEmailChange = (e) => {
         </div>
         <div className="business-section">
           <h4>CONTACT US</h4>
+        
           <ul>
+          <li>
+              <Link to="/about">About Us</Link>
+            </li>
+          <li>
+              <Link to="/contact">Contact Us</Link>
+            </li>
           <li>
               <Link to="/">COMPANY: LUSHIO PRIVATE LIMITED</Link>
             </li>
-            <li>
+            {/* <li>
               <Link to="/">PHONE NUMBER +91 8319713763</Link>
             </li>
             <li>
               <Link to="/">EMAIL us at officialushio@gmail.com</Link>
-            </li>
-           
+            </li> */}
+           <li>
+  <a href="tel:+918319713763">PHONE NUMBER +91 8319713763</a>
+</li>
+<li>
+  <a href="mailto:officialushio@gmail.com">EMAIL us at officialushio@gmail.com</a>
+</li>
+
           </ul>
         </div>
         {/* <div className="business-section">

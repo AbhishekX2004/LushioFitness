@@ -1,10 +1,30 @@
-import React, {useRef,useContext} from "react";
+import React, {useRef,useContext,useEffect,useState} from "react";
 import "./refer-earn.css";
+import axios from 'axios';
 import ShareComponent from "./ShareComponent";
 import { UserContext } from "../../components/context/UserContext";
 function ReferAndEarn() {
   const textRef = useRef(null);
   const { user } = useContext(UserContext);
+const [referralCode,setReferralCode] = useState(null);
+  useEffect(() => {
+    if (user) {
+     
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/user/details/${user.uid}`);
+         
+          setReferralCode(response.data.referralCode);
+        
+          
+        
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        } 
+      };
+      fetchUserData();
+    }
+  }, [user]);
   console.log(user);
   const copyText = () => {
     const textToCopy = textRef.current.innerText;
@@ -29,8 +49,8 @@ function ReferAndEarn() {
       </div>
       <div className="referralBlock">
         <p>Tap To Copy Code</p>
-      {user &&  <div ref={textRef} onClick={copyText}>{user.referralCode}</div>}
-        <ShareComponent referralCode={user.referralCode}/>
+      {user &&  <div ref={textRef} onClick={copyText}>{referralCode}</div>}
+        <ShareComponent referralCode={referralCode}/>
       </div>
       <p className="refer-question">How Does Referrel Work?</p>
       <div className="instruction-container">

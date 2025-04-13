@@ -1,7 +1,7 @@
 .return-exchange-container {
     max-width: 500px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: #f9f9f9;
@@ -40,7 +40,7 @@
   }
   
   .return-reasons,
-  .size-options {
+  .exchange-reasons {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -97,3 +97,33 @@
     border: 1px solid #ccc;
     border-radius: 4px;
   }
+  .quantity-section {
+    display: flex;
+    flex-direction: column;
+    max-width: 200px;
+    width: 100%;
+    margin: 10px 0;
+  }
+  
+  .quantity-section h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  
+  .quantity-select {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+  }
+  
+  .quantity-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  

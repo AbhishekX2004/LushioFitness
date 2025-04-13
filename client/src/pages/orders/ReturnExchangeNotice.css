@@ -1,0 +1,42 @@
+.notice-card {
+    background-color: #fef3c7;
+    border: 1px solid #facc15;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .alert-icon {
+    color: #d97706;
+  }
+  
+  .notice-content {
+    flex: 1;
+    padding: 0;
+  }
+  
+  .notice-text {
+    color: #92400e;
+    font-weight: 500;
+  }
+  
+  /* button {
+    border: 1px solid #d97706;
+    color: #d97706;
+    padding: 6px 12px;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  button:hover {
+    background-color: #facc15;
+    color: #fff;
+  }
+   */
