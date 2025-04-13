@@ -23,7 +23,8 @@ const OrderLogistics = () => {
       2000: '',
       3000: '',
       5000: ''
-    }
+    },
+    orderDiscountCoinsDays: 30
   });
 
   // Fetch initial data from Firestore
@@ -267,6 +268,17 @@ const OrderLogistics = () => {
               </label>
             ))}
           </div>
+          <br />
+          <label>
+            Order Discount Coins Days:
+            <input
+              type="number"
+              name="orderDiscountCoinsDays"
+              value={formData.orderDiscountCoinsDays}
+              onChange={handleChange}
+              placeholder="Enter days for coins to expire"
+            />
+          </label>
         </div>
 
         <button type="submit" className="save-button">
