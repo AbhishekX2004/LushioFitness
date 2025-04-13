@@ -14,6 +14,7 @@ import { AiOutlineCheck } from "react-icons/ai";
 import { FaChevronRight } from "react-icons/fa";
 import OrderedProducts from "./OrderedProducts";
 import ReturnExchange from "./ReturnExchange";
+import ReturnExchangeNotice from "./ReturnExchangeNotice";
 //import Accordion from "./Accordian";
 import { db } from '../../firebaseConfig'; 
 import { doc, getDoc } from 'firebase/firestore';
@@ -32,52 +33,7 @@ function OrderInfo() {
       // setTimeout(() => setCopied(false), 2000);
     });
   };
-  // useEffect(() => {
-  //   if (orderId) {
-  //     fetchOrderDetails();
-  //   }
-  // }, [orderId]);
  
-  // const fetchOrderDetails = async () => {
-  //   const uid = user.uid;
-  //   setLoading(true);
-  
-  //   try {
-  //     const response = await axios.get(
-  //       `${process.env.REACT_APP_API_URL}/orders/${orderId}?uid=${uid}`
-  //     );
-    
-  //     setOrderDetails(response.data);
-  //   } catch (err) {
-  //     console.log(err);
-     
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  // useEffect(() => {
-  //   const fetchAdminControls = async () => {
-  //     try {
-        
-  //       const adminDocRef = doc(db, 'controls', 'admin');
-  //       const docSnap = await getDoc(adminDocRef);
-        
-  //       if (docSnap.exists()) {
-  //         const data = docSnap.data();
-        
-
-  //       setCanReturn(data.returnEnabled);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching admin controls:", error);
-       
-  //     }
-  //   };
-
-  //   fetchAdminControls();
-  // }, []);
- 
-  
   useEffect(() => {
     const fetchData = async () => {
       if (!orderId) return;
@@ -190,6 +146,7 @@ function OrderInfo() {
             Payment Mode <strong>{orderDetails?.modeOfPayment==="cashOnDelivery"?"Cash On Delivery":"Online Payment"}</strong>
           </p>
         </div>
+      
         <div className="orderId-right" onClick={handleCopy}>
           {copied ? (
             <div className="orderId-copiedContainer">
@@ -208,7 +165,7 @@ function OrderInfo() {
       {/* <InvoiceForm invoiceData={invoiceData} setInvoiceData={setInvoiceData} /> */}
       <InvoicePreview data={invoiceData} />
      
-    
+      <ReturnExchangeNotice/>
       <OrderedProducts orderedProducts={orderDetails?.orderedProducts || []} canReturn={canReturn} orderId={orderId}/>
 
       <div className="order-tracking-vertical-container">

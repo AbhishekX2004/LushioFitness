@@ -1,0 +1,68 @@
+.contact-container {
+    padding: 20px;
+  }
+  
+  .contact-heading {
+    text-align: center;
+    font-size: 1.5rem;
+    padding-top: 24px;
+    color: #6b7280; /* gray-500 */
+  }
+  
+  .highlight-text {
+    color: #374151; /* gray-700 */
+    font-weight: 500;
+  }
+  
+  .contact-content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin: 40px 0 112px;
+    font-size: 0.875rem; /* text-sm */
+  }
+  
+  @media (min-width: 768px) {
+    .contact-content {
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+  
+  .contact-image {
+    width: 100%;
+    max-width: 360px;
+  }
+  
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #4b5563; /* text-gray-600 */
+  }
+  
+  .section-info {
+    color: #6b7280; /* text-gray-500 */
+  }
+  
+  .explore-btn {
+    border: 1px solid black;
+    padding: 16px 32px;
+    font-size: 0.875rem;
+    background-color: transparent;
+    color: black;
+    cursor: pointer;
+    transition: all 0.5s ease;
+  }
+  
+  .explore-btn:hover {
+    background-color: black;
+    color: white;
+  }
+  

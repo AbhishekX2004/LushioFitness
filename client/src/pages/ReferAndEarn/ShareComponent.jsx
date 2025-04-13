@@ -10,8 +10,8 @@ import {
   EmailIcon,
 } from 'react-share';
 
-const ShareComponent = () => {
-  const shareUrl = 'https://lushio-fitness.web.app';  // URL to share
+const ShareComponent = ({referralCode}) => {
+  const shareUrl = `https://lushio-fitness.web.app?${referralCode}`;  // URL to share
  
   const text = "Hey, check this out! Sign up using my referral codeand earn ₹100 rewards. Don't miss this amazing opportunity!"; // Refer and earn text
 

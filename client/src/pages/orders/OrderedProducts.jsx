@@ -1,9 +1,48 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import { Link } from "react-router-dom";
 import ReturnExchange from "./ReturnExchange";
-
+import axios from "axios";
+import { UserContext } from "../../components/context/UserContext";
 const OrderedProducts = ({ orderedProducts, canReturn,orderId }) => {
-  
+  const [items, setItems] = useState({});
+  const { user } = useContext(UserContext);
+  const updateItems = (newItem) => {
+    setItems((prevItems) => ({
+      ...prevItems,
+      ...newItem,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (Object.keys(items).length === 0) {
+      alert("No items selected for return/exchange.");
+      return;
+    }
+
+    const requestBody = {
+      uid: user?.uid,
+      oid: orderId,
+      items,
+    };
+if(1){
+  console.log(requestBody);
+ console.log(orderedProducts);
+ return;
+}
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/returnExchange/process-return-exchange`, requestBody);
+      console.log("Response:", response.data);
+      alert("Return/Exchange request submitted successfully!");
+      setItems({});
+    } catch (error) {
+      
+  if (error.response && error.response.status === 403) {
+    alert("Return already initiated");
+  } else {
+    alert("Failed to submit request. Try again.");
+  }
+    }
+  };
 
   return (
     <div className="ordered-products-container">
@@ -49,15 +88,27 @@ const OrderedProducts = ({ orderedProducts, canReturn,orderId }) => {
               </div>
             </div>
 
-            <ReturnExchange
+            {/* <ReturnExchange
               title="RETURN/EXCHANGE PRODUCT"
               canReturn={canReturn}
               identifier={index}
           orderId={orderId}
           product={product}
-            />
+            /> */}
+               <ReturnExchange
+          key={product.id}
+          title="RETURN/EXCHANGE PRODUCT"
+          canReturn={canReturn}
+          identifier={product.opid}
+          orderId={orderId}
+          product={product}
+          updateItems={updateItems}
+        />
           </div>
         ))}
+            <button className="final-submit-button" onClick={handleSubmit}>
+        Submit Return/Exchange Request
+      </button>
       </div>
     </div>
   );

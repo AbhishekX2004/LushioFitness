@@ -11,10 +11,11 @@ import {
   FaSpinner,
   FaHeartBroken,
 } from "react-icons/fa";
-
+import { FaShippingFast } from "react-icons/fa";
 // 3. Absolute Imports/Global Components
 import { UserContext } from "../../components/context/UserContext";
 import { useWishlist } from "../../components/context/WishlistContext";
+import { useAddress } from "../../components/context/AddressContext";
 import { useCart } from "../../components/context/CartContext";
 import URLMediaRenderer from "../../components/URLMediaRenderer";
 
@@ -119,6 +120,7 @@ function ProductDisplay() {
   const [heightCategory, setHeightCategory] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [showNotification, setShowNotification] = useState(false);
 //  const [isLoadingWishlist, setIsLoadingWishlist] = useState(false);
@@ -128,12 +130,34 @@ function ProductDisplay() {
   const { user } = useContext(UserContext);
   const { fetchCartCount } = useCart();
   const { wishlist, wishlistIds, toggleWishlist } = useWishlist();
+   const {selectedAddress} = useAddress();
   const isHeightBased = product?.height;
   const [image, setImage] = useState(null);
   const [isRemoving, setIsRemoving] = useState(false);
   const id = productID;
   const wishlistItem = wishlist.find((item) => item.productId === id);
   const [liked, setLiked] = useState(wishlistIds.has(id));
+
+  useEffect(()=>{
+    const fetchExpectedDeliveryDate = async () => {
+      console.log(selectedAddress)
+try{
+  const payload = {
+    pickup_postcode: 452001, 
+    delivery_postcode: selectedAddress.pinCode,
+  };
+  const response =await  axios.post( `${process.env.REACT_APP_API_URL}/couriers/serviceability`,payload)
+ 
+  setEstimatedDeliveryDate(response.data.data.min_etd);
+}
+catch(err){
+  console.log(error);
+}
+    }
+    if(selectedAddress){
+      fetchExpectedDeliveryDate();
+    }
+  },[product,selectedAddress])
   useEffect(() => {
     // Fetch product when `id` changes
     const fetchProduct = async () => {
@@ -166,7 +190,7 @@ function ProductDisplay() {
     };
 
     if (id) fetchProduct();
-  }, [id]); // Runs the effect when `id` changes
+  }, [id]); 
 
   const targetRef = useRef(null); // Create a reference for the target component
   //  const discount =  Math.ceil(((props.price - props.discountedPrice) / props.price) * 100);
@@ -202,17 +226,21 @@ function ProductDisplay() {
   useEffect(() => {
     if (product) {
       setHeightCategory(product.height ? "aboveHeight" : null);
-      //  setSelectedColor(null); // Initialize with a default color if needed
-      setSelectedSize(null); // Initialize with a default size if needed
+     
+      setSelectedSize(null);
     }
   }, [product]);
 
   const addToCart = async (id) => {
+    if (!user) {
+      navigate("/login");
+      return;
+    };
     if (selectedSize == null) {
       setShowError(true); // Show error if size is not selected
       return;
     }
-    if (!user) return;
+ 
     const cartItem = {
       uid: user.uid,
       productId: id,
@@ -354,6 +382,15 @@ function ProductDisplay() {
           </div>
         </div>
         <p className="productDisplay-tax-statement">Inclusive of all taxes</p>
+
+        {
+          estimatedDeliveryDate &&  
+          <div className="delivery-container">
+           <p >
+            <strong>Expected Delivery: </strong> <span >{estimatedDeliveryDate}</span>
+          </p>
+        </div>
+        }
         <div className="productDisplay-color-size-selector">
           {isHeightBased ? (
             <HeightBasedSelection
@@ -388,9 +425,12 @@ function ProductDisplay() {
           <button onClick={() => addToCart(product.id)}>ADD TO CART</button>
         </div>
 
+      
+      
         <button className="productDisplay-buy-button" onClick={handleBuyNow}>
           BUY NOW
         </button>
+       
         <div className="productDisplay-right-discription">
           <strong>Description: </strong> {product.description.productDetails}
         </div>
@@ -457,7 +497,8 @@ function ProductDisplay() {
           ) : (
             <FaShoppingCart />
           )}{" "}
-          ADD TO CART
+          {user ? <>ADD TO CART</>:<>PLEASE LOGIN</>}
+         
         </button>
       </div>
     </div>

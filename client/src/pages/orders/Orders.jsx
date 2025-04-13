@@ -40,7 +40,7 @@ export default function Orders() {
           lastOrderId: isInitialLoad ? null : pagination.lastOrderId,
         },
       });
-  
+
       const { orders: newOrders, pagination: newPagination } = response.data;
   
       setOrders((prevOrders) =>
@@ -145,7 +145,7 @@ export default function Orders() {
             <div className="order-products">
               {order.orderedProducts.map((product, index) => (
                 <div className="product-details" key={index}>
-                    <Link to={`/product/${product?.productDetails?.id}`}>
+                    <Link to={`/product/${product?.productId}`}>
                     <img
                     src={product.productDetails.cardImages[0]}
                     alt={product.productName}
