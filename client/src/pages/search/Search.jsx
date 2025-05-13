@@ -7,7 +7,7 @@ const SearchResults = () => {
   const location = useLocation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+ // const [error, setError] = useState("");
   const [hasMore, setHasMore] = useState(false);
   const [lastProductId, setLastProductId] = useState(null);
 
@@ -27,7 +27,7 @@ const SearchResults = () => {
       setHasMore(moreResults);
       setLastProductId(lastId);
     } catch (err) {
-      setError("Error fetching results. Please try again.");
+     // setError("Error fetching results. Please try again.");
       console.error("Search Error:", err);
     } finally {
       setLoading(false);

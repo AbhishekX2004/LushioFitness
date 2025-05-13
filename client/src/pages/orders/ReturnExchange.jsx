@@ -1,11 +1,11 @@
-import React, { useState, useContext } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+//import axios from "axios";
 import "./Accordion.css";
 import "./ReturnExchange.css";
-import { UserContext } from "../../components/context/UserContext";
+//import { UserContext } from "../../components/context/UserContext";
 
-const ReturnExchange = ({ title, canReturn, identifier, orderId, product, updateItems }) => {
-  const { user } = useContext(UserContext);
+const ReturnExchange = ({ title, canReturn, identifier, orderId, product, updateItems, setPayloadForMail }) => {
+ // const { user } = useContext(UserContext);
 
   const [state, setState] = useState({
     isOpen: false,
@@ -48,9 +48,9 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
     setState((prev) => ({ ...prev, exchangeReason: reason, otherReason: reason === "Other" ? "" : prev.otherReason }));
   };
 
-  const handleSizeSelect = (size) => {
-    setState((prev) => ({ ...prev, selectedSize: size }));
-  };
+  // const handleSizeSelect = (size) => {
+  //   setState((prev) => ({ ...prev, selectedSize: size }));
+  // };
 
   const handleQuantityChange = (e) => {
     setState((prev) => ({ ...prev, selectedQuantity: Number(e.target.value) }));
@@ -80,7 +80,26 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
         exchangeReason: state.selectedOption === "exchange" ? (state.exchangeReason === "Other" ? state.otherReason : state.exchangeReason) : "",
       },
     };
-
+    const finalReason =
+    state.selectedOption === "exchange"
+      ? state.exchangeReason === "Other"
+        ? state.otherReason
+        : state.exchangeReason
+      : state.selectedReason === "other"
+      ? state.otherReason
+      : state.selectedReason;
+     // 👇 Update the new payloadForMail state
+     const payloadItem = {
+      identifier: identifier,
+      exchange: state.selectedOption === "exchange",
+      productName: product.productName,
+      quantity: state.selectedQuantity,
+      color: product.color,
+      size: product.size,
+      reason: finalReason,
+    };
+  
+  setPayloadForMail((prev) => [...prev, payloadItem]);
     updateItems(itemData);
     alert(`Added ${title} to return/exchange list!`);
   };
@@ -243,7 +262,7 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
               </div>
             )}
 
-            <button className="submit-button" onClick={handleAddItem}>
+            <button className="submit-button add-request-button" onClick={handleAddItem}>
               Add to Request
             </button>
           </div>

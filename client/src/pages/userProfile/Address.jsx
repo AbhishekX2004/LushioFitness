@@ -1,9 +1,9 @@
-import React, { useState, useEffect,useContext } from 'react';
-import PhoneInput from "react-phone-input-2";
+import React, { useState, useEffect } from 'react';
+//import PhoneInput from "react-phone-input-2";
 import './address.css';
 import { useAddress } from '../../components/context/AddressContext';
 import AddressForm from '../cartItems/AddressForm';
-import { UserContext } from "../../components/context/UserContext";
+//import { UserContext } from "../../components/context/UserContext";
 export default function Address() {
   const {
     addressData,
@@ -11,7 +11,7 @@ export default function Address() {
     isLoading,
     handleAddAddress,
     handleEditAddress,
-    fetchAddresses,
+   // fetchAddresses,
     handleRemoveAddress,
     handleSetDefault,
   } = useAddress();
@@ -30,7 +30,7 @@ export default function Address() {
     isDefault: false,
   });
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const { user } = useContext(UserContext);
+  //const { user } = useContext(UserContext);
  
   const handleEdit = (index) => {
     setEditingIndex(index);

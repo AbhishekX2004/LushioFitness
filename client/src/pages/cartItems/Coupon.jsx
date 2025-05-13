@@ -223,7 +223,13 @@ function Coupon({ setDiscount, cartAmount, setCouponApplied }) {
                               Load More
                             </button>
                           )}
-                          <div className="coupon-button-container">
+                        
+                        </>
+                      ) : (
+                        <p className="no-coupons-message">No coupons available</p>
+                      )}
+                    </div>
+                    <div className="coupon-button-container">
                             <button onClick={handleClose} className="cancel-button">
                               Cancel
                             </button>
@@ -241,11 +247,6 @@ function Coupon({ setDiscount, cartAmount, setCouponApplied }) {
                               )}
                             </button>
                           </div>
-                        </>
-                      ) : (
-                        <p className="no-coupons-message">No coupons available</p>
-                      )}
-                    </div>
                   </>
                 ) : (
                   <video

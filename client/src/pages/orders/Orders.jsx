@@ -61,9 +61,27 @@ export default function Orders() {
     }
   }, [user]); // Only runs when 'user' changes and orders are empty
   
+  const sendEmail = async(orderId, orderedProducts) => {
+    try {
+      const payload = {
+        email: user.email,
+        name :user.displayName || "User",
+        type: "cancel",
+        orderId: orderId,
+      //  address: orderDetails.email,
+        items: orderedProducts,
+       // item: items[0]?.name || '', // fallback for 'cancel' single item
+      };
+  
+      await axios.post(`${process.env.REACT_APP_API_URL}/sendEmail`, payload);
+     
+    } catch (err) {
+      console.error('Error:', err);
+     
+    }
+   }
  
- 
-  const handleCancelOrder = async (orderId) => {
+  const handleCancelOrder = async (orderId, orderedProducts) => {
     // Show a confirmation dialog
     const confirmCancel = window.confirm("Are you sure you want to cancel this order?");
     if (!confirmCancel) return; // Exit if the user clicks "Cancel"
@@ -75,7 +93,9 @@ export default function Orders() {
         oid: orderId,
         uid: user.uid,
       });
-  
+  if(response.status===200){
+    await sendEmail(orderId, orderedProducts);
+  }
       // Show a success alert after the cancellation
       alert("Order cancelled successfully!");
     } catch (error) {
@@ -99,10 +119,10 @@ export default function Orders() {
     try {
       const response = await axios.post(apiUrl, requestBody);
       console.log("Response:", response.data);
-      alert("API call successful!");
+      alert(" successful!");
     } catch (error) {
       console.error("Error making API call:", error);
-      alert("API call failed. Check console for details.");
+      //alert("API call failed. Check console for details.");
     }
   };
 
@@ -229,7 +249,7 @@ export default function Orders() {
               {/* Cancel Order Button */}
               <button
                 className="open-rating-button"
-                onClick={() => handleCancelOrder(order.orderId)}
+                onClick={() => handleCancelOrder(order.orderId,order.orderedProducts)}
               >
                 Cancel Order
               </button>
