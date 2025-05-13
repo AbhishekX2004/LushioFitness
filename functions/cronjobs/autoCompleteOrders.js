@@ -20,6 +20,14 @@ const autoCompleteOrders = onSchedule("every 1 hours", async (event) => {
   let totalUpdated = 0;
 
   try {
+    // Fetch the orderDiscounts map from admin controls
+    const controlsDoc = await db.collection("controls").doc("admin").get();
+    const orderDiscounts = controlsDoc.exists ? controlsDoc.data().orderDiscounts || {} : {};
+    const orderDiscountCoinsDays = controlsDoc.exists ? controlsDoc.data().orderDiscountCoinsDays || 30 : 30;
+    if (Object.keys(orderDiscounts).length === 0) {
+      logger.warn("No orderDiscounts configuration found in controls/admin document");
+    }
+
     // Process batches until we either:
     // 1. Run out of orders to process
     // 2. Reach MAX_BATCHES limit to avoid timeout
@@ -51,14 +59,85 @@ const autoCompleteOrders = onSchedule("every 1 hours", async (event) => {
       const batch = db.batch();
       let batchUpdateCount = 0;
 
-      ordersToComplete.forEach((doc) => {
+      // Track user coin updates to batch them efficiently
+      const userCoinUpdates = new Map();
+
+      // Process each order
+      for (const doc of ordersToComplete.docs) {
+        const orderData = doc.data();
+
+        // Update order status
         batch.update(doc.ref, {
           status: "completed",
           autoCompletedAt: new Date(),
-          autoCompleted: true, // Optional flag to identify auto-completed orders
+          autoCompleted: true,
         });
+
+        // Check if order has a uid and payableAmount for coin calculation
+        if (orderData.uid && orderData.payableAmount) {
+          // Determine how many coins to award based on the order amount
+          const orderAmount = orderData.payableAmount;
+          let coinPercentage = 0;
+
+          // Find the applicable discount tier
+          // Sort discount tiers in descending order to find the highest applicable tier
+          const orderThresholds = Object.keys(orderDiscounts)
+              .map(Number)
+              .sort((a, b) => b - a);
+
+          for (const threshold of orderThresholds) {
+            if (orderAmount >= threshold) {
+              coinPercentage = orderDiscounts[threshold];
+              break;
+            }
+          }
+
+          if (coinPercentage > 0) {
+            // Calculate coins as percentage of payable amount and floor the value
+            const coinsToAward = Math.floor((orderAmount * coinPercentage) / 100);
+
+            if (coinsToAward > 0) {
+              // Store the coin update details for this user
+              if (!userCoinUpdates.has(orderData.uid)) {
+                userCoinUpdates.set(orderData.uid, []);
+              }
+
+              userCoinUpdates.get(orderData.uid).push({
+                amount: coinsToAward,
+                orderNumber: doc.id,
+                orderAmount: orderAmount,
+              });
+            }
+          }
+        }
+
         batchUpdateCount++;
-      });
+      }
+
+      // Add coin documents for each user
+      for (const [userId, coinUpdates] of userCoinUpdates.entries()) {
+        for (const update of coinUpdates) {
+          // Set expiration date (e.g., 60 days from now)
+          const expirationDate = new Date();
+          expirationDate.setDate(expirationDate.getDate() + orderDiscountCoinsDays);
+
+          // Create a new coin document in the user's coins subcollection
+          const coinRef = db.collection("users").doc(userId).collection("coins").doc();
+
+          batch.set(coinRef, {
+            amount: update.amount,
+            amountLeft: update.amount,
+            message: `Award for successful completion of order #${update.orderNumber}`,
+            expiresOn: expirationDate,
+            createdAt: new Date(),
+            isExpired: false,
+            orderReference: update.orderNumber,
+            orderAmount: update.orderAmount,
+          });
+
+          logger.log(`Adding ${update.amount} coins to user ${userId} for order ${update.orderNumber}`);
+        }
+      }
 
       // Commit the batch
       await batch.commit();
@@ -67,7 +146,7 @@ const autoCompleteOrders = onSchedule("every 1 hours", async (event) => {
       totalUpdated += batchUpdateCount;
       batchCount++;
 
-      logger.log(`Processed batch ${batchCount}: Updated ${batchUpdateCount} orders`);
+      logger.log(`Processed batch ${batchCount}: Updated ${batchUpdateCount} orders and awarded coins to ${userCoinUpdates.size} users`);
 
       // If the batch wasn't full, we've processed all orders
       if (ordersToComplete.size < BATCH_SIZE) {
