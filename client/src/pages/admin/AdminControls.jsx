@@ -4,7 +4,7 @@ import { db } from '../../firebaseConfig';
 import './AdminControls.css';
 
 const AdminControls = () => {
-  const [engine, setEngine] = useState(false);
+  // const [engine, setEngine] = useState(false);
   const [dobCoins, setDobCoins] = useState(0);
   const [dobMessage, setDobMessage] = useState('');
   const [dobExpiry, setDobExpiry] = useState(30);
@@ -47,7 +47,7 @@ const AdminControls = () => {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setEngine(data.engine);
+          // setEngine(data.engine);
           setDobCoins(data.dobCoins);
           setDobMessage(data.dobMessage);
           setDobExpiry(data.dobExpiry);
@@ -75,6 +75,22 @@ const AdminControls = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // const handleEngineChange = async (checked) => {
+  //   setEngine(checked);
+  //   try {
+  //     await updateDoc(docRef, {
+  //       engine: checked
+  //     });
+  //     // Optional: Show a quick feedback to user
+  //     console.log("Engine status updated successfully");
+  //   } catch (error) {
+  //     console.error("Error updating engine status:", error);
+  //     // Revert UI state if update fails
+  //     setEngine(!checked);
+  //     alert("Failed to update engine status. Please try again.");
+  //   }
+  // };
+
   const handleCoinSettingChange = (milestone, field, value) => {
     setAgeCoins(prevSettings => ({
       ...prevSettings,
@@ -88,7 +104,7 @@ const AdminControls = () => {
   const handleUpdate = async () => {
     try {
       await updateDoc(docRef, {
-        engine,
+        // engine,
         dobCoins: Number(dobCoins),
         dobMessage,
         dobExpiry: Number(dobExpiry),
@@ -117,7 +133,7 @@ const AdminControls = () => {
     <div className="admin-controls">
       <h2 className="admin-controls-title">Admin Controls</h2>
       
-      <div className="admin-controls-card">
+      {/* <div className="admin-controls-card">
         <div className="admin-controls-card-header">
           <h3 className="admin-controls-card-header-title">System Settings</h3>
         </div>
@@ -126,11 +142,11 @@ const AdminControls = () => {
             type="checkbox"
             className="admin-controls-input-checkbox"
             checked={engine}
-            onChange={(e) => setEngine(e.target.checked)}
+            onChange={(e) => handleEngineChange(e.target.checked)}
           />
           <label className="admin-controls-label">Keep Website Alive</label>
         </div>
-      </div>
+      </div> */}
       
       <div className="admin-controls-grid">
         <div className="admin-controls-card">

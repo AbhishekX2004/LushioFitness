@@ -292,7 +292,7 @@ router.post("/createOrder", validateOrderRequest, async (req, res) => {
             code: couponCode,
           });
         } catch (couponError) {
-          console.error("Error marking coupon as used:", couponError);
+          console.error("Error marking coupon as used: ", couponError);
         }
       }
       if (lushioCurrencyUsed) {
@@ -303,8 +303,8 @@ router.post("/createOrder", validateOrderRequest, async (req, res) => {
             oid: orderRef.id,
             orderAmount: payableAmount,
           });
-        } catch (couponError) {
-          console.error("Error marking coupon as used:", couponError);
+        } catch (currencyError) {
+          console.error("Error Updating Lushio Currencies: ", currencyError);
         }
       }
     } catch (shiprocketError) {

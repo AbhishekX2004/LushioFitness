@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './SendTokens.css';
+import Papa from 'papaparse';
 
 // API
 const API = process.env.REACT_APP_API_URL;
@@ -8,7 +9,6 @@ const API = process.env.REACT_APP_API_URL;
 const SendTokens = () => {
   const [method, setMethod] = useState('specific');
   const [recipients, setRecipients] = useState('');
-  const [uploadedFile, setUploadedFile] = useState(null);
   const [amount, setAmount] = useState('');
   const [days, setDays] = useState('');
   const [message, setMessage] = useState('');
@@ -16,9 +16,37 @@ const SendTokens = () => {
   const [lastDate, setLastDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(null);
+  const [csvParseError, setCsvParseError] = useState(null);
 
   const handleFileChange = (e) => {
-    setUploadedFile(e.target.files[0]);
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setCsvParseError(null);
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        if (results.errors.length > 0) {
+          setCsvParseError('Error parsing CSV file');
+          console.error('CSV parsing errors:', results.errors);
+          return;
+        }
+
+        // Extract emails and phones from parsed data
+        const contacts = [];
+        results.data.forEach(row => {
+          if (row.email) contacts.push(row.email.trim());
+          if (row.phone) contacts.push(row.phone.trim());
+        });
+
+        // Set as comma-separated string
+        setRecipients(contacts.join(','));
+      },
+      error: (error) => {
+        setCsvParseError(`CSV parsing error: ${error.message}`);
+      }
+    });
   };
 
   const parseRecipients = () => {
@@ -34,11 +62,6 @@ const SendTokens = () => {
     try {
       let endpoint = '';
       let data = {};
-      const config = {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
       
       // Common fields for all methods
       data.amount = amount;
@@ -49,29 +72,7 @@ const SendTokens = () => {
       switch(method) {
         case 'specific':
           endpoint = `${API}/wallet/send-specific`;
-          if (uploadedFile) {
-            // For file uploads, we need to use FormData
-            const formData = new FormData();
-            formData.append('recipientsFile', uploadedFile);
-            formData.append('amount', amount);
-            formData.append('days', days);
-            formData.append('message', message);
-            
-            config.headers = {
-              'Content-Type': 'multipart/form-data'
-            };
-            
-            // Make the request with FormData
-            const response = await axios.post(endpoint, formData, config);
-            setResponse({
-              success: true,
-              data: response.data
-            });
-            setLoading(false);
-            return;
-          } else {
-            data.recipients = parseRecipients();
-          }
+          data.recipients = parseRecipients();
           break;
         case 'all':
           endpoint = `${API}/wallet/send`;
@@ -91,7 +92,7 @@ const SendTokens = () => {
       }
       
       // Make the request with JSON data
-      const response = await axios.post(endpoint, data, config);
+      const response = await axios.post(endpoint, data);
       
       setResponse({
         success: true,
@@ -153,13 +154,14 @@ const SendTokens = () => {
           <div className="SendTokens-section">
             <h3>Specific Users</h3>
             <div className="SendTokens-option">
-              <label>Upload CSV <span style={{color:"red"}}>COMMING SOON</span></label>
+              <label>Upload CSV</label>
               <input 
                 type="file" 
                 accept=".csv" 
                 onChange={handleFileChange}
                 className="SendTokens-fileInput"
               />
+              {csvParseError && <div className="SendTokens-error">{csvParseError}</div>}
             </div>
             <div className="SendTokens-option">
               <label>Or Enter Emails/Phone Numbers (comma separated)</label>

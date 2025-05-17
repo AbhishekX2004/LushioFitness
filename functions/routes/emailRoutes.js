@@ -1,13 +1,15 @@
-const express = require('express');
-const nodemailer = require('nodemailer');
+/* eslint-disable new-cap */
+/* eslint-disable max-len */
+const express = require("express");
+const nodemailer = require("nodemailer");
 const router = express.Router();
 
 // 1. Create reusable transporter using SMTP
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // use your email provider here (e.g., Gmail, Outlook)
+  service: "gmail", // use your email provider here (e.g., Gmail, Outlook)
   auth: {
-    user: process.env.EMAIL_USER,      // your email address (use environment variable for safety)
-    pass: process.env.EMAIL_PASSWORD,  // your email password or app-specific password
+    user: process.env.EMAIL_USER, // your email address (use environment variable for safety)
+    pass: process.env.EMAIL_PASSWORD, // your email password or app-specific password
   },
 });
 
@@ -50,7 +52,7 @@ router.post('/', async (req, res) => {
   const { email, type, orderId, name, item, items, address } = req.body;
 
   if (!email || !type || !name) {
-    return res.status(400).json({ message: 'Required fields missing' });
+    return res.status(400).json({message: "Required fields missing"});
   }
 
   let subject = '';
@@ -140,7 +142,7 @@ router.post('/', async (req, res) => {
       break;
 
     default:
-      return res.status(400).json({ message: 'Invalid email type' });
+      return res.status(400).json({message: "Invalid email type"});
   }
 
   const mailOptions = {
@@ -152,10 +154,10 @@ router.post('/', async (req, res) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: 'Email sent successfully' });
+    res.status(200).json({message: "Email sent successfully"});
   } catch (err) {
-    console.error('Email error:', err);
-    res.status(500).json({ message: 'Failed to send email', error: err });
+    console.error("Email error:", err);
+    res.status(500).json({message: "Failed to send email", error: err});
   }
 });
 
