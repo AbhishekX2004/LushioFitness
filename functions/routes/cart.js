@@ -185,8 +185,8 @@ router.post("/debug-cart", async (req, res) => {
 router.post("/batch-delete", async (req, res) => {
   try {
     const {uid, itemIds} = req.body;
-    logger.log("\n=== Starting batch delete operation ===");
-    logger.log("Input received:", {uid, itemIds});
+    // logger.log("\n=== Starting batch delete operation ===");
+    // logger.log("Input received:", {uid, itemIds});
 
     // Input validation
     if (!uid || !itemIds || !Array.isArray(itemIds) || itemIds.length === 0) {
@@ -199,27 +199,27 @@ router.post("/batch-delete", async (req, res) => {
 
     // Reference to the user's active cart
     const userCartRef = db.collection("users").doc(uid).collection("carts").doc("activeCart");
-    logger.log("Cart reference path:", userCartRef.path);
+    // logger.log("Cart reference path:", userCartRef.path);
 
     // First verify the cart exists and log its contents
     const cartSnapshot = await userCartRef.get();
-    logger.log("\n=== Cart Verification ===");
-    logger.log(`Cart exists: ${cartSnapshot.exists}`);
+    // logger.log("\n=== Cart Verification ===");
+    // logger.log(`Cart exists: ${cartSnapshot.exists}`);
     if (cartSnapshot.exists) {
-      logger.log("Cart data:", cartSnapshot.data());
+      // logger.log("Cart data:", cartSnapshot.data());
     }
 
     // Get all items in the cart for verification
     const cartItemsCollection = userCartRef.collection("cartItems");
     const allCartItems = await cartItemsCollection.get();
 
-    logger.log("\n=== Current Cart Contents ===");
-    logger.log(`Total items in cart: ${allCartItems.size}`);
+    // logger.log("\n=== Current Cart Contents ===");
+    // logger.log(`Total items in cart: ${allCartItems.size}`);
     const existingItems = new Map();
 
     allCartItems.forEach((doc) => {
-      logger.log(`Found item - ID: ${doc.id}`);
-      logger.log(`Item data:`, doc.data());
+      // logger.log(`Found item - ID: ${doc.id}`);
+      // logger.log(`Item data:`, doc.data());
       existingItems.set(doc.id, doc.data());
     });
 
@@ -230,13 +230,13 @@ router.post("/batch-delete", async (req, res) => {
     let successCount = 0;
 
     // Check each requested item
-    logger.log("\n=== Processing Requested Deletions ===");
+    // logger.log("\n=== Processing Requested Deletions ===");
     for (const itemId of itemIds) {
-      logger.log(`\nProcessing item: ${itemId}`);
-      logger.log(`Checking if item exists in cart items map...`);
+      // logger.log(`\nProcessing item: ${itemId}`);
+      // logger.log(`Checking if item exists in cart items map...`);
 
       if (existingItems.has(itemId)) {
-        logger.log(`✓ Found item ${itemId} in cart`);
+        // logger.log(`✓ Found item ${itemId} in cart`);
         const itemRef = cartItemsCollection.doc(itemId);
         batch.delete(itemRef);
         successfulDeletions.push({
@@ -245,7 +245,7 @@ router.post("/batch-delete", async (req, res) => {
         });
         successCount++;
       } else {
-        logger.log(`✗ Item ${itemId} not found in cart`);
+        // logger.log(`✗ Item ${itemId} not found in cart`);
         failedDeletions.push({
           itemId,
           reason: "Item not found in cart",
@@ -257,15 +257,15 @@ router.post("/batch-delete", async (req, res) => {
 
     // Execute batch if there are items to delete
     if (successCount > 0) {
-      logger.log(`\n=== Executing batch deletion for ${successCount} items ===`);
+      // logger.log(`\n=== Executing batch deletion for ${successCount} items ===`);
       await batch.commit();
-      logger.log("Batch deletion completed");
+      // logger.log("Batch deletion completed");
     } else {
-      logger.log("No items to delete");
+      // logger.log("No items to delete");
     }
 
     // Final verification
-    logger.log("\n=== Final Verification ===");
+    // logger.log("\n=== Final Verification ===");
     const updatedCartItems = await cartItemsCollection.get();
     const remainingItems = [];
     updatedCartItems.forEach((doc) => {
@@ -295,8 +295,8 @@ router.post("/batch-delete", async (req, res) => {
       remainingItems: remainingItems,
     };
 
-    logger.log("\n=== Operation complete ===");
-    logger.log("Final response:", response);
+    // logger.log("\n=== Operation complete ===");
+    // logger.log("Final response:", response);
     res.status(200).json(response);
   } catch (error) {
     logger.error("\n=== Error in batch delete operation ===");

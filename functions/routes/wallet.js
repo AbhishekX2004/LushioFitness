@@ -4,18 +4,18 @@
 const express = require("express");
 const {getFirestore} = require("firebase-admin/firestore");
 const db = getFirestore();
-const multer = require("multer");
-const csv = require("csv-parse");
+// const multer = require("multer");
+// const csv = require("csv-parse");
 const router = express.Router();
 const logger = require("firebase-functions/logger");
 
 // Configure multer for file upload
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 1024 * 1024 * 5, // Limit file size to 5MB
-  },
-});
+// const upload = multer({
+//   storage: multer.memoryStorage(),
+//   limits: {
+//     fileSize: 1024 * 1024 * 5, // Limit file size to 5MB
+//   },
+// });
 
 // Route to get the total coins and cash for a user
 router.get("/:id", async (req, res) => {
@@ -38,10 +38,17 @@ router.get("/:id", async (req, res) => {
 
     coinsSnapshot.forEach((doc) => {
       const coinData = doc.data();
-      if (!coinData.lushioCash && coinData.isExpired && coinData.amountLeft <= 0) {
-        return; // Skip expired coins
+
+      // Count only if:
+      // 1. It's not a cash coin (lushioCash is false or undefined), AND
+      // 2. Either it's not expired (isExpired is false) OR it still has amount left (amountLeft > 0)
+      if (!coinData.lushioCash && !coinData.isExpired && coinData.amountLeft > 0) {
+        // console.log("Coin ID: ", doc.id);
+        // console.log("is Cash: ", !coinData.lushioCash);
+        // console.log("is Expired: ", coinData.isExpired);
+        // console.log("Amount Left: ", coinData.amountLeft);
+        lushioCoins += Number(coinData.amountLeft) || 0;
       }
-      lushioCoins += Number(coinData.amountLeft) || 0; // Add the amount from each document
     });
 
     const totalCredits = lushioCoins + lushioCash; // Sum of coins and cash
@@ -242,50 +249,50 @@ router.post("/consume", async (req, res) => {
 });
 
 // Process CSV or direct input into arrays of emails and phones
-async function extractContactInfo(recipients, fileBuffer) {
-  const contacts = [];
+// async function extractContactInfo(recipients, fileBuffer) {
+//   const contacts = [];
 
-  if (fileBuffer) {
-    return new Promise((resolve, reject) => {
-      csv.parse(fileBuffer.toString(), {
-        columns: true,
-        skip_empty_lines: true,
-      })
-          .on("data", (data) => {
-          // Each email/phone is a separate potential user
-            if (data.email) contacts.push(data.email.toLowerCase().trim());
-            if (data.phone) contacts.push(data.phone.trim());
-          })
-          .on("end", () => resolve(contacts))
-          .on("error", reject);
-    });
-  }
+//   if (fileBuffer) {
+//     return new Promise((resolve, reject) => {
+//       csv.parse(fileBuffer.toString(), {
+//         columns: true,
+//         skip_empty_lines: true,
+//       })
+//           .on("data", (data) => {
+//           // Each email/phone is a separate potential user
+//             if (data.email) contacts.push(data.email.toLowerCase().trim());
+//             if (data.phone) contacts.push(data.phone.trim());
+//           })
+//           .on("end", () => resolve(contacts))
+//           .on("error", reject);
+//     });
+//   }
 
-  // if (Array.isArray(recipients)) {
-  //   recipients.forEach((recipient) => {
-  //     if (recipient.email) contacts.push(recipient.email.toLowerCase().trim());
-  //     if (recipient.phone) contacts.push(recipient.phone.trim());
-  //   });
-  // }
-  if (Array.isArray(recipients)) {
-    recipients.forEach((recipient) => {
-      if (typeof recipient === "string") {
-        // Handle string recipient
-        if (recipient.includes("@")) {
-          contacts.push(recipient.toLowerCase().trim());
-        } else {
-          contacts.push(recipient.trim());
-        }
-      } else if (recipient && typeof recipient === "object") {
-        // Handle object recipient
-        if (recipient.email) contacts.push(recipient.email.toLowerCase().trim());
-        if (recipient.phone) contacts.push(recipient.phone.trim());
-      }
-    });
-  }
+//   // if (Array.isArray(recipients)) {
+//   //   recipients.forEach((recipient) => {
+//   //     if (recipient.email) contacts.push(recipient.email.toLowerCase().trim());
+//   //     if (recipient.phone) contacts.push(recipient.phone.trim());
+//   //   });
+//   // }
+//   if (Array.isArray(recipients)) {
+//     recipients.forEach((recipient) => {
+//       if (typeof recipient === "string") {
+//         // Handle string recipient
+//         if (recipient.includes("@")) {
+//           contacts.push(recipient.toLowerCase().trim());
+//         } else {
+//           contacts.push(recipient.trim());
+//         }
+//       } else if (recipient && typeof recipient === "object") {
+//         // Handle object recipient
+//         if (recipient.email) contacts.push(recipient.email.toLowerCase().trim());
+//         if (recipient.phone) contacts.push(recipient.phone.trim());
+//       }
+//     });
+//   }
 
-  return contacts;
-}
+//   return contacts;
+// }
 
 // Route to send coins to specific users
 router.post("/send-specific", async (req, res) => {

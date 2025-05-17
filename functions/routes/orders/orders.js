@@ -148,7 +148,7 @@ router.post("/createOrder", validateOrderRequest, async (req, res) => {
 
     // Get user details
     const userDoc = await db.collection("users").doc(uid).get();
-    const email = userDoc.exists ? userDoc.data().email : null;
+    const email = userDoc.exists && userDoc.data().email ? userDoc.data().email : "";
 
     const dateOfOrder = new Date();
 

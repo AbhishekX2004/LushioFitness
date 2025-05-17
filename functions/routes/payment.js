@@ -177,55 +177,52 @@ router.post("/status", async (req, res) => {
     res.status(500).json({error: "Internal Server Error"});
   }
 });
-router.post("/refund", async( req, res) =>{
-
+router.post("/refund", async ( req, res) =>{
   try {
-    const { transactionId, refundAmount, refundReason } = req.body;
+    const {transactionId, refundAmount, refundReason} = req.body;
     if (!transactionId || !refundAmount || !refundReason) {
-        return res.status(400).json({ error: 'transactionId, refundAmount, and refundReason are required.' });
+      return res.status(400).json({error: "transactionId, refundAmount, and refundReason are required."});
     }
-   
+
     // Generate a unique refund ID
     const refundId = `REF${transactionId}-${Date.now()}`;
     const payload = {
-        merchantId: PHONEPE_MERCHANT_ID,
-        transactionId,
-        refundId,
-        amount: refundAmount * 100, // Convert to paisa
-        reason: refundReason,
+      merchantId: PHONEPE_MERCHANT_ID,
+      transactionId,
+      refundId,
+      amount: refundAmount * 100, // Convert to paisa
+      reason: refundReason,
     };
 
     // Generate HMAC signature
     const payloadString = JSON.stringify(payload);
-    const salt = crypto.randomBytes(16).toString('hex');
+    const salt = crypto.randomBytes(16).toString("hex");
     const signature = crypto
-        .createHmac('sha256', PHONEPE_SALT_KEY + salt)
+        .createHmac("sha256", PHONEPE_SALT_KEY + salt)
         .update(payloadString)
-        .digest('hex');
+        .digest("hex");
 
-      
+
     // Make the refund request to PhonePe
     const options = {
-        method: 'post',
-        url: `${PHONEPE_URL}/v3/credit/backToSource`,
-        url: "https://mercury-uat.phonepe.com/enterprise-sandbox/v3/credit/backToSource",
-        headers: {
-            accept: 'text/plain',
-            'Content-Type': 'application/json',
-            'X-VERIFY': signature + '###' + salt,
-            'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
-        },
-        data: payload,
+      method: "post",
+      url: `${PHONEPE_URL}/v3/credit/backToSource`,
+      url: "https://mercury-uat.phonepe.com/enterprise-sandbox/v3/credit/backToSource",
+      headers: {
+        "accept": "text/plain",
+        "Content-Type": "application/json",
+        "X-VERIFY": signature + "###" + salt,
+        "X-MERCHANT-ID": PHONEPE_MERCHANT_ID,
+      },
+      data: payload,
     };
-   
+
     const response = await axios.request(options);
-  //  res.status(200).json({message: "Message"});
+    //  res.status(200).json({message: "Message"});
     res.status(200).json(response.data);
-} catch (error) {
-    console.error('Refund Error:', error);
-    res.status(500).json({ error: 'Refund failed. Please try again later.' });
-}
-
-
+  } catch (error) {
+    console.error("Refund Error:", error);
+    res.status(500).json({error: "Refund failed. Please try again later."});
+  }
 });
 module.exports = router;
