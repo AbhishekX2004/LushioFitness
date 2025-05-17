@@ -1,177 +1,187 @@
 .SendTokens-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  
-  .SendTokens-header {
-    margin-bottom: 30px;
-    border-bottom: 2px solid #f0f0f0;
-    padding-bottom: 15px;
-  }
-  
-  .SendTokens-header h1 {
-    color: #2c3e50;
-    margin-bottom: 5px;
-  }
-  
-  .SendTokens-header p {
-    color: #7f8c8d;
-    font-size: 16px;
-    margin: 0;
-  }
-  
-  .SendTokens-form {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 25px;
-  }
-  
-  .SendTokens-methodSelector {
-    margin-bottom: 25px;
-  }
-  
-  .SendTokens-methodSelector h2 {
-    font-size: 18px;
-    margin-bottom: 15px;
-    color: #2c3e50;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.SendTokens-header {
+  margin-bottom: 30px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 15px;
+}
+
+.SendTokens-header h1 {
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.SendTokens-header p {
+  color: #7f8c8d;
+  font-size: 16px;
+  margin: 0;
+}
+
+.SendTokens-form {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+}
+
+.SendTokens-methodSelector {
+  margin-bottom: 25px;
+}
+
+.SendTokens-methodSelector h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.SendTokens-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.SendTokens-methodButton {
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  color: #495057;
+}
+
+.SendTokens-methodButton:hover {
+  background-color: #e9ecef;
+}
+
+.SendTokens-methodButton.active {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.SendTokens-section {
+  margin-bottom: 25px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.SendTokens-section h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.SendTokens-option {
+  margin-bottom: 15px;
+}
+
+.SendTokens-option label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #495057;
+}
+
+.SendTokens-input, .SendTokens-textarea, .SendTokens-fileInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.SendTokens-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.SendTokens-dateFields {
+  display: flex;
+  gap: 15px;
+}
+
+.SendTokens-dateFields .SendTokens-option {
+  flex: 1;
+}
+
+.SendTokens-submitButton {
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.SendTokens-submitButton:hover {
+  background-color: #2ecc71;
+}
+
+.SendTokens-submitButton:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.SendTokens-response {
+  margin-top: 25px;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+.SendTokens-response.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.SendTokens-response.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.SendTokens-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.SendTokens-response pre {
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 10px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .SendTokens-dateFields {
+    flex-direction: column;
+    gap: 10px;
   }
   
   .SendTokens-methods {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
+    flex-direction: column;
   }
   
   .SendTokens-methodButton {
-    padding: 10px 15px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    color: #495057;
-  }
-  
-  .SendTokens-methodButton:hover {
-    background-color: #e9ecef;
-  }
-  
-  .SendTokens-methodButton.active {
-    background-color: #3498db;
-    color: white;
-    border-color: #3498db;
-  }
-  
-  .SendTokens-section {
-    margin-bottom: 25px;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 6px;
-  }
-  
-  .SendTokens-section h3 {
-    font-size: 16px;
-    margin-bottom: 15px;
-    color: #2c3e50;
-  }
-  
-  .SendTokens-option {
-    margin-bottom: 15px;
-  }
-  
-  .SendTokens-option label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #495057;
-  }
-  
-  .SendTokens-input, .SendTokens-textarea, .SendTokens-fileInput {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-  
-  .SendTokens-textarea {
-    min-height: 100px;
-    resize: vertical;
-  }
-  
-  .SendTokens-dateFields {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .SendTokens-dateFields .SendTokens-option {
-    flex: 1;
-  }
-  
-  .SendTokens-submitButton {
-    background-color: #27ae60;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
     width: 100%;
   }
-  
-  .SendTokens-submitButton:hover {
-    background-color: #2ecc71;
-  }
-  
-  .SendTokens-submitButton:disabled {
-    background-color: #95a5a6;
-    cursor: not-allowed;
-  }
-  
-  .SendTokens-response {
-    margin-top: 25px;
-    padding: 15px;
-    border-radius: 6px;
-  }
-  
-  .SendTokens-response.success {
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
-  }
-  
-  .SendTokens-response.error {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
-  }
-  
-  .SendTokens-response pre {
-    background-color: rgba(255, 255, 255, 0.5);
-    padding: 10px;
-    border-radius: 4px;
-    overflow-x: auto;
-    font-size: 13px;
-  }
-  
-  @media (max-width: 768px) {
-    .SendTokens-dateFields {
-      flex-direction: column;
-      gap: 10px;
-    }
-    
-    .SendTokens-methods {
-      flex-direction: column;
-    }
-    
-    .SendTokens-methodButton {
-      width: 100%;
-    }
-  }
+}

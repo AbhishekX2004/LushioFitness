@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
 // Components
@@ -43,6 +43,10 @@ import TermsAndConditions from "./pages/Policy/TermsAndConditions";
 import RefundPolicy from "./pages/Policy/RefundPolicy";
 import ShippingPolicy from "./pages/Policy/ShippingPolicy";
 
+// Miscellaneous
+import Maintenance from "./pages/Maintenance/Maintenance";
+import ServerError from "./pages/Maintenance/ServerError";
+
 // Category Components
 import CategoryPage from "./components/CategoryPage";
 
@@ -59,18 +63,28 @@ function App() {
   const [admin, setAdmin] = useState(null);
 
   useEffect(() => {
-    const fetchControls = async () => {
-      try {
-        const backendDoc = await getDoc(doc(db, "controls", "backend"));
-        const adminDoc = await getDoc(doc(db, "controls", "admin"));
-        setBackend(backendDoc.data().engine);
-        setAdmin(adminDoc.data().engine);
-      } catch (error) {
-        console.error("Error fetching control values:", error);
+    // Setup realtime listener for admin engine control using Firestore
+    const adminDocRef = doc(db, "controls", "admin");
+    const unsubscribeAdmin = onSnapshot(adminDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setAdmin(docSnap.data().engine);
       }
+    });
+
+    // Setup realtime listener for backend engine control
+    const backendDocRef = doc(db, "controls", "backend");
+    const unsubscribeBackend = onSnapshot(backendDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setBackend(docSnap.data().engine);
+      }
+    });
+
+    // Clean up listeners when component unmounts
+    return () => {
+      unsubscribeAdmin();
+      unsubscribeBackend();
     };
-    fetchControls();
-  }, [backend, admin]);
+  }, []);
 
   if (backend === null || admin === null) {
     return <div className="loader-container"> <span className="loader"></span></div>;
@@ -82,7 +96,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/backendAnalytics" element={<BackendAnalytics />} />
-            <Route path="*" element={<div>Server is not responding</div>} />
+            <Route path="*" element={<ServerError />} />
           </Routes>
         </BrowserRouter>
       );
@@ -90,70 +104,70 @@ function App() {
 
     return (
       <>
-       <BrowserRouter>
-  <Navbar />
-  <ScrollToTop />
-  <Routes>
-    {/* Home and Categories */}
-    <Route path="/" element={<Home />} />
-    <Route path="/:category/:subCategory" element={<CategoryPage />} />
-    <Route path="/men" element={<ShopCategory banner={men_banner} category="men" />} />
-    <Route path="/women" element={<ShopCategory banner={women_banner} category="women" />} />
-    <Route path="/accessories" element={<ShopCategory banner={accessories_banner} category="accessories" />} />
-    <Route path="/search" element={<Search/>}/>
-    <Route path="/about" element={<About/>}/>
-    <Route path="/contact" element={<Contact/>}/>
-    
-    {/* Authentication */}
-    <Route path="/register" element={<Register />} />
-    <Route path="/login" element={<Login />} />
-    <Route path="/finishSignIn" element={<FinishEmailSignUp />} />
-    
-    {/* Product Details */}
-    <Route path="/product/:productID" element={<ProductDisplay />} />
-    
-    {/* Cart and Wishlist */}
-    <Route path="/cart" element={<Cart />} />
-    <Route path="/wishlist" element={<WishList />} />
-    
-    {/* User Section */}
-    <Route path="/user" element={<User />} />
-    <Route path="/user-editProfile" element={<EditProfile />} />
-    <Route path="/user/orders" element={<Orders />} />
-    <Route path="/user-address" element={<Address />} />
-    <Route path="/user-referAndEarn" element={<ReferAndEarn />} />
-    
-    {/* Wallet and Orders */}
-    <Route path="/wallet" element={<Wallet />} />
-    <Route path="/orderInfo/:orderId" element={<OrderInfo />} />
-    <Route path="/buyNow" element={<BuyNow />} />
-    
-    {/* Policies */}
-    <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
-    <Route path="/termAndConditions" element={<TermsAndConditions />} />
-    <Route path="/refundPolicy" element={<RefundPolicy />} />
-    <Route path="/shippingPolicy" element={<ShippingPolicy />} />
-    
-    {/* Payment Status */}
-    <Route path="/paymentStatus" element={<PaymentSuccess />} />
-    <Route path="/paymentFailed" element={<PaymentFailed />} />
-    
-    {/* Admin Panel */}
-    <Route path="/lushioGods" element={<AdminPanel />} />
-  </Routes>
-  <Footer />
-</BrowserRouter>
+        <BrowserRouter>
+          <Navbar />
+          <ScrollToTop />
+          <Routes>
+            {/* Home and Categories */}
+            <Route path="/" element={<Home />} />
+            <Route path="/:category/:subCategory" element={<CategoryPage />} />
+            <Route path="/men" element={<ShopCategory banner={men_banner} category="men" />} />
+            <Route path="/women" element={<ShopCategory banner={women_banner} category="women" />} />
+            <Route path="/accessories" element={<ShopCategory banner={accessories_banner} category="accessories" />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
 
-           
+            {/* Authentication */}
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/finishSignIn" element={<FinishEmailSignUp />} />
+
+            {/* Product Details */}
+            <Route path="/product/:productID" element={<ProductDisplay />} />
+
+            {/* Cart and Wishlist */}
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/wishlist" element={<WishList />} />
+
+            {/* User Section */}
+            <Route path="/user" element={<User />} />
+            <Route path="/user-editProfile" element={<EditProfile />} />
+            <Route path="/user/orders" element={<Orders />} />
+            <Route path="/user-address" element={<Address />} />
+            <Route path="/user-referAndEarn" element={<ReferAndEarn />} />
+
+            {/* Wallet and Orders */}
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/orderInfo/:orderId" element={<OrderInfo />} />
+            <Route path="/buyNow" element={<BuyNow />} />
+
+            {/* Policies */}
+            <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
+            <Route path="/termAndConditions" element={<TermsAndConditions />} />
+            <Route path="/refundPolicy" element={<RefundPolicy />} />
+            <Route path="/shippingPolicy" element={<ShippingPolicy />} />
+
+            {/* Payment Status */}
+            <Route path="/paymentStatus" element={<PaymentSuccess />} />
+            <Route path="/paymentFailed" element={<PaymentFailed />} />
+
+            {/* Admin Panel */}
+            <Route path="/lushioGods" element={<AdminPanel />} />
+          </Routes>
+          <Footer />
+        </BrowserRouter>
+
+
       </>
     );
   }
-    
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/lushioGods" element={<AdminPanel />} />
-        <Route path="*" element={<div>Site under maintenance</div>} />
+        <Route path="*" element={<Maintenance/>} />
       </Routes>
     </BrowserRouter>
   );

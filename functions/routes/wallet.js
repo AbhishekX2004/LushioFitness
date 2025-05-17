@@ -288,45 +288,48 @@ async function extractContactInfo(recipients, fileBuffer) {
 }
 
 // Route to send coins to specific users
-router.post("/send-specific", upload.single("recipientsFile"), async (req, res) => {
+router.post("/send-specific", async (req, res) => {
   try {
     const {recipients, amount, days, message} = req.body;
-    console.log(req.body);
-    const fileBuffer = req.file?.buffer;
 
-    if ((!recipients && !req.file) || !amount || !days || !message) {
+    if (!recipients || !amount || !days || !message) {
       return res.status(400).json({error: "Missing required parameters"});
     }
 
-    // Get all contact information
-    const contacts = await extractContactInfo(
-        // recipients ? JSON.parse(recipients) : null,
-        recipients || null,
-        fileBuffer,
-    );
+    // Ensure recipients is an array
+    let recipientsArray = [];
+    if (Array.isArray(recipients)) {
+      recipientsArray = recipients;
+    } else if (typeof recipients === "string") {
+      // Handle comma-separated string
+      recipientsArray = recipients.split(",").map((item) => item.trim()).filter((item) => item);
+    }
 
-    if (contacts.length === 0) {
+    if (recipientsArray.length === 0) {
       return res.status(400).json({error: "No valid contacts provided"});
     }
 
     // Find users matching any of the contacts
     const uniqueUsers = new Map();
+    const batchSize = 10; // Firestore "in" query limitation
 
-    // Search for each contact as either email or phone
-    const emailQuery = db.collection("users").where("email", "in", contacts);
-    const phoneQuery = db.collection("users").where("phoneNumber", "in", contacts);
+    // Process recipients in batches to avoid "in" query limitations
+    for (let i = 0; i < recipientsArray.length; i += batchSize) {
+      const batch = recipientsArray.slice(i, i + batchSize);
 
-    const [emailUsers, phoneUsers] = await Promise.all([
-      emailQuery.get(),
-      phoneQuery.get(),
-    ]);
+      // Search for each contact as either email or phone
+      const [emailUsers, phoneUsers] = await Promise.all([
+        db.collection("users").where("email", "in", batch).get(),
+        db.collection("users").where("phoneNumber", "in", batch).get(),
+      ]);
 
-    // Combine results, preventing duplicates
-    [...emailUsers.docs, ...phoneUsers.docs].forEach((doc) => {
-      if (!uniqueUsers.has(doc.id)) {
-        uniqueUsers.set(doc.id, doc);
-      }
-    });
+      // Combine results, preventing duplicates
+      [...emailUsers.docs, ...phoneUsers.docs].forEach((doc) => {
+        if (!uniqueUsers.has(doc.id)) {
+          uniqueUsers.set(doc.id, doc);
+        }
+      });
+    }
 
     // Prepare batch write
     const batch = db.batch();
@@ -354,7 +357,7 @@ router.post("/send-specific", upload.single("recipientsFile"), async (req, res) 
 
     res.status(200).json({
       success: true,
-      totalContactsProvided: contacts.length,
+      totalContactsProvided: recipientsArray.length,
       uniqueUsersFound: uniqueUsers.size,
     });
   } catch (error) {
@@ -565,21 +568,3 @@ router.post("/send-to-orders", async (req, res) => {
 });
 
 module.exports = router;
-/*
-  ***********
-  ** TODOS **
-  ***********
-  *** Route to send coins to users who ordered between a specific date range
-  ** Logic - get all the orders between the date range and get the users from the orders and send coins to them.
-              (order should not be a cancelled order and return period should have ended.)
-              cancellationDate should not exist or be null
-              returnExchangeExpiresOn -> How is this field comming since we dont get a realtime update of delivery from shiprocket.
-  * Request body should contain the following:
-  * - startDate: The start date of the range
-  * - endDate: The end date of the range
-  * - amount: The amount of coins to send
-  * - days: The number of days until the coins expire
-  * - message: The message to attach to the coins
-*/
-
-
