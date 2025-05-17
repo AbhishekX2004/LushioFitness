@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 
 const getMediaType = (src) => {
- 
+ // console.log(src);
+  if (!src || typeof src !== 'string') return 'unknown';
   const imageExtensions = ['jpg', 'jpeg','avif', 'png', 'gif', 'webp', 'svg', 'bmp', 'tiff'];
   const videoExtensions = ['mp4', 'webm', 'ogg', 'avi', 'mov', 'mkv', 'flv', 'wmv'];
   const extension = src.split('?')[0].split('.').pop().toLowerCase();

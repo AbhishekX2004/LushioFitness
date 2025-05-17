@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./cartitems.css";
 import CartRow from "./CartRow";
 import EmptyCart from "./EmptyCart";
-import PaymentMethod from "./PaymentMethod";
+//import PaymentMethod from "./PaymentMethod";
 import axios from "axios";
 import { UserContext } from "../../components/context/UserContext";
 import { useWishlist } from "../../components/context/WishlistContext";
@@ -388,10 +388,32 @@ const getTotalForCOD = () => {
       });
       setIsActive(false);
   };
- 
+ const sendEmail = async(oid) => {
+  try {
+    const payload = {
+      email: user.email,
+      name : orderDetails.address.name || "User",
+      type: "order",
+      orderId: oid,
+    //  address: orderDetails.email,
+      items: orderDetails.orderedProducts,
+     // item: items[0]?.name || '', // fallback for 'cancel' single item
+    };
+
+    await axios.post(`${process.env.REACT_APP_API_URL}/sendEmail`, payload);
+   
+  } catch (err) {
+    console.error('Error:', err);
+   
+  }
+ }
   const createOrder = async () => {
     try {
-      console.log(orderDetails)
+      console.log(orderDetails.orderedProducts);
+      // if(1){
+      //   console.log(orderDetails.address.name);
+      //   return;
+      // }
       setIsActive(true);
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/orders/createOrder`,
@@ -405,6 +427,9 @@ const getTotalForCOD = () => {
       // Wait for 4 seconds before closing the success state
       await deleteCartItems();
   await new Promise((resolve) => setTimeout(resolve, 2000));
+  if(response.status===200 && user.email){
+await sendEmail(response.data.orderId);
+  }
   setSuccessOpen(false);
      
     } catch (error) {
@@ -500,7 +525,7 @@ fetchCartCount();
   )}
   <PlaceOrder />
 </div>
-
+{/* <button onClick={()=>sendEmail("123456")}> Click Me</button> */}
       {/* <button onClick={()=>handleSubmit()}>submit </button> */}
       <Success successOpen={successOpen} setSuccessOpen={setSuccessOpen} />
       <div className="cartitems">

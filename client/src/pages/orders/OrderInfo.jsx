@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { toast } from 'react-toastify'; 
 import { useParams } from "react-router-dom";
 import { UserContext } from "../../components/context/UserContext";
 import "./orderinfo.css";
+import TrackingDetails from "./Tracking/TrackingDetails";
 import InvoicePreview from "./InvoicePreview";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
@@ -23,6 +25,7 @@ function OrderInfo() {
   const { orderId } = useParams();
   const { user } = useContext(UserContext);
   const [orderDetails, setOrderDetails] = useState(null);
+  const [trackingData, setTrackingData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [canReturn,setCanReturn] = useState(true);
   const steps = ["Order Placed", "Shipped", "Out for Delivery", "Delivered"];
@@ -62,7 +65,7 @@ function OrderInfo() {
       } finally {
         setLoading(false);
       }
-    };
+    }; 
   
     fetchData();
   }, [orderId]);
@@ -164,7 +167,8 @@ function OrderInfo() {
       {/* <h1>Download Invoice</h1> */}
       {/* <InvoiceForm invoiceData={invoiceData} setInvoiceData={setInvoiceData} /> */}
       <InvoicePreview data={invoiceData} />
-     
+      <TrackingDetails oid="mUmJTgrZ1nu2lCvH5GAw" uid="WUMRFsuouMTVX802XL80kDSDMiP2" />
+
       <ReturnExchangeNotice/>
       <OrderedProducts orderedProducts={orderDetails?.orderedProducts || []} canReturn={canReturn} orderId={orderId}/>
 
@@ -203,7 +207,8 @@ function OrderInfo() {
           <FaChevronRight />
         </div>
       </div>
-   
+      {/* <OrderTrackingTimeline trackingData={trackingData} /> */}
+  
         {/*  <ReturnExchange/> */}
       <div className="order-price-details-container">
         <h2 className="order-price-details-heading">Order Details</h2>

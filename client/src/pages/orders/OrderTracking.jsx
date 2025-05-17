@@ -1,4 +1,6 @@
 import React from "react";
+import axios from 'axios';
+import { toast } from 'react-toastify'; 
 import {
   Box,
   Typography,
@@ -16,6 +18,8 @@ import {
 } from "@mui/icons-material";
 
 const OrderTracking = ({ status }) => {
+
+ 
   const stages = [
     { label: "Order Placed", icon: <CartIcon />, key: "Order Placed" },
     { label: "Order Confirmed", icon: <CheckCircleIcon />, key: "Order Confirmed" },
@@ -27,6 +31,7 @@ const OrderTracking = ({ status }) => {
   const isCancelled = status === "Cancelled";
 
   return (
+    <>
     <Box
       sx={{
         maxWidth: 400,
@@ -59,6 +64,7 @@ const OrderTracking = ({ status }) => {
 
           return (
             <Step key={stage.key}>
+             
               <StepLabel
                 StepIconComponent={() => (
                   <Avatar
@@ -123,6 +129,7 @@ const OrderTracking = ({ status }) => {
         })}
       </Stepper>
     </Box>
+  </>
   );
 };
 

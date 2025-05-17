@@ -1,12 +1,12 @@
-import React, { useContext,useState } from "react";
+import React, { useState } from "react";
 import "./footer.css";
 import { HashLink as Link } from "react-router-hash-link";
-import { UserContext } from "./context/UserContext";
+//import { UserContext } from "./context/UserContext";
 import axios from "axios";
 
 export default function Footer() {
 
-const { user } = useContext(UserContext);
+//const { user } = useContext(UserContext);
 const [email, setEmail] = useState(''); 
 const [message, setMessage] = useState(''); 
 const handleEmailChange = (e) => { 
