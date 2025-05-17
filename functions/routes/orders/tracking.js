@@ -7,7 +7,7 @@ const router = express.Router();
 const {getFirestore} = require("firebase-admin/firestore");
 const db = getFirestore();
 const {generateToken, destroyToken} = require("./shiprocketAuth");
-const getStatusDescription = require("./statusDescription");
+const {getStatusDescription} = require("./statusDescription");
 // const logger = require("firebase-functions/logger");
 
 // URLs

@@ -574,4 +574,68 @@ router.post("/send-to-orders", async (req, res) => {
   }
 });
 
+// Route to add cash to a user's account
+router.post("/addCash", async (req, res) => {
+  try {
+    const {uid, amount, message} = req.body;
+
+    // Input validation
+    if (!uid || !amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: uid and amount are required",
+      });
+    }
+
+    // Validate amount is a number
+    const numericAmount = Number(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Amount must be a positive number",
+      });
+    }
+
+    // Start a transaction to ensure data consistency
+    await db.runTransaction(async (transaction) => {
+      // Get user document reference
+      const userRef = db.collection("users").doc(uid);
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists) {
+        throw new Error("User not found");
+      }
+
+      const userData = userDoc.data();
+      const currentCash = userData.lushioCash || 0;
+
+      // Update user's lushioCash by adding the new amount
+      transaction.update(userRef, {
+        lushioCash: currentCash + numericAmount,
+      });
+
+      // Create a new document in coins subcollection for lushioCash credit
+      const lushioCashCreditRef = userRef.collection("coins").doc();
+      transaction.create(lushioCashCreditRef, {
+        lushioCash: true,
+        cashCredited: numericAmount,
+        message: message || "Cash credited to your account.",
+        createdAt: new Date(),
+      });
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully added ${numericAmount} cash to user ${uid}`,
+      amountAdded: numericAmount,
+    });
+  } catch (error) {
+    logger.error("Error adding cash:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Error processing cash addition",
+    });
+  }
+});
+
 module.exports = router;
