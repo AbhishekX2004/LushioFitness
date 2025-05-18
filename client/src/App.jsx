@@ -1,6 +1,8 @@
+
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
+import axios from "axios";
 import { db } from "./firebaseConfig";
 
 // Components
@@ -61,8 +63,24 @@ import "./App.css";
 function App() {
   const [backend, setBackend] = useState(null);
   const [admin, setAdmin] = useState(null);
+  const [backendHealthCheck, setBackendHealthCheck] = useState(true); // Default to true until proven otherwise
+  const API = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
+    // Check if backend API is reachable
+    const checkBackendHealth = async () => {
+      try {
+        const response = await axios.get(`${API}/helloWorld`, { timeout: 5000 });
+        setBackendHealthCheck(response.status === 200);
+      } catch (error) {
+        console.error("Backend health check failed:", error);
+        setBackendHealthCheck(false);
+      }
+    };
+
+    // Perform backend health check
+    checkBackendHealth();
+
     // Setup realtime listener for admin engine control using Firestore
     const adminDocRef = doc(db, "controls", "admin");
     const unsubscribeAdmin = onSnapshot(adminDocRef, (docSnap) => {
@@ -84,14 +102,18 @@ function App() {
       unsubscribeAdmin();
       unsubscribeBackend();
     };
-  }, []);
+  }, [API]);
 
+  // Show loading state while initial checks are in progress
   if (backend === null || admin === null) {
     return <div className="loader-container"> <span className="loader"></span></div>;
   }
 
+  // Determine if backend is truly available based on both Firestore flag and API health check
+  const isBackendAvailable = backend && backendHealthCheck;
+
   if (admin) {
-    if (!backend) {
+    if (!isBackendAvailable) {
       return (
         <BrowserRouter>
           <Routes>
@@ -157,8 +179,6 @@ function App() {
           </Routes>
           <Footer />
         </BrowserRouter>
-
-
       </>
     );
   }
