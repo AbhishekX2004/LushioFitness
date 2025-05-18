@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSwipeable } from "react-swipeable";
 import MediaRenderer from "../../components/MediaRenderer";
+import URLMediaRenderer from "../../components/URLMediaRenderer";
 import "./Home.css";
 
 function Carousel({ images }) {
   const [current, setCurrent] = useState(0);
   const timeOutRef = useRef(null);
-
+console.log(images);
   // Slide right logic
   const slideRight = useCallback(() => {
     setCurrent((prev) => (prev === images.length - 1 ? 0 : prev + 1));
@@ -59,8 +60,8 @@ function Carousel({ images }) {
                 : "carousel_card"
             }
           >
-           
-              <MediaRenderer src={image.image}/>
+            <URLMediaRenderer src={image}  className="media-preview" />
+              {/* <MediaRenderer src={image.image}/> */}
           </div>
         ))}
         {images.length > 1 && (

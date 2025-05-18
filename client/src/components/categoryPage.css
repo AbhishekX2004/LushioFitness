@@ -1,3 +1,8 @@
+.category-page{
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+}
 .products-grid{
   display: grid;
   justify-items: center;

@@ -36,6 +36,7 @@ const CartRow = ({
     : item.product.quantities[item.color]?.[item.size];
   const inStock = quantityAvailable > 0;
   const canPurchase = quantityAvailable >= item?.quantity;
+const displayQuantity = item.quantity > quantityAvailable ? quantityAvailable : item.quantity;
 
   // Wishlist Item and Color Hex
   const wishlistItem = wishlist.find((e) => e.productId === item.product.id);
@@ -187,7 +188,7 @@ const CartRow = ({
                     className="itemComponents-base-quantity"
                     onClick={() => handlePopUpOneOpen(item)}
                   >
-                    <span className="">Qty: {item.quantity}</span>
+                    <span className="">Qty: {displayQuantity}</span>
                     <img src="/Images/icons/quantityDropdown.svg" alt="" />
                   </div>
                 </div>

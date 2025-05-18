@@ -12,6 +12,7 @@ const logger = require("firebase-functions/logger");
 const PHONEPE_SALT_KEY = process.env.PHONEPE_SALT_KEY;
 const PHONEPE_MERCHANT_ID = process.env.PHONEPE_MERCHANT_ID;
 const PHONEPE_URL = process.env.PHONEPE_API_URL;
+const PHONEPE_REFUND_URL = process.env.PHONEPE_REFUND_URL
 const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL;
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -187,7 +188,7 @@ router.post("/refund", async( req, res) =>{
    
     // Generate a unique refund ID
     const refundId = `REF${transactionId}-${Date.now()}`;
-    const payload = {
+    const payloadData = {
         merchantId: PHONEPE_MERCHANT_ID,
         transactionId,
         refundId,
@@ -195,27 +196,30 @@ router.post("/refund", async( req, res) =>{
         reason: refundReason,
     };
 
-    // Generate HMAC signature
-    const payloadString = JSON.stringify(payload);
-    const salt = crypto.randomBytes(16).toString('hex');
-    const signature = crypto
-        .createHmac('sha256', PHONEPE_SALT_KEY + salt)
-        .update(payloadString)
-        .digest('hex');
+        const KeyIndex = 1;
 
+    // Base64 encode the payload
+    const payload = JSON.stringify(payloadData);
+    const payloadMain = Buffer.from(payload).toString("base64");
+
+    // Generate X-VERIFY checksum
+    const string = payloadMain + "/v3/credit/backToSource" + PHONEPE_SALT_KEY;
+    const sha256 = crypto.createHash("sha256").update(string).digest("hex");
+
+    const checksum = sha256 + "###" + KeyIndex;
       
     // Make the refund request to PhonePe
     const options = {
         method: 'post',
-        url: `${PHONEPE_URL}/v3/credit/backToSource`,
-        url: "https://mercury-uat.phonepe.com/enterprise-sandbox/v3/credit/backToSource",
+       
+    url: `${PHONEPE_URL}/v3/credit/backToSource`,
         headers: {
             accept: 'text/plain',
             'Content-Type': 'application/json',
-            'X-VERIFY': signature + '###' + salt,
+            'X-VERIFY': checksum,
             'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
         },
-        data: payload,
+        data: payloadMain,
     };
    
     const response = await axios.request(options);
