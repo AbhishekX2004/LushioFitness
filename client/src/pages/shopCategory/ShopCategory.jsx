@@ -51,7 +51,7 @@ const fetchProducts = async (reset = false) => {
     const response = await axios.get( `${process.env.REACT_APP_API_URL}/filters/${props.category}`, {
       params: {
         lastDocId: reset ? null : lastDocId,
-        limit: 20,
+        limit: 25,
       },
     });
 
@@ -168,10 +168,10 @@ if (color.length > 0) {
     let fpCopy = filterProducts.slice();
     switch (sortType) {
       case "low-high":
-        setFilterProducts([...fpCopy].sort((a, b) => a.price - b.price));
+        setFilterProducts([...fpCopy].sort((a, b) => a.discountedPrice - b.discountedPrice));
         break;
       case "high-low":
-        setFilterProducts([...fpCopy].sort((a, b) => b.price - a.price));
+        setFilterProducts([...fpCopy].sort((a, b) => b.discountedPrice - a.discountedPrice));
         break;
       case "rating":
         setFilterProducts([...fpCopy].sort((a, b) => b.rating - a.rating));

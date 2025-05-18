@@ -29,7 +29,7 @@ function Coupon({ setDiscount, cartAmount, setCouponApplied }) {
       const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/coupon/usableCoupons/${user.uid}`, {
         params: {
           lastDocId,
-          limit: 6, // Fetch 10 coupons per page
+          limit: 10, // Fetch 10 coupons per page
         },
       });
   

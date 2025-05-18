@@ -8,16 +8,31 @@ function Search({searchRef, closeSearch}) {
   const handleSearchChange = (e) => {
     setSearchText(e.target.value);
   };
+const handleSearch = (e) => {
+  if (e.key === "Enter" && searchText.trim()) {
+    const trimmedText = searchText.trim().toLowerCase();
 
-  const handleSearch = (e) => {
-    // If Enter key is pressed, initiate search
-    if (e.key === "Enter" && searchText.trim()) {
-      
-      navigate(`/search?query=${encodeURIComponent(searchText.trim())}`);
-      setSearchText("");
-    closeSearch();
+    // Check for specific categories
+    if (["men", "women", "accessories"].includes(trimmedText)) {
+      navigate(`/${trimmedText}`);
+    } else {
+      navigate(`/search?query=${encodeURIComponent(trimmedText)}`);
     }
-  };
+
+    setSearchText("");
+    closeSearch();
+  }
+};
+
+  // const handleSearch = (e) => {
+  //   // If Enter key is pressed, initiate search
+  //   if (e.key === "Enter" && searchText.trim()) {
+      
+  //     navigate(`/search?query=${encodeURIComponent(searchText.trim())}`);
+  //     setSearchText("");
+  //   closeSearch();
+  //   }
+  // };
 
   const closeSearchBox = () => {
     setSearchText("");

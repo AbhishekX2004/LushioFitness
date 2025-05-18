@@ -49,6 +49,7 @@ const [cartAddress, setCartAddress] = useState(null);
 const [open, setOpen] = useState(false);
 const [successOpen, setSuccessOpen] = useState(false);
 const [showNotification, setShowNotification] = useState(false);
+const [showNotification1, setShowNotification1] = useState(false);
 const [isActive, setIsActive] = useState(false);
 const [loading, setLoading] = useState(false);
 
@@ -445,6 +446,11 @@ await sendEmail(response.data.orderId);
       setTimeout(() => setShowNotification(false), 3000);
       return;
     }
+     if (getTotalWithWalletAndDiscount().total<=0) {
+      setShowNotification1(true);
+      setTimeout(() => setShowNotification1(false), 3000);
+      return;
+    }
     if (selectedPaymentMethod === "phonepe") {
       await handlePayment();
      // await createOrder();
@@ -492,6 +498,14 @@ fetchCartCount();
         <div className="notification-container">
    <div className="cart-notification" style={{ aspectRatio: 180 / 25 }}>
           Select Address to Proceed
+        </div>
+        </div>
+     
+      )}
+       {showNotification1 && (
+        <div className="notification-container">
+   <div className="cart-notification amount-notification" style={{ aspectRatio: 180 / 25 }}>
+         Amount Must be greater than zero
         </div>
         </div>
      

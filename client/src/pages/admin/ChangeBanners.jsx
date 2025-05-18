@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, storage } from '../../firebaseConfig';
+import URLMedia from '../../components/URLMediaRenderer';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
@@ -287,7 +288,7 @@ const ChangeBanners = () => {
         <div className="ChangeBanners-carousel-preview">
           {carouselBanners.map((banner, index) => (
             <div key={banner.id || index} className="ChangeBanners-image-container">
-              <img src={banner.url} alt={`Carousel banner ${index + 1}`} />
+               <URLMedia src={banner.url} className="media-preview" />
               <button 
                 className="ChangeBanners-remove-btn" 
                 onClick={() => handleRemoveCarouselImage(index)}
@@ -302,7 +303,7 @@ const ChangeBanners = () => {
             Add New Banner
             <input
               type="file"
-              accept="image/*"
+               accept="image/*,video/*"
               multiple
               onChange={handleCarouselImageUpload}
               disabled={uploading}
