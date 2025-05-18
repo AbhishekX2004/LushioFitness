@@ -4,18 +4,18 @@
 const express = require("express");
 const {getFirestore} = require("firebase-admin/firestore");
 const db = getFirestore();
-const multer = require("multer");
-const csv = require("csv-parse");
+// const multer = require("multer");
+// const csv = require("csv-parse");
 const router = express.Router();
 const logger = require("firebase-functions/logger");
 
 // Configure multer for file upload
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 1024 * 1024 * 5, // Limit file size to 5MB
-  },
-});
+// const upload = multer({
+//   storage: multer.memoryStorage(),
+//   limits: {
+//     fileSize: 1024 * 1024 * 5, // Limit file size to 5MB
+//   },
+// });
 
 // Route to get the total coins and cash for a user
 router.get("/:id", async (req, res) => {
@@ -38,10 +38,17 @@ router.get("/:id", async (req, res) => {
 
     coinsSnapshot.forEach((doc) => {
       const coinData = doc.data();
-      if (!coinData.lushioCash && coinData.isExpired && coinData.amountLeft <= 0) {
-        return; // Skip expired coins
+
+      // Count only if:
+      // 1. It's not a cash coin (lushioCash is false or undefined), AND
+      // 2. Either it's not expired (isExpired is false) OR it still has amount left (amountLeft > 0)
+      if (!coinData.lushioCash && !coinData.isExpired && coinData.amountLeft > 0) {
+        // console.log("Coin ID: ", doc.id);
+        // console.log("is Cash: ", !coinData.lushioCash);
+        // console.log("is Expired: ", coinData.isExpired);
+        // console.log("Amount Left: ", coinData.amountLeft);
+        lushioCoins += Number(coinData.amountLeft) || 0;
       }
-      lushioCoins += Number(coinData.amountLeft) || 0; // Add the amount from each document
     });
 
     const totalCredits = lushioCoins + lushioCash; // Sum of coins and cash
@@ -242,50 +249,50 @@ router.post("/consume", async (req, res) => {
 });
 
 // Process CSV or direct input into arrays of emails and phones
-async function extractContactInfo(recipients, fileBuffer) {
-  const contacts = [];
+// async function extractContactInfo(recipients, fileBuffer) {
+//   const contacts = [];
 
-  if (fileBuffer) {
-    return new Promise((resolve, reject) => {
-      csv.parse(fileBuffer.toString(), {
-        columns: true,
-        skip_empty_lines: true,
-      })
-          .on("data", (data) => {
-          // Each email/phone is a separate potential user
-            if (data.email) contacts.push(data.email.toLowerCase().trim());
-            if (data.phone) contacts.push(data.phone.trim());
-          })
-          .on("end", () => resolve(contacts))
-          .on("error", reject);
-    });
-  }
+//   if (fileBuffer) {
+//     return new Promise((resolve, reject) => {
+//       csv.parse(fileBuffer.toString(), {
+//         columns: true,
+//         skip_empty_lines: true,
+//       })
+//           .on("data", (data) => {
+//           // Each email/phone is a separate potential user
+//             if (data.email) contacts.push(data.email.toLowerCase().trim());
+//             if (data.phone) contacts.push(data.phone.trim());
+//           })
+//           .on("end", () => resolve(contacts))
+//           .on("error", reject);
+//     });
+//   }
 
-  // if (Array.isArray(recipients)) {
-  //   recipients.forEach((recipient) => {
-  //     if (recipient.email) contacts.push(recipient.email.toLowerCase().trim());
-  //     if (recipient.phone) contacts.push(recipient.phone.trim());
-  //   });
-  // }
-  if (Array.isArray(recipients)) {
-    recipients.forEach((recipient) => {
-      if (typeof recipient === "string") {
-        // Handle string recipient
-        if (recipient.includes("@")) {
-          contacts.push(recipient.toLowerCase().trim());
-        } else {
-          contacts.push(recipient.trim());
-        }
-      } else if (recipient && typeof recipient === "object") {
-        // Handle object recipient
-        if (recipient.email) contacts.push(recipient.email.toLowerCase().trim());
-        if (recipient.phone) contacts.push(recipient.phone.trim());
-      }
-    });
-  }
+//   // if (Array.isArray(recipients)) {
+//   //   recipients.forEach((recipient) => {
+//   //     if (recipient.email) contacts.push(recipient.email.toLowerCase().trim());
+//   //     if (recipient.phone) contacts.push(recipient.phone.trim());
+//   //   });
+//   // }
+//   if (Array.isArray(recipients)) {
+//     recipients.forEach((recipient) => {
+//       if (typeof recipient === "string") {
+//         // Handle string recipient
+//         if (recipient.includes("@")) {
+//           contacts.push(recipient.toLowerCase().trim());
+//         } else {
+//           contacts.push(recipient.trim());
+//         }
+//       } else if (recipient && typeof recipient === "object") {
+//         // Handle object recipient
+//         if (recipient.email) contacts.push(recipient.email.toLowerCase().trim());
+//         if (recipient.phone) contacts.push(recipient.phone.trim());
+//       }
+//     });
+//   }
 
-  return contacts;
-}
+//   return contacts;
+// }
 
 // Route to send coins to specific users
 router.post("/send-specific", async (req, res) => {
@@ -563,6 +570,70 @@ router.post("/send-to-orders", async (req, res) => {
       error: "Internal server error",
       details: error.message,
       code: error.code,
+    });
+  }
+});
+
+// Route to add cash to a user's account
+router.post("/addCash", async (req, res) => {
+  try {
+    const {uid, amount, message} = req.body;
+
+    // Input validation
+    if (!uid || !amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: uid and amount are required",
+      });
+    }
+
+    // Validate amount is a number
+    const numericAmount = Number(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Amount must be a positive number",
+      });
+    }
+
+    // Start a transaction to ensure data consistency
+    await db.runTransaction(async (transaction) => {
+      // Get user document reference
+      const userRef = db.collection("users").doc(uid);
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists) {
+        throw new Error("User not found");
+      }
+
+      const userData = userDoc.data();
+      const currentCash = userData.lushioCash || 0;
+
+      // Update user's lushioCash by adding the new amount
+      transaction.update(userRef, {
+        lushioCash: currentCash + numericAmount,
+      });
+
+      // Create a new document in coins subcollection for lushioCash credit
+      const lushioCashCreditRef = userRef.collection("coins").doc();
+      transaction.create(lushioCashCreditRef, {
+        lushioCash: true,
+        cashCredited: numericAmount,
+        message: message || "Cash credited to your account.",
+        createdAt: new Date(),
+      });
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully added ${numericAmount} cash to user ${uid}`,
+      amountAdded: numericAmount,
+    });
+  } catch (error) {
+    logger.error("Error adding cash:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Error processing cash addition",
     });
   }
 });

@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 /* eslint-disable new-cap */
 /* eslint-disable max-len */
 const express = require("express");
@@ -48,21 +49,22 @@ function generateTableForRE(items) {
   `;
 }
 
-router.post('/', async (req, res) => {
-  const { email, type, orderId, name, item, items, address } = req.body;
+router.post("/", async (req, res) => {
+  // eslint-disable-next-line no-unused-vars
+  const {email, type, orderId, name, item, items, address} = req.body;
 
   if (!email || !type || !name) {
     return res.status(400).json({message: "Required fields missing"});
   }
 
-  let subject = '';
-  let htmlContent = '';
+  let subject = "";
+  let htmlContent = "";
 
   const generateTable = (itemsArray) => {
-    if (!Array.isArray(itemsArray) || itemsArray.length === 0) return '';
+    if (!Array.isArray(itemsArray) || itemsArray.length === 0) return "";
 
     const rows = itemsArray.map(
-      ({ productName, quantity, size, color,heightType }) => `
+        ({productName, quantity, size, color, heightType}) => `
         <tr>
           <td style="padding: 8px; border: 1px solid #ddd;">${productName}</td>
            <td style="padding: 8px; border: 1px solid #ddd;">${heightType}</td>
@@ -70,8 +72,8 @@ router.post('/', async (req, res) => {
           <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${quantity}</td>
           <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${size}</td>
         </tr>
-      `
-    ).join('');
+      `,
+    ).join("");
 
     return `
       <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; width: 100%; max-width: 100%; margin-top: 10px; font-family: Arial, sans-serif; font-size: 14px;">
@@ -90,8 +92,8 @@ router.post('/', async (req, res) => {
   };
 
   switch (type) {
-    case 'order':
-      subject = 'Order Confirmation';
+    case "order":
+      subject = "Order Confirmation";
       htmlContent = `
         <div style="font-family: Arial, sans-serif; padding: 10px;">
           <p>Hi ${name},</p>
@@ -101,8 +103,8 @@ router.post('/', async (req, res) => {
       `;
       break;
 
-    case 'cancel':
-      subject = 'Item Cancelled';
+    case "cancel":
+      subject = "Item Cancelled";
       htmlContent = `
         <div style="font-family: Arial, sans-serif; padding: 10px;">
   <p>Dear ${name},</p>
@@ -117,9 +119,9 @@ router.post('/', async (req, res) => {
       `;
       break;
 
-      case 'return-request':
-        subject = 'Return/Exchange Request Received';
-        htmlContent = `
+    case "return-request":
+      subject = "Return/Exchange Request Received";
+      htmlContent = `
           <div style="font-family: Arial, sans-serif; padding: 10px;">
             <p>Hi ${name},</p>
             <p>We have received your request for return/exchange for Order ID <b>${orderId}</b>. Please find the details below:</p>
@@ -128,10 +130,10 @@ router.post('/', async (req, res) => {
             <p>Thank you for shopping with us!</p>
           </div>
         `;
-        break;
-      
-    case 'address':
-      subject = 'Address Updated';
+      break;
+
+    case "address":
+      subject = "Address Updated";
       htmlContent = `
         <div style="font-family: Arial, sans-serif; padding: 10px;">
           <p>Hi ${name},</p>

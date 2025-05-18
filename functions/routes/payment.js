@@ -178,14 +178,13 @@ router.post("/status", async (req, res) => {
     res.status(500).json({error: "Internal Server Error"});
   }
 });
-router.post("/refund", async( req, res) =>{
-
+router.post("/refund", async ( req, res) =>{
   try {
-    const { transactionId, refundAmount, refundReason } = req.body;
+    const {transactionId, refundAmount, refundReason} = req.body;
     if (!transactionId || !refundAmount || !refundReason) {
-        return res.status(400).json({ error: 'transactionId, refundAmount, and refundReason are required.' });
+      return res.status(400).json({error: "transactionId, refundAmount, and refundReason are required."});
     }
-   
+
     // Generate a unique refund ID
     const refundId = `REF${transactionId}-${Date.now()}`;
     const payloadData = {
@@ -221,15 +220,13 @@ router.post("/refund", async( req, res) =>{
         },
         data: payloadMain,
     };
-   
+
     const response = await axios.request(options);
-  //  res.status(200).json({message: "Message"});
+    //  res.status(200).json({message: "Message"});
     res.status(200).json(response.data);
-} catch (error) {
-    console.error('Refund Error:', error);
-    res.status(500).json({ error: 'Refund failed. Please try again later.' });
-}
-
-
+  } catch (error) {
+    console.error("Refund Error:", error);
+    res.status(500).json({error: "Refund failed. Please try again later."});
+  }
 });
 module.exports = router;
