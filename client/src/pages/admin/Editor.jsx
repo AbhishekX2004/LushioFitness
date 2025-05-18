@@ -606,7 +606,7 @@ const Editor = ({ product: initialProduct,onClose}) => {
                           <input
                             type="number"
                             min="0"
-                            value={product[`${heightType}Height`].quantities[color.name]?.[size] || ''}
+                            value={product[`${heightType}Height`].quantities[color.name]?.[size] === undefined ? '' : product[`${heightType}Height`].quantities[color.name]?.[size]}
                             onChange={(e) => handleQuantityChange(color.name, size, e.target.value, heightType)}
                             className="w-full p-2 border rounded"
                           />
@@ -683,7 +683,7 @@ const Editor = ({ product: initialProduct,onClose}) => {
                       <input
                         type="number"
                         min="0"
-                        value={product.quantities[color.name]?.[size] || ''}
+                        value={product.quantities[color.name]?.[size] === undefined ? '' : product.quantities[color.name]?.[size]}
                         onChange={(e) => handleQuantityChange(color.name, size, e.target.value)}
                         className="w-full p-2 border rounded"
                       />
