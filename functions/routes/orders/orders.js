@@ -480,7 +480,7 @@ router.post("/cancel", async (req, res) => {
     }
 
     const orderData = orderDoc.data();
-    
+
     // Validate user owns this order
     if (orderData.uid !== uid) {
       return res.status(403).json({message: "Unauthorized access to order"});

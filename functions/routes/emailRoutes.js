@@ -7,10 +7,10 @@ const router = express.Router();
 
 //  Create reusable transporter using SMTP
 const transporter = nodemailer.createTransport({
-  service: 'gmail', 
+  service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,    
-    pass: process.env.EMAIL_PASSWORD,  
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
@@ -158,8 +158,8 @@ router.post("/", async (req, res) => {
     await transporter.sendMail(mailOptions);
     res.status(200).json({message: "Email sent successfully"});
   } catch (err) {
-    console.error('Email error:', err);
-    res.status(500).json({ message: 'Failed to send email', error: err });
+    console.error("Email error:", err);
+    res.status(500).json({message: "Failed to send email", error: err});
   }
 });
 

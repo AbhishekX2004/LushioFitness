@@ -12,7 +12,7 @@ const logger = require("firebase-functions/logger");
 const PHONEPE_SALT_KEY = process.env.PHONEPE_SALT_KEY;
 const PHONEPE_MERCHANT_ID = process.env.PHONEPE_MERCHANT_ID;
 const PHONEPE_URL = process.env.PHONEPE_API_URL;
-const PHONEPE_REFUND_URL = process.env.PHONEPE_REFUND_URL
+const PHONEPE_REFUND_URL = process.env.PHONEPE_REFUND_URL;
 const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL;
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -188,14 +188,14 @@ router.post("/refund", async ( req, res) =>{
     // Generate a unique refund ID
     const refundId = `REF${transactionId}-${Date.now()}`;
     const payloadData = {
-        merchantId: PHONEPE_MERCHANT_ID,
-        transactionId,
-        refundId,
-        amount: refundAmount * 100, // Convert to paisa
-        reason: refundReason,
+      merchantId: PHONEPE_MERCHANT_ID,
+      transactionId,
+      refundId,
+      amount: refundAmount * 100, // Convert to paisa
+      reason: refundReason,
     };
 
-        const KeyIndex = 1;
+    const KeyIndex = 1;
 
     // Base64 encode the payload
     const payload = JSON.stringify(payloadData);
@@ -206,19 +206,19 @@ router.post("/refund", async ( req, res) =>{
     const sha256 = crypto.createHash("sha256").update(string).digest("hex");
 
     const checksum = sha256 + "###" + KeyIndex;
-      
+
     // Make the refund request to PhonePe
     const options = {
-        method: 'post',
-       
-    url: `${PHONEPE_URL}/v3/credit/backToSource`,
-        headers: {
-            accept: 'text/plain',
-            'Content-Type': 'application/json',
-            'X-VERIFY': checksum,
-            'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
-        },
-        data: payloadMain,
+      method: "post",
+
+      url: `${PHONEPE_URL}/v3/credit/backToSource`,
+      headers: {
+        "accept": "text/plain",
+        "Content-Type": "application/json",
+        "X-VERIFY": checksum,
+        "X-MERCHANT-ID": PHONEPE_MERCHANT_ID,
+      },
+      data: payloadMain,
     };
 
     const response = await axios.request(options);
