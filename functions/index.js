@@ -56,7 +56,7 @@ const courierServicabilityRoute = require("./routes/orders/courierServicability.
 const returnsRoute = require("./routes/orders/returns.js");
 const trackRoute = require("./routes/orders/tracking.js");
 const searchRoute = require("./routes/search.js");
-const emailRoute = require('./routes/emailRoutes');
+const emailRoute = require("./routes/emailRoutes");
 const exchangeRoute = require("./routes/orders/exchange.js");
 const transactionsRoute = require("./routes/transactions.js");
 const returnExchangeRoute = require("./routes/orders/returnExchange.js");
@@ -82,7 +82,7 @@ app.use("/couriers", courierServicabilityRoute);
 app.use("/returns", returnsRoute);
 app.use("/track", trackRoute);
 app.use("/search", searchRoute);
-app.use("/sendEmail", emailRoute)
+app.use("/sendEmail", emailRoute);
 app.use("/exchange", exchangeRoute);
 app.use("/transactions", transactionsRoute);
 app.use("/returnExchange", returnExchangeRoute);

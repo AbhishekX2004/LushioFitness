@@ -1,5 +1,7 @@
-const express = require('express');
-const nodemailer = require('nodemailer');
+/* eslint-disable new-cap */
+/* eslint-disable max-len */
+const express = require("express");
+const nodemailer = require("nodemailer");
 const router = express.Router();
 
 //  Create reusable transporter using SMTP
@@ -50,7 +52,7 @@ router.post('/', async (req, res) => {
   const { email, type, orderId, name, item, items, address } = req.body;
 
   if (!email || !type || !name) {
-    return res.status(400).json({ message: 'Required fields missing' });
+    return res.status(400).json({message: "Required fields missing"});
   }
 
   let subject = '';
@@ -140,7 +142,7 @@ router.post('/', async (req, res) => {
       break;
 
     default:
-      return res.status(400).json({ message: 'Invalid email type' });
+      return res.status(400).json({message: "Invalid email type"});
   }
 
   const mailOptions = {
@@ -152,7 +154,7 @@ router.post('/', async (req, res) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: 'Email sent successfully' });
+    res.status(200).json({message: "Email sent successfully"});
   } catch (err) {
     console.error('Email error:', err);
     res.status(500).json({ message: 'Failed to send email', error: err });
