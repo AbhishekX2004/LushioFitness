@@ -148,7 +148,7 @@ router.post("/createOrder", validateOrderRequest, async (req, res) => {
 
     // Get user details
     const userDoc = await db.collection("users").doc(uid).get();
-    const email = userDoc.exists ? userDoc.data().email : null;
+    const email = userDoc.exists && userDoc.data().email ? userDoc.data().email : "";
 
     const dateOfOrder = new Date();
 
@@ -480,7 +480,7 @@ router.post("/cancel", async (req, res) => {
     }
 
     const orderData = orderDoc.data();
-    
+
     // Validate user owns this order
     if (orderData.uid !== uid) {
       return res.status(403).json({message: "Unauthorized access to order"});
