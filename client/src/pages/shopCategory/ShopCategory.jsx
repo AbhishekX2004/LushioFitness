@@ -16,30 +16,6 @@ function ShopCategory(props) {
   const [isFilterApplied, setIsFilterApplied] = useState(false);
   const filterRef = useRef();
 
-//   useEffect(() => {
-//     const fetchProducts = async () => {
-//       setLoading(true);
-   
-
-//       try {
-//         const response = await axios.get(
-//           `${process.env.REACT_APP_API_URL}/filters/${props.category}`
-//         );
-//         const data = response.data;
-// console.log(data);
-//         if (Array.isArray(data)) {
-     
-//           setProducts(data);
-//         } 
-//       } catch (err) {
-//         console.log(err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchProducts();
-//   }, [props.category]);
 
 const fetchProducts = async (reset = false) => {
   if (!hasMore && !reset) return;

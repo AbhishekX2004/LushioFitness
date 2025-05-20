@@ -1,7 +1,7 @@
 import React, {useRef,useContext,useEffect,useState} from "react";
 import "./refer-earn.css";
 import axios from 'axios';
-import ShareComponent from "./ShareComponent";
+import ShareComponent from "./ShareComp";
 import { UserContext } from "../../components/context/UserContext";
 function ReferAndEarn() {
   const textRef = useRef(null);
@@ -54,24 +54,24 @@ const [referralCode,setReferralCode] = useState(null);
       </div>
       <p className="refer-question">How Does Referrel Work?</p>
       <div className="instruction-container">
-        <div className="instruction">
+        <div className="instruction-refer">
           <span>1</span>
           <p>Invite your friend to Lushio® with the given referral code</p>
         </div>
-        <div className="instruction">
+        <div className="instruction-refer">
           <span>2</span>
           <p>
             They place their first order with your referral code & get a flat
             ₹100 discount
           </p>
         </div>
-        <div className="instruction">
+        <div className="instruction-refer">
           <span>3</span>
           <p>
             Their order gets completed (delivered & crossed the return window)
           </p>
         </div>
-        <div className="instruction">
+        <div className="instruction-refer">
           <span>4</span>
           <p>You get Lushio® credits worth ₹100</p>
         </div>

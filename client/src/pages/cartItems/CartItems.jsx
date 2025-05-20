@@ -60,8 +60,9 @@ const [loading, setLoading] = useState(false);
         `${process.env.REACT_APP_API_URL}/cart/${user.uid}`
       );
       setCartProducts(response.data.cartItems);
-    setCartAddress(response.data.cartAddress);
-   // console.log(response.data.cart.cartAddress);
+    setCartAddress(response.data.cart.cartAddress);
+    // console.log(cartAddress);
+    // console.log(response.data.cart.cartAddress);
     } catch (err) {
       console.error(err);
     } finally {
@@ -223,7 +224,7 @@ const getTotalForCOD = () => {
         updatedSelections[item.id] = true;
       }
     });
-  
+   setSelectedItems(updatedSelections); 
     setIsAllSelected(true);
   
   };
@@ -317,8 +318,11 @@ const getTotalForCOD = () => {
       setCartProducts((prevCartProducts) =>
         prevCartProducts.filter((item) => item.id !== cartItemId)
       );
-
+      setSelectedProduct(null);
+ setTimeout(() => {
       handleClose();
+    }, 100);
+      //handleClose();
     } catch (error) {
       console.error(
         "Error removing item from cart:",
@@ -537,7 +541,7 @@ fetchCartCount();
   ) : (
     <p>No addresses found. Please add a new address.</p>
   )}
-  <PlaceOrder />
+  <PlaceOrder setCartAddress={setCartAddress}/>
 </div>
 {/* <button onClick={()=>sendEmail("123456")}> Click Me</button> */}
       {/* <button onClick={()=>handleSubmit()}>submit </button> */}

@@ -255,7 +255,7 @@ line-height: 16px
 }
 .coupon-image{
     display: flex;
-    gap: 16px;
+    gap: 8px;
 }
 .coupons-base-content img{
     height: 20px;
@@ -293,7 +293,7 @@ line-height: 16px
 .priceBlock-base-priceHeader {
     font-size: 12px;
     font-weight: 700;
-    margin: 24px 0 16px;
+    margin: 14px 0 16px;
     color: #535766
 }
 .priceDetail-base-value {
@@ -366,7 +366,8 @@ font-size: 18px;
 .priceDetail-base-total {
     font-weight: 700;
     font-size: 15px;
-    padding-top: 16px;
+    padding-top: 5px;
+    padding-bottom: 10px;
     border-top: 1px solid #eaeaec;
     color: #3e4152;
     line-height: 16px

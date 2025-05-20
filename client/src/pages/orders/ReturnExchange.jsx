@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-//import axios from "axios";
 import "./Accordion.css";
 import "./ReturnExchange.css";
-//import { UserContext } from "../../components/context/UserContext";
 
 const ReturnExchange = ({ title, canReturn, identifier, orderId, product, updateItems, setPayloadForMail }) => {
- // const { user } = useContext(UserContext);
+ 
 
   const [state, setState] = useState({
     isOpen: false,
@@ -14,7 +12,7 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
     selectedSize: "",
     selectedQuantity: 1,
     otherReason: "",
-    exchangeReason: "Wrong size selected", // Default exchange reason
+    exchangeReason: "Wrong size selected", 
   });
 
   const toggleAccordion = () => {
@@ -48,9 +46,7 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
     setState((prev) => ({ ...prev, exchangeReason: reason, otherReason: reason === "Other" ? "" : prev.otherReason }));
   };
 
-  // const handleSizeSelect = (size) => {
-  //   setState((prev) => ({ ...prev, selectedSize: size }));
-  // };
+ 
 
   const handleQuantityChange = (e) => {
     setState((prev) => ({ ...prev, selectedQuantity: Number(e.target.value) }));
@@ -67,10 +63,7 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
       return;
     }
 
-    // if (state.selectedOption === "exchange" && !state.selectedSize) {
-    //   alert(`Please select a size for exchange on ${title}.`);
-    //   return;
-    // }
+ 
 
     const itemData = {
       [identifier]: {
@@ -88,6 +81,7 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
       : state.selectedReason === "other"
       ? state.otherReason
       : state.selectedReason;
+
      // 👇 Update the new payloadForMail state
      const payloadItem = {
       identifier: identifier,
@@ -115,7 +109,10 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
         </div>
 
         {state.isOpen && (
-          <div className={`accordion-content ${state.isOpen ? "expanded" : ""}`}>
+          <div 
+          className={`accordion-content ${state.isOpen ? "expanded" : ""}`}
+            style={{ maxHeight: state.isOpen ? "1000px" : "0" }}
+          >
             <div className="return-exchange-options">
               <label className="radio-label">
                 <input
@@ -140,13 +137,7 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
             </div>
 
             <h3>Select Quantity:</h3>
-            {/* <select value={state.selectedQuantity} onChange={handleQuantityChange} className="quantity-dropdown">
-              {[1, 2, 3, 4, 5].map((num) => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select> */}
+           
              <select
                 value={state.selectedQuantity}
                 onChange={handleQuantityChange}
@@ -210,16 +201,6 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
 
                 <h3>Select Reason for Exchange:</h3>
                 <div className="exchange-reasons">
-                  {/* <label className="radio-label">
-                    <input
-                      type="radio"
-                      name={`exchangeReason-${identifier}`}
-                      value="Wrong size selected"
-                      checked={state.exchangeReason === "Wrong size selected"}
-                      onChange={() => handleExchangeReasonChange("Wrong size selected")}
-                    />
-                    Wrong size selected
-                  </label> */}
                   <label className="radio-label">
                     <input
                       type="radio"

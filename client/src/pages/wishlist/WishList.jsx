@@ -12,7 +12,7 @@ function WishList() {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(false);
 const [wishlistLength, setWishlistLength] = useState(0);
-  const itemsPerPage = 10; // Control the number of items per page
+  const itemsPerPage = 10; 
 
   const handleChange = (event, value) => {
     setPage(value);

@@ -31,9 +31,19 @@ export const renderCartMessages = (totalAmount, keyValuePairs) => {
 
     if (totalAmount >= threshold && (i === sortedKeys.length - 1 || totalAmount < sortedKeys[i + 1])) {
       return (
-        <p style={{ color: "green" }}>
-          Great! You will get {discount}% Worth LushioCoins for orders above ₹{threshold}!
-        </p>
+        <p
+  style={{
+    backgroundColor: "#e6f4ea", // Light green background
+    color: "#2d7d46", // Dark green text
+    padding: "6px 9px",
+    borderRadius: "8px",
+    fontWeight: "600",
+    margin: "15px 0"
+  }}
+>
+  Great! You will get {discount}% Worth LushioCoins for orders above ₹{threshold}!
+</p>
+
       );
     }
   }

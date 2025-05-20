@@ -1,7 +1,7 @@
 import React,{useState} from "react";
 import { Modal, Box, Fade, Backdrop } from "@mui/material";
 import AddressSelection from "./AddressSelection"
-const PlaceOrder = ()=> {
+const PlaceOrder = ({setCartAddress})=> {
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
  const handleOpen = () => {
@@ -45,7 +45,10 @@ const PlaceOrder = ()=> {
               className="address-modal-close"
               onClick={handleClose}
             />
-<AddressSelection handleClose={handleClose}/>
+<AddressSelection 
+handleClose={handleClose}
+setCartAddress={setCartAddress}/>
+
 
           </Box>
         </Fade>

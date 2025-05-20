@@ -5,6 +5,7 @@
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: #f9f9f9;
+     transition: all 0.3s ease-in-out;
   }
   .return-exchange-container input[type="radio"]{
     accent-color: #1c1c1c;
@@ -33,6 +34,12 @@
   .return-section,
   .exchange-section {
     margin-top: 20px;
+  }
+   .return-section textarea,
+  .exchange-section textarea{
+    width: 90%;
+    padding: 10px;
+    height: 50px;
   }
   .return-section h3,
   .exchange-section h3 {

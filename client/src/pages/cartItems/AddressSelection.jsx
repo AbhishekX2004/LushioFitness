@@ -4,7 +4,7 @@ import { useAddress } from '../../components/context/AddressContext';
 import "./addressSelection.css"
 import AddressForm from './AddressForm';
 import { UserContext } from "../../components/context/UserContext";
-const AddressSelection = ({handleClose})=> {
+const AddressSelection = ({handleClose,setCartAddress})=> {
   const {
     addressData,
     isChangingDefault,
@@ -66,7 +66,9 @@ const handleSelectAddress = async () => {
       `${process.env.REACT_APP_API_URL}/cart/address/${user.uid}`,
       updatedAddress
     );
-
+if(res.status===200){
+  setCartAddress(res.data.cartAddress);
+}
     handleClose();
     console.log(res);
   } catch (err) {

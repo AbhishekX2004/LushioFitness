@@ -167,7 +167,7 @@ function OrderInfo() {
       {/* <h1>Download Invoice</h1> */}
       {/* <InvoiceForm invoiceData={invoiceData} setInvoiceData={setInvoiceData} /> */}
       <InvoicePreview data={invoiceData} />
-      <TrackingDetails oid="mUmJTgrZ1nu2lCvH5GAw" uid="WUMRFsuouMTVX802XL80kDSDMiP2" />
+      {/* <TrackingDetails oid="mUmJTgrZ1nu2lCvH5GAw" uid="WUMRFsuouMTVX802XL80kDSDMiP2" /> */}
 
       <ReturnExchangeNotice/>
       <OrderedProducts orderedProducts={orderDetails?.orderedProducts || []} canReturn={canReturn} orderId={orderId}/>

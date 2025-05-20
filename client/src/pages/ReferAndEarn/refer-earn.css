@@ -99,27 +99,31 @@
 
 .instruction-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start;
   flex-wrap: wrap;
   background-color: var(--background-dark);
   padding: 40px 5%;
   border-radius: 10px;
 }
 
-.instruction {
+.instruction-refer {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
-  width: 45%;
+ padding: 10px;
+   background-color: #fff3e0;
+   border-radius: 45px;
+   width: 100%;
+  /* width: 45%; */
 }
 
-.instruction p {
+.instruction-refer p {
   flex: 1;
   margin-left: 20px;
   color: var(--text-dark);
 }
 
-.instruction span {
+.instruction-refer span {
   display: flex;
   justify-content: center;
   align-items: center;

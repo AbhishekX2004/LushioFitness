@@ -1,0 +1,45 @@
+.summary-card {
+  display: flex;
+  gap: 10px;
+  padding-bottom: 18px;
+  align-items: center;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border: 1px solid rgb(233, 232, 232);
+}
+
+.credit-icon {
+  height: 19px;
+  width: 23px;
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.date {
+  color: #737E93;
+  font-size: 0.75rem;
+}
+
+.title {
+  color: #292D35;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding-top: 10px;
+}
+
+.validity {
+  color: #292D35;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding-top: 0.75rem;
+}
+
+.amount {
+  color: #008C2D;
+  font-weight: 500;
+  font-size: 1rem;
+}

@@ -15,9 +15,9 @@ function User() {
   // const [userName, setUserName] = useState("");
   const { userName } = useCart();
 
-//   useEffect(() => {
+
     
-//     const fetchUserData = async () => {
+
 //       try {
      
 //        const response = await axios.get(`${process.env.REACT_APP_API_URL}/user/name/${user.uid}`);

@@ -24,15 +24,7 @@ const handleSearch = (e) => {
   }
 };
 
-  // const handleSearch = (e) => {
-  //   // If Enter key is pressed, initiate search
-  //   if (e.key === "Enter" && searchText.trim()) {
-      
-  //     navigate(`/search?query=${encodeURIComponent(searchText.trim())}`);
-  //     setSearchText("");
-  //   closeSearch();
-  //   }
-  // };
+ 
 
   const closeSearchBox = () => {
     setSearchText("");
