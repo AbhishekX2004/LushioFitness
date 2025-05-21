@@ -42,6 +42,7 @@ router.post("/createOrder", validateOrderRequest, async (req, res) => {
     uid, modeOfPayment, orderedProducts, address,
     totalAmount, payableAmount, discount, lushioCurrencyUsed, couponCode,
     paymentData, isExchange, exchangeOrderId,
+    onlinePaymentDiscount, couponDiscount, lushioCashBack,
   } = req.body;
 
   // Start a Firestore batch
@@ -166,6 +167,9 @@ router.post("/createOrder", validateOrderRequest, async (req, res) => {
       modeOfPayment,
       status: "Pending",
       paymentData: paymentData?.data || null,
+      onlinePaymentDiscount,
+      couponDiscount,
+      lushioCashBack,
     };
 
     // Fetch dimensions from the admin document

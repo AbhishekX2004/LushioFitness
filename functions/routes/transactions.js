@@ -62,6 +62,7 @@ router.post("/", async (req, res) => {
             id: doc.id,
             type: "cash_usage",
             amount: data.cashUsed,
+            message: data.message || "Cash used for order",
             orderId: data.oid,
             orderAmount: data.orderAmount,
             transactionDate: data.createdAt.toDate(),
