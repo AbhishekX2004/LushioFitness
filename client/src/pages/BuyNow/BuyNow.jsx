@@ -270,10 +270,7 @@ const normalizedHeight = {
       setTimeout(() => setShowNotification1(false), 3000);
       return;
     }
-     if(1){
-      console.log(orderDetails);
-      return;
-    }
+    
     if (selectedPaymentMethod === "phonepe") {
       await handlePayment();
       // await createOrder();
