@@ -11,7 +11,7 @@ import {
   FaSpinner,
   FaHeartBroken,
 } from "react-icons/fa";
-import { FaShippingFast } from "react-icons/fa";
+//import { FaShippingFast } from "react-icons/fa";
 // 3. Absolute Imports/Global Components
 import { UserContext } from "../../components/context/UserContext";
 import { useWishlist } from "../../components/context/WishlistContext";
@@ -27,7 +27,8 @@ import ImagePopUp from "./ImagePopUp";
 import ColorOptions from "./ColorOptions";
 import HeightBasedSelection from "./HeightBasedSelection";
 import SizeChart from "./SizeChart";
-import SingleStar from "./SingleStar";
+import BuyNowModal from "../BuyNow/BuyNowModal";
+//import SingleStar from "./SingleStar";
 const formatDateTime = (timestamp) => {
   if (!timestamp || !timestamp._seconds || !timestamp._nanoseconds) {
     return "Invalid date"; // Return a fallback string if the timestamp is not valid
@@ -91,7 +92,7 @@ const ReviewCard = ({
       </div>
 
       <div className="review-details">
-      <p>
+        <p>
           <strong>Quality:</strong> {quality}
         </p>
         <p>
@@ -100,7 +101,6 @@ const ReviewCard = ({
         <p>
           <strong>Review:</strong> {review}
         </p>
-      
       </div>
       <ImagePopUp
         images={media} // Pass the images array as prop
@@ -123,14 +123,14 @@ function ProductDisplay() {
   const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [showNotification, setShowNotification] = useState(false);
-//  const [isLoadingWishlist, setIsLoadingWishlist] = useState(false);
+  //  const [isLoadingWishlist, setIsLoadingWishlist] = useState(false);
   const [isLoadingCart, setIsLoadingCart] = useState(false);
   const navigate = useNavigate();
   const [showError, setShowError] = useState(false);
   const { user } = useContext(UserContext);
   const { fetchCartCount } = useCart();
   const { wishlist, wishlistIds, toggleWishlist } = useWishlist();
-   const {selectedAddress} = useAddress();
+  const { selectedAddress } = useAddress();
   const isHeightBased = product?.height;
   const [image, setImage] = useState(null);
   const [isRemoving, setIsRemoving] = useState(false);
@@ -138,26 +138,31 @@ function ProductDisplay() {
   const wishlistItem = wishlist.find((item) => item.productId === id);
   const [liked, setLiked] = useState(wishlistIds.has(id));
 
-  useEffect(()=>{
+  const [buyNowOpen, setBuyNowOpen] = useState(false);
+
+  const handleBuyNowOpen = () => setBuyNowOpen(true);
+  useEffect(() => {
     const fetchExpectedDeliveryDate = async () => {
-      console.log(selectedAddress)
-try{
-  const payload = {
-    pickup_postcode: 452001, 
-    delivery_postcode: selectedAddress.pinCode,
-  };
-  const response =await  axios.post( `${process.env.REACT_APP_API_URL}/couriers/serviceability`,payload)
- 
-  setEstimatedDeliveryDate(response.data.data.min_etd);
-}
-catch(err){
-  console.log(error);
-}
-    }
-    if(selectedAddress){
+      console.log(selectedAddress);
+      try {
+        const payload = {
+          pickup_postcode: 452001,
+          delivery_postcode: selectedAddress.pinCode,
+        };
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_URL}/couriers/serviceability`,
+          payload
+        );
+
+        setEstimatedDeliveryDate(response.data.data.min_etd);
+      } catch (err) {
+        console.log(error);
+      }
+    };
+    if (selectedAddress) {
       fetchExpectedDeliveryDate();
     }
-  },[product,selectedAddress])
+  }, [product, selectedAddress]);
   useEffect(() => {
     // Fetch product when `id` changes
     const fetchProduct = async () => {
@@ -191,7 +196,7 @@ catch(err){
     };
 
     if (id) fetchProduct();
-  }, [id]); 
+  }, [id]);
 
   const targetRef = useRef(null); // Create a reference for the target component
   //  const discount =  Math.ceil(((props.price - props.discountedPrice) / props.price) * 100);
@@ -227,7 +232,7 @@ catch(err){
   useEffect(() => {
     if (product) {
       setHeightCategory(product.height ? "aboveHeight" : null);
-     
+
       setSelectedSize(null);
     }
   }, [product]);
@@ -236,12 +241,12 @@ catch(err){
     if (!user) {
       navigate("/login");
       return;
-    };
+    }
     if (selectedSize == null) {
       setShowError(true); // Show error if size is not selected
       return;
     }
- 
+
     const cartItem = {
       uid: user.uid,
       productId: id,
@@ -284,30 +289,14 @@ catch(err){
     if (!user) {
       navigate("/login");
       return;
-    };
+    }
     if (selectedSize == null) {
       handleScroll();
       setShowError(true); // Show error if size is not selected
       return;
     }
-  if(1>0){
-    return;
-  }
-    const imageURL = product.cardImages[0];
-    const name = product.displayName;
- 
-    const productId = id;
-    const queryParams = new URLSearchParams({
-      heightCategory,
-      selectedColor,
-      selectedSize,
-      name,
-      productId,
-      imageURL, // Passing the image URL as a query param
-    }).toString();
-
-    // Navigate to the new page with the query params
-    navigate(`/buyNow?${queryParams}`);
+   
+    handleBuyNowOpen();
   };
   if (loading)
     return (
@@ -320,208 +309,232 @@ catch(err){
   if (!product) return <div>No product found</div>;
   return (
     <>
-    <div className="productDisplay">
-      {showNotification && (
-        <div className="notification-container">
-          <div className="notification" style={{ aspectRatio: 180 / 25 }}>
-            Product added to cart!
+      <div className="productDisplay">
+        {showNotification && (
+          <div className="notification-container">
+            <div className="notification" style={{ aspectRatio: 180 / 25 }}>
+              Product added to cart!
+            </div>
           </div>
-        </div>
-      )}
-      <div className="productDisplay-left">
-        <div className="productDisplay-img-list">
-          {product.allImages.map((img) => (
-            <URLMediaRenderer
-              onClick={() => setImage(img)}
-              className={img === image ? "image-selected" : "image-not-selected"}
-              src={img}
-            />
-          ))}
-        </div>
-        <div className="productDisplay-img">
-          <URLMediaRenderer
-            key={image}
-            src={image}
-            className="productDisplay-main-img"
-            onClick={openGallery}
-          />
-          <div className="productDisplay-left-rating">
-            <span>
-              {/* {product.rating > 0 ? <p>{product.rating}</p> : <p>4.5</p>} */}
-              <strong>
-                {product.rating > 0 ? product.rating.toFixed(1) : "4.5"}
-              </strong>
-              {/* <SingleStar review="3.7" /> */}
-              <img src="/Images/icons/star.png" alt="icon" />
-              <p>({product.reviews.length})</p>
-            </span>
-          </div>
-        </div>
-      </div>
-      <ImagePopUp
-        images={product.allImages} // Pass the images array as prop
-        isOpen={isOpen} // Pass the open/close state as prop
-        closeGallery={closeGallery} // Pass the close function as prop
-        openGallery={openGallery} // Pass the open function as prop
-      />
-      <div className="productDisplay-right">
-        <div ref={targetRef}></div>
-        <h1>{product.displayName}</h1>
-
-        <div className="productDisplay-right-prices">
-          <div className="productDisplay-right-price-new">
-            ₹{product.discountedPrice}{" "}
-          </div>
-          <div className="productDisplay-right-price-old">
-            ₹{product.price}{" "}
-          </div>
-          <div className="productDisplay-right-price-discount">
-            {Math.ceil(
-              ((product.price - product.discountedPrice) / product.price) * 100
-            )}
-            % OFF
-          </div>
-        </div>
-        <p className="productDisplay-tax-statement">Inclusive of all taxes</p>
-
-        {
-          estimatedDeliveryDate &&  
-          <div className="delivery-container">
-           <p >
-            <strong>Expected Delivery: </strong> <span >{estimatedDeliveryDate}</span>
-          </p>
-        </div>
-        }
-        <div className="productDisplay-color-size-selector">
-          {isHeightBased ? (
-            <HeightBasedSelection
-              data={product}
-              selectedHeight={heightCategory}
-              setSelectedHeight={setHeightCategory}
-              selectedColor={selectedColor}
-              setSelectedColor={setSelectedColor}
-              selectedSize={selectedSize}
-              setSelectedSize={setSelectedSize}
-            />
-          ) : (
-            <ColorOptions
-              data={product}
-              selectedColor={selectedColor}
-              setSelectedColor={setSelectedColor}
-              selectedSize={selectedSize}
-              setSelectedSize={setSelectedSize}
-            />
-          )}
-        </div>
-       
-        {showError && !selectedSize && (
-          <p className="product-display-error-message">
-            Please select a size to proceed!
-          </p>
         )}
-           <div className="productDisplay-button-container">
-          <button onClick={() => toggleWishlist(wishlistItem?.id, id)}>
-            WISHLIST
-          </button>
-          <button onClick={() => addToCart(product.id)}>ADD TO CART</button>
-        </div>
-
-      
-      
-        <button className="productDisplay-buy-button" onClick={handleBuyNow}>
-          BUY NOW
-        </button>
-       
-        <div className="productDisplay-right-discription">
-          <strong>Description: </strong> {product.description.productDetails}
-        </div>
-        <div className="productDisplay-right-discription">
-          <strong>Size & Fit: </strong> {product.description.sizeFit}
-        </div>
-        <div className="productDisplay-right-discription">
-          <strong>MaterialCare: </strong> {product.description.MaterialCare}
-        </div>
-        <p className="productDisplay-right-category">
-          <span>
-            <strong>Category:</strong>{" "}
-          </span>
-          <>
-            {product.categories?.map((category, index) => (
-              <span key={index}>
-                {category}
-                {", "}
-              </span>
-            ))}
-          </>
-        </p>
-
-        <SizeChart />
-        <div className="productDisplay-desktop">
-          <img className="productDisplay-trust-image" src="/Images/trust.png" alt="" />
-        </div>
-        <button className="productDisplay-buy-button-mobile" onClick={handleBuyNow}>
-          BUY NOW
-        </button>
-
-      
-      </div>
-      <div className="mobile-button-container">
-        <button
-          className="wishlist-button"
-          onClick={() => handleToggleWishlist(wishlistItem?.id, id)}
-        >
-          {isRemoving ? (
-            <>
-              {" "}
-              <FaHeartBroken color="red" className="wishlist-icon"/>
-              REMOVING
-            </>
-          ) : (
-            <>
-              {" "}
-              <FaHeart
-                className={`wishlist-icon ${liked ? "liked" : ""}`}
-              
+        <div className="productDisplay-left">
+          <div className="productDisplay-img-list">
+            {product.allImages.map((img) => (
+              <URLMediaRenderer
+                onClick={() => setImage(img)}
+                className={
+                  img === image ? "image-selected" : "image-not-selected"
+                }
+                src={img}
               />
-              {liked ? <>WISHLISTED</> : <>WISHLIST</>}
-            </>
+            ))}
+          </div>
+          <div className="productDisplay-img">
+            <URLMediaRenderer
+              key={image}
+              src={image}
+              className="productDisplay-main-img"
+              onClick={openGallery}
+            />
+            <div className="productDisplay-left-rating">
+              <span>
+                {/* {product.rating > 0 ? <p>{product.rating}</p> : <p>4.5</p>} */}
+                <strong>
+                  {product.rating > 0 ? product.rating.toFixed(1) : "4.5"}
+                </strong>
+                {/* <SingleStar review="3.7" /> */}
+                <img src="/Images/icons/star.png" alt="icon" />
+                <p>({product.reviews.length})</p>
+              </span>
+            </div>
+          </div>
+        </div>
+        <ImagePopUp
+          images={product.allImages} // Pass the images array as prop
+          isOpen={isOpen} // Pass the open/close state as prop
+          closeGallery={closeGallery} // Pass the close function as prop
+          openGallery={openGallery} // Pass the open function as prop
+        />
+        <div className="productDisplay-right">
+          <div ref={targetRef}></div>
+          <h1>{product.displayName}</h1>
+
+          <div className="productDisplay-right-prices">
+            <div className="productDisplay-right-price-new">
+              ₹{product.discountedPrice}{" "}
+            </div>
+            <div className="productDisplay-right-price-old">
+              ₹{product.price}{" "}
+            </div>
+            <div className="productDisplay-right-price-discount">
+              {Math.ceil(
+                ((product.price - product.discountedPrice) / product.price) *
+                  100
+              )}
+              % OFF
+            </div>
+          </div>
+          <p className="productDisplay-tax-statement">Inclusive of all taxes</p>
+
+          {estimatedDeliveryDate && (
+            <div className="delivery-container">
+              <p>
+                <strong>Expected Delivery: </strong>{" "}
+                <span>{estimatedDeliveryDate}</span>
+              </p>
+            </div>
           )}
-        </button>
+          <div className="productDisplay-color-size-selector">
+            {isHeightBased ? (
+              <HeightBasedSelection
+                data={product}
+                selectedHeight={heightCategory}
+                setSelectedHeight={setHeightCategory}
+                selectedColor={selectedColor}
+                setSelectedColor={setSelectedColor}
+                selectedSize={selectedSize}
+                setSelectedSize={setSelectedSize}
+              />
+            ) : (
+              <ColorOptions
+                data={product}
+                selectedColor={selectedColor}
+                setSelectedColor={setSelectedColor}
+                selectedSize={selectedSize}
+                setSelectedSize={setSelectedSize}
+              />
+            )}
+          </div>
 
-        <button
-          className="cart-button"
-          onClick={() => handleAddToCart(product.id)}
-          disabled={isLoadingCart}
-        >
-          {isLoadingCart ? (
-            <FaSpinner className="spinner-icon" />
-          ) : (
-            <FaShoppingCart />
-          )}{" "}
-          {user ? <>ADD TO CART</>:<>PLEASE LOGIN</>}
-         
+          {showError && !selectedSize && (
+            <p className="product-display-error-message">
+              Please select a size to proceed!
+            </p>
+          )}
+          <div className="productDisplay-button-container">
+            <button onClick={() => toggleWishlist(wishlistItem?.id, id)}>
+              WISHLIST
+            </button>
+            <button onClick={() => addToCart(product.id)}>ADD TO CART</button>
+          </div>
+
+          {/* <button className="productDisplay-buy-button" onClick={handleBuyNow}>
+          BUY NOW
         </button>
+        */}
+          <BuyNowModal
+            className="productDisplay-buy-button"
+            open={buyNowOpen}
+            handleOpen={handleBuyNow}
+            setOpen={setBuyNowOpen}
+            product={product}
+            selectedHeight={heightCategory}
+            setSelectedHeight={setHeightCategory}
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
+            selectedSize={selectedSize}
+            setSelectedSize={setSelectedSize}
+          />
+          <div className="productDisplay-right-discription">
+            <strong>Description: </strong> {product.description.productDetails}
+          </div>
+          <div className="productDisplay-right-discription">
+            <strong>Size & Fit: </strong> {product.description.sizeFit}
+          </div>
+          <div className="productDisplay-right-discription">
+            <strong>MaterialCare: </strong> {product.description.MaterialCare}
+          </div>
+          <p className="productDisplay-right-category">
+            <span>
+              <strong>Category:</strong>{" "}
+            </span>
+            <>
+              {product.categories?.map((category, index) => (
+                <span key={index}>
+                  {category}
+                  {", "}
+                </span>
+              ))}
+            </>
+          </p>
+
+          <SizeChart />
+          <div className="productDisplay-desktop">
+            <img
+              className="productDisplay-trust-image"
+              src="/Images/trust.png"
+              alt=""
+            />
+          </div>
+          {/* <button className="productDisplay-buy-button-mobile" onClick={handleBuyNow}>
+          BUY NOW
+        </button> */}
+          <BuyNowModal
+            className="productDisplay-buy-button-mobile"
+            open={buyNowOpen}
+            handleOpen={handleBuyNow}
+            setOpen={setBuyNowOpen}
+            product={product}
+            selectedHeight={heightCategory}
+            setSelectedHeight={setHeightCategory}
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
+            selectedSize={selectedSize}
+            setSelectedSize={setSelectedSize}
+          />
+        </div>
+        <div className="mobile-button-container">
+          <button
+            className="wishlist-button"
+            onClick={() => handleToggleWishlist(wishlistItem?.id, id)}
+          >
+            {isRemoving ? (
+              <>
+                {" "}
+                <FaHeartBroken color="red" className="wishlist-icon" />
+                REMOVING
+              </>
+            ) : (
+              <>
+                {" "}
+                <FaHeart className={`wishlist-icon ${liked ? "liked" : ""}`} />
+                {liked ? <>WISHLISTED</> : <>WISHLIST</>}
+              </>
+            )}
+          </button>
+
+          <button
+            className="cart-button"
+            onClick={() => handleAddToCart(product.id)}
+            disabled={isLoadingCart}
+          >
+            {isLoadingCart ? (
+              <FaSpinner className="spinner-icon" />
+            ) : (
+              <FaShoppingCart />
+            )}{" "}
+            {user ? <>ADD TO CART</> : <>PLEASE LOGIN</>}
+          </button>
+        </div>
       </div>
-    </div>
-     <div className="review-container">
-     <div className="review-headings">
-       <h5>Product Review</h5>
-       <RatingModal productId={product.id} />
-     </div>
-     <div className="reviews-container">
-  {reviews.length > 0 ? (
-    <div className="reviews-list">
-      {reviews.map((review, index) => (
-        <ReviewCard key={index} {...review} />
-      ))}
-    </div>
-  ) : (
-    <p className="no-reviews-message">No reviews available.</p>
-  )}
-</div>
-
-   </div>
-   </>
+      <div className="review-container">
+        <div className="review-headings">
+          <h5>Product Review</h5>
+          <RatingModal productId={product.id} />
+        </div>
+        <div className="reviews-container">
+          {reviews.length > 0 ? (
+            <div className="reviews-list">
+              {reviews.map((review, index) => (
+                <ReviewCard key={index} {...review} />
+              ))}
+            </div>
+          ) : (
+            <p className="no-reviews-message">No reviews available.</p>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 

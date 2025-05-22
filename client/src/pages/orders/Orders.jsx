@@ -175,15 +175,20 @@ export default function Orders() {
                
                   <div className="product-info">
                     <h3>{product?.productName || product?.name}</h3>
+                     <p>
+                      <strong>Price:</strong> ₹{product.productDetails.discountedPrice} x {product.quantity} = ₹{product.productDetails.discountedPrice*product.quantity}
+                    </p>
                     <p>
                       <strong>Quantity:</strong> {product.quantity}
                     </p>
                     <p>
-                      <strong>Price:</strong> Rs. {product.price}
+                      <strong>Height:</strong> {product.heightType}
                     </p>
                     <p>
+                       
                       <strong>Size:</strong> {product.size}
                     </p>
+                    
                     <p className="product-color">
                       <strong>Color:</strong> {product.color}
                       <span

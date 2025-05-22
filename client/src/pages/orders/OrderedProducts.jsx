@@ -92,13 +92,17 @@ setLoading(true);
                 <p className="ordered-product-name">
                   {product?.productName || product?.name}
                 </p>
-                <p className="ordered-product-info">Size: {product?.size}</p>
+                 <p>
+                      <strong>Price:</strong> ₹{product.productDetails.discountedPrice} x {product.quantity} = ₹{product.productDetails.discountedPrice*product.quantity}
+                    </p>
+                     <p className="ordered-product-info">
+                  Quantity: {product?.quantity}
+                </p>
+              
                 <p className="ordered-product-info">
                   Height: {product?.heightType || "Normal"}
                 </p>
-                <p className="ordered-product-info">
-                  Quantity: {product?.quantity}
-                </p>
+               
                 <p className="ordered-product-info">
                   Color: {product?.color}
                   <span
@@ -114,6 +118,7 @@ setLoading(true);
                     }}
                   ></span>
                 </p>
+                  <p className="ordered-product-info">Size: {product?.size}</p>
               </div>
             </div>
 

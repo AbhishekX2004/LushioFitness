@@ -3,7 +3,7 @@ import { UserContext } from "../../components/context/UserContext";
 import { useWishlist } from "../../components/context/WishlistContext";
 import ResponsivePopup from "./ResponsivePopUp";
 import axios from "axios";
-import "./newcart.css";
+import "./Cart.css";
 const CartRow = ({
   item,
   selectedItems,

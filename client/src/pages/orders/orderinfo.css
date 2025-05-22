@@ -1,3 +1,6 @@
+.order-info-wrapper *{
+  font-family: "Assistant";
+}
 .orderId-container {
     display: flex;
     align-items: center;
@@ -124,8 +127,14 @@
     background-color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
-  
+  .location-icon{
+    height: 22px;
+    width: 22px;
+  }
   .order-delivery-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin: 0;
     font-size: 18px;
     font-weight: bold;
@@ -139,6 +148,7 @@
     font-size: 16px;
     color: #555;
     line-height: 1.6;
+    margin-bottom: 10px;
   }
   
   .order-delivery-name {

@@ -59,13 +59,14 @@ export default function Wallet() {
             <h2>My Wallet</h2>
             <hr />
           </div>
+          
            {/* <Transactions/> */}
           <div className="my-wallet">
             <div className="totalblock">
               <p>Total wallet points</p>
               <p>{userCoins?.totalCredits}</p>
             </div>
-            <div className="credit-block">
+            <div className="credit-block"  onClick={() => navigate("/wallet/transactions/coin")}>
               <div className="heading-row">
                 <div className="heading-block">
                   <img
@@ -87,7 +88,7 @@ export default function Wallet() {
                 Can be redeemed on orders above ₹297
               </p>
             </div>
-            <div className="cash-block">
+            <div className="cash-block"  onClick={() => navigate("/wallet/transactions/cash")}>
               <div className="heading-row">
                 <div className="heading-block">
                   <img

@@ -202,7 +202,7 @@ font-size: min(7cqi, 18px);
 .item-price span {
   font-family: "montserrat", sans-serif;
   display: inline-block;
-  font-size: min(6.9cqi, 17px);
+  font-size: min(6cqi, 17px);
   margin-right: 5%;
 }
 .new-price {

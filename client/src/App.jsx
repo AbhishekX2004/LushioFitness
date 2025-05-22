@@ -21,6 +21,7 @@ import PaymentSuccess from "./pages/orders/PaymentSuccess";
 import PaymentFailed from "./pages/orders/PaymentFailure";
 import Address from "./pages/userProfile/Address";
 import Wallet from "./pages/wallet/Wallet";
+import Transaction from "./pages/wallet/Transaction";
 import ShopCategory from "./pages/shopCategory/ShopCategory";
 import ReferAndEarn from "./pages/ReferAndEarn/ReferAndEarn";
 import BuyNow from "./pages/BuyNow/BuyNow";
@@ -139,6 +140,7 @@ function App() {
 
             {/* Wallet and Orders */}
             <Route path="/wallet" element={<Wallet />} />
+            <Route path="/wallet/transactions/:type" element={<Transaction />} />
             <Route path="/orderInfo/:orderId" element={<OrderInfo />} />
             <Route path="/buyNow" element={<BuyNow />} />
 

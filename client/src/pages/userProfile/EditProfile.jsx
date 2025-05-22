@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import moment from "moment";
 import { UserContext } from "../../components/context/UserContext.jsx";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 function EditProfile() {
   const { user } = useContext(UserContext);
@@ -65,7 +67,7 @@ function EditProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const changedFields = getChangedFields();
-    
+  
     // Only proceed if there are actually changes
     if (Object.keys(changedFields).length === 0) {
       alert("No changes detected!");
@@ -136,6 +138,24 @@ function EditProfile() {
            pattern="\d{10}"
   maxlength="10"
         />
+{/* <label>Phone no.</label>
+<PhoneInput
+  country={'in'}                      // Default country is India
+  value={userData.phoneNumber}       // Bound to your state
+  onChange={(phone) =>
+    setUserData((prevData) => ({
+      ...prevData,
+      phoneNumber: phone,
+    }))
+  }
+  inputProps={{
+    name: 'phoneNumber',
+    required: true,
+  }}
+  enableSearch={true}               
+  disableCountryGuess={true}         
+  disableSearchIcon={false}       
+/> */}
 
         <label>Birthday Date (modifiable up to two times only)</label>
         <input

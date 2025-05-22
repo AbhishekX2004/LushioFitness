@@ -1,9 +1,10 @@
- const Transactions =  [
+ const Transactions =   [
         {
             "id": "I4yXhr2iC4LZBDeNMvn2",
             "type": "coin",
             "amount": 100,
             "amountLeft": 100,
+            "message": "Test message by manoj",
             "expiresOn": "2025-06-28T14:07:12.179Z",
             "isExpired": false,
             "orders": [],
@@ -11,7 +12,7 @@
         },
         {
             "id": "ggxlSfZl91PrxA3GgKXs",
-            "type": "cash",
+            "type": "cash_usage",
             "amount": 2000,
             "orderId": "dwrNQzTHnR4JK5chKafc",
             "orderAmount": 1000,
@@ -20,33 +21,18 @@
         },
         {
             "id": "paVBRvC8GPuxTnTOUOlX",
-            "type": "cash",
+            "type": "cash_credit",
+            "amount": 500,
+            "message": "Testing Cash",
             "transactionDate": "2025-05-18T08:38:39.747Z",
             "createdAt": "2025-05-18T08:38:39.747Z"
-        },
-        {
-            "id": "voesixh3FmHBQAora7XN",
-            "type": "cash",
-            "transactionDate": "2025-05-17T15:34:05.568Z",
-            "createdAt": "2025-05-17T15:34:05.568Z"
-        },
-        {
-            "id": "IZ122swwsDZNTpHDlnfk",
-            "type": "cash",
-            "transactionDate": "2025-05-17T15:33:42.092Z",
-            "createdAt": "2025-05-17T15:33:42.092Z"
-        },
-        {
-            "id": "hoeGEzbtFMqLeXRY7dEA",
-            "type": "cash",
-            "transactionDate": "2025-05-17T15:33:30.571Z",
-            "createdAt": "2025-05-17T15:33:30.571Z"
         },
         {
             "id": "0yTaVDVlau30QuynCE0i",
             "type": "coin",
             "amount": 100,
             "amountLeft": 100,
+            "message": "11",
             "expiresOn": "2025-05-12T15:17:38.481Z",
             "isExpired": true,
             "orders": [],
@@ -57,6 +43,7 @@
             "type": "coin",
             "amount": 100,
             "amountLeft": 100,
+            "message": "Test",
             "expiresOn": "2025-05-12T14:51:30.543Z",
             "isExpired": true,
             "orders": [],
@@ -67,6 +54,7 @@
             "type": "coin",
             "amount": 14,
             "amountLeft": 14,
+            "message": "1",
             "expiresOn": "2025-04-07T13:20:25.924Z",
             "isExpired": true,
             "orders": [],
@@ -77,56 +65,20 @@
             "type": "coin",
             "amount": 10,
             "amountLeft": 10,
+            "message": "one month",
             "expiresOn": "2025-04-24T00:00:09.115Z",
             "isExpired": true,
             "orders": [],
             "createdAt": "2025-03-25T00:00:09.115Z"
         },
-        {
-            "id": "Hnnuoj8o3YtfGEGbBbEW",
-            "type": "coin",
-            "amount": 100,
-            "amountLeft": 100,
-            "expiresOn": "2025-03-12T10:08:25.677Z",
-            "isExpired": true,
-            "orders": [],
-            "createdAt": "2025-03-02T10:08:25.677Z"
-        },
-        {
-            "id": "w0zJWu0eunkCqPu0RPcg",
-            "type": "coin",
-            "amount": 100,
-            "amountLeft": 100,
-            "expiresOn": "2025-03-12T10:06:10.479Z",
-            "isExpired": true,
-            "orders": [],
-            "createdAt": "2025-03-02T10:06:10.479Z"
-        },
-        {
-            "id": "msusnxao6ONScTLWq4HQ",
-            "type": "coin",
-            "amount": 100,
-            "amountLeft": 100,
-            "expiresOn": "2025-03-12T10:06:10.228Z",
-            "isExpired": true,
-            "orders": [],
-            "createdAt": "2025-03-02T10:06:10.228Z"
-        },
-        {
-            "id": "dWBqtBcCJ8RltUDPToko",
-            "type": "coin",
-            "amount": 100,
-            "amountLeft": 100,
-            "expiresOn": "2025-03-12T10:04:16.109Z",
-            "isExpired": true,
-            "orders": [],
-            "createdAt": "2025-03-02T10:04:16.109Z"
-        },
+     
+    
         {
             "id": "AlnWJWR0pmiREabOkHkB",
             "type": "coin",
             "amount": 100,
             "amountLeft": 100,
+            "message": "Give up on your dreams and die.",
             "expiresOn": "2025-03-12T10:04:15.860Z",
             "isExpired": true,
             "orders": [],
@@ -137,6 +89,7 @@
             "type": "coin",
             "amount": 1000,
             "amountLeft": 1000,
+            "message": "Gomu Gomu No Mi",
             "expiresOn": "2025-03-12T08:57:34.432Z",
             "isExpired": true,
             "orders": [],
@@ -147,6 +100,7 @@
             "type": "coin",
             "amount": 1000,
             "amountLeft": 1000,
+            "message": "BANKAI .... Sen Bon Sakura Kageyoshi!!",
             "expiresOn": "2025-03-12T08:57:02.298Z",
             "isExpired": true,
             "orders": [],
@@ -157,6 +111,7 @@
             "type": "coin",
             "amount": 500,
             "amountLeft": 0,
+            "message": "BANKAIIIII",
             "expiresOn": "2025-06-06T13:10:18.042Z",
             "isExpired": false,
             "orders": [

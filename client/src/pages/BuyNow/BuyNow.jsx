@@ -1,107 +1,68 @@
-import React,{useState,useContext,useEffect,useRef} from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useContext, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAddress } from "../../components/context/AddressContext";
-import PlaceOrder from "../cartItems/PlaceOrder";
 import PriceDetails from "../cartItems/PriceDetails";
+import CartRow from "./CartRow";
 import { UserContext } from "../../components/context/UserContext";
-import { renderCartMessages } from "../cartItems/cartUtils"
+import { renderCartMessages } from "../cartItems/cartUtils";
+import Success from "../cartItems/Success";
+import AddressModal from "../cartItems/AddressModal";
 import axios from "axios";
-const BuyNowPage = () => {
- // Context and Location Data
-const { user } = useContext(UserContext);
-const location = useLocation();
-const { selectedAddress } = useAddress();
-const queryParams = new URLSearchParams(location.search);
+const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize }) => {
+  //  const navigate = useNavigate();
+  const { selectedAddress } = useAddress();
+  const [formData, setFormData] = useState({
+    name: selectedAddress && selectedAddress.name,
+    mobile: selectedAddress && selectedAddress.contactNo,
+  });
+  const navigate = useNavigate();
+  console.log(selectedHeight);
+  // User and Context Data
+  const { user } = useContext(UserContext);
 
-// Query Parameters
-const heightCategory = queryParams.get("heightCategory");
-const selectedColor = queryParams.get("selectedColor");
-const selectedSize = queryParams.get("selectedSize");
-const name = queryParams.get("name");
-const productId = queryParams.get("productId");
-const imageURL = queryParams.get("imageURL");
+  // Payment and Discount States
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("phonepe");
+  const [discountPercentage, setDiscountPercentage] = useState(0);
+  const [couponApplied, setCouponApplied] = useState("");
+  const [useWalletPoints, setUseWalletPoints] = useState(true);
+  const [walletPoints, setWalletPoints] = useState(null);
+  const additionalDiscountRef = useRef(0); // Additional discounts reference
+  const [quantity, setQuantity] = useState(1);
 
-// Form and Address States
-const [formData, setFormData] = useState({
-  name: selectedAddress?.name || "",
-  mobile: selectedAddress?.contactNo || "",
-});
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-// Payment and Discount States
-const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("phonepe");
-const [discountPercentage, setDiscountPercentage] = useState(0);
-const [couponApplied, setCouponApplied] = useState("");
-const [useWalletPoints, setUseWalletPoints] = useState(true);
-const [walletPoints, setWalletPoints] = useState(null);
-const additionalDiscountRef = useRef(0); // Reference for additional discounts
+  // Address and Checkout States
+  const [cartAddress, setCartAddress] = useState(null);
 
-// Product and Interaction States
-const [product, setProduct] = useState(null);
-const [isActive, setIsActive] = useState(false);
+  // UI and Interaction States
+  const [open, setOpen] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [showNotification1, setShowNotification1] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-// UI and Loading States
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
-const [showNotification, setShowNotification] = useState(false);
-const [successOpen, setSuccessOpen] = useState(false);
+  const fetchCartAddress = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/cart/${user.uid}`
+      );
+
+      setCartAddress(response.data.cart.cartAddress);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Fetch product when `id` changes
-    const fetchProduct = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/products/${productId}`
-        );
-
-        const data = await response.json();
-setProduct(data);
-        
-      } catch (err) {
-        setError(err.message);
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (productId) fetchProduct();
-  }, [productId]); 
-  const getSelectedTotalAmount = () => {
-    if(product){
-      return product.discountedPrice;
+    if (user) {
+      fetchCartAddress();
     }
-   
- 
-  };
-  const getTotalWithWalletAndDiscount = () => {
-    let total = getSelectedTotalAmount();
+  }, [user]);
 
-    // Apply wallet points if applicable
-    if (useWalletPoints && walletPoints > 0) {
-      total = Math.max(0, total - walletPoints); // Ensure total doesn't go below zero
-    }
-
-    // Calculate coupon discount
-  //  const couponDiscountAmount = (total * discountPercentage) / 100; // Calculate coupon discount
-  const couponDiscountAmount = Math.ceil(discountPercentage);
-  total = Math.max(0, total - couponDiscountAmount); 
-  // const couponDiscountAmount = discountPercentage;
-  //   total = Math.max(0, total - couponDiscountAmount); 
-
-    // Apply additional discount for payment method
-    if (selectedPaymentMethod !== "cashOnDelivery") {
-      const additionalDiscount =  Math.ceil(total * 0.05); // 5% additional discount for online payment
-      additionalDiscountRef.current = additionalDiscount; // Store it in useRef without causing re-renders
-      total = Math.max(0, total - additionalDiscount); // Apply additional discount and ensure total doesn't go below zero
-    }
-
-    // No additional discount for "COD"
-
-    return total;
-  };
   useEffect(() => {
     if (user) {
       const fetchUserData = async () => {
@@ -111,7 +72,6 @@ setProduct(data);
           );
           const data = response.data;
           setWalletPoints(data.totalCredits);
-          //   console.log("Fetched user data:", response.data);
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
@@ -119,98 +79,183 @@ setProduct(data);
       fetchUserData();
     }
   }, [user]);
-  const selectedProductDetails = [
-    {
-      productId,         // Assuming these variables are defined earlier
-      heightCategory,    // and hold the respective values.
-      selectedColor,
-      selectedSize,
-      name,
-      price: product?.discountedPrice || 0, // Correcting property access for discountedPrice
+
+  const handleOpen = (e) => {
+    setSelectedProduct(e);
+    setOpen(true);
+  };
+  const handleClose = () => setOpen(false);
+
+  const getTotalWithWalletAndDiscount = () => {
+    let total = getSelectedTotalAmount();
+    let walletAppliedAmount = 0;
+    let couponDiscountAmount = 0;
+    let additionalDiscount = 0;
+
+    // Apply wallet points if applicable
+    if (useWalletPoints && walletPoints > 0) {
+      walletAppliedAmount = Math.min(walletPoints, total); // Wallet points applied
+      total = Math.max(0, total - walletPoints); // Ensure total doesn't go below zero
     }
-  ];
-  
-  const orderDetails = {
-    uid: user?.uid,
-    modeOfPayment: selectedPaymentMethod,
-    totalAmount: getSelectedTotalAmount(),
-    payableAmount: getTotalWithWalletAndDiscount(),
-    discount: getSelectedTotalAmount() - getTotalWithWalletAndDiscount(),
-    lushioCurrencyUsed: useWalletPoints && walletPoints,
-    couponCode: couponApplied,
-    address: selectedAddress,
-    orderedProducts: selectedProductDetails,
- //   paymentData: paymentData,
-  
+
+    // Calculate coupon discount
+    couponDiscountAmount = Math.ceil(discountPercentage); // Calculate coupon discount
+    total = Math.max(0, total - couponDiscountAmount); // Apply coupon discount and ensure total doesn't go below zero
+
+    // Apply additional discount for payment method
+    if (selectedPaymentMethod !== "cashOnDelivery") {
+      additionalDiscount = Math.ceil(total * 0.05); // 5% additional discount for online payment
+      additionalDiscountRef.current = additionalDiscount;
+      total = Math.max(0, total - additionalDiscount); // Apply additional discount and ensure total doesn't go below zero
+    }
+
+    return {
+      total: Math.ceil(total),
+      walletAppliedAmount,
+      couponDiscountAmount,
+      additionalDiscount,
+    };
   };
 
+  const getTotalForCOD = () => {
+    let total = getSelectedTotalAmount();
+    let walletAppliedAmount = 0;
+    let couponDiscountAmount = 0;
+    let additionalDiscount = 0;
+
+    // Apply wallet points if applicable
+    if (useWalletPoints && walletPoints > 0) {
+      walletAppliedAmount = Math.min(walletPoints, total); // Wallet points applied
+      total = Math.max(0, total - walletPoints); // Ensure total doesn't go below zero
+    }
+
+    // Calculate coupon discount
+    couponDiscountAmount = Math.ceil(discountPercentage); // Calculate coupon discount
+    total = Math.max(0, total - couponDiscountAmount); // Apply coupon discount and ensure total doesn't go below zero
+    return Math.ceil(total);
+  };
   const handleWalletCheckboxChange = () => {
     setUseWalletPoints(!useWalletPoints);
   };
-  const handlePayment = async () => {
-   
-    const { name, mobile } = formData;
+ // const [selectedProductDetails, setSelectedProductDetails] = useState([]);
+  //const [selectedProductIds, setSelectedProductIds] = useState([]);
 
+  // Call this function whenever the selected items or cart products change
+
+  const getSelectedTotalAmount = () => {
+    return product.discountedPrice * quantity;
+  };
+  const getSelectedTotalMRP = () => {
+    return product.price * quantity;
+  };
+  const getSelectedAmount = () => {
+    return product.price * quantity;
+  };
+const normalizedHeight = {
+  aboveHeight: "above",
+  belowHeight: "below",
+}[selectedHeight] || selectedHeight || "normal";
+
+  const orderDetails = {
+    uid: user.uid,
+    modeOfPayment: selectedPaymentMethod,
+    totalAmount: getSelectedTotalMRP(),
+    payableAmount: getTotalWithWalletAndDiscount().total,
+    discount: getSelectedTotalAmount() - getTotalWithWalletAndDiscount().total,
+    lushioCurrencyUsed: useWalletPoints && walletPoints,
+    couponCode: couponApplied,
+    couponDiscount: getTotalWithWalletAndDiscount().couponDiscountAmount || 0,
+    onlinePaymentDiscount:
+      getTotalWithWalletAndDiscount().additionalDiscount || 0,
+    address: selectedAddress,
+    //  orderedProducts: selectedProductDetails,
+    orderedProducts: [
+      {
+        productId: product.id,
+        color: selectedColor,
+        heightType: normalizedHeight,
+        quantity: quantity,
+        size: selectedSize,
+        productName: product.displayName,
+      },
+    ],
+    lushioCashBack: 0,
+    //   paymentData: paymentData,
+  };
+
+  const handlePayment = async () => {
+    const { name, mobile } = formData;
+    setIsActive(true);
     const data = {
       name,
       mobile,
-      amount: getTotalWithWalletAndDiscount(),
+      amount: getTotalWithWalletAndDiscount().total,
       MUID: "MUIDW" + Date.now(),
       transactionId: "T" + Date.now(),
     };
-     // Combine orderDetails with paymentData
-  const combinedData = {
-    ...orderDetails, // Include all the properties of orderDetails
-    ...data,  // Override or add properties from paymentData
-  };
+    // Combine orderDetails with paymentData
+    const combinedData = {
+      ...orderDetails, // Include all the properties of orderDetails
+      ...data, // Override or add properties from paymentData
+    };
 
-   
     await axios
-      .post(
-        `${process.env.REACT_APP_API_URL}/payment/`,
-        combinedData
-      )
+      .post(`${process.env.REACT_APP_API_URL}/payment/`, combinedData)
       .then((response) => {
-       
-     //   setPaymentData(response.data);
+        // setPaymentData(response.data);
         if (
-          response.data
-          && response.data.data.instrumentResponse.redirectInfo.url
+          response.data &&
+          response.data.data.instrumentResponse.redirectInfo.url
         ) {
-         
           window.location.href =
             response.data.data.instrumentResponse.redirectInfo.url;
-           
-        
         } else {
           console.error("Redirect URL not found in response:", response.data);
         }
-
       })
       .catch((error) => {
         console.log("Error:", error);
       });
+    setIsActive(false);
   };
- 
-  const createOrder = async () => {
-   
+  const sendEmail = async (oid) => {
     try {
+      const payload = {
+        email: user.email,
+        name: orderDetails.address.name || "User",
+        type: "order",
+        orderId: oid,
+        //  address: orderDetails.email,
+        items: orderDetails.orderedProducts,
+        // item: items[0]?.name || '', // fallback for 'cancel' single item
+      };
+
+      await axios.post(`${process.env.REACT_APP_API_URL}/sendEmail`, payload);
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+  const createOrder = async () => {
+    try {
+      console.log(orderDetails.orderedProducts);
+
       setIsActive(true);
-   
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/orders/createOrder`,
         orderDetails
       );
-     
-    
-   //   await deleteCartItems(selectedProductIds);
+
       setIsActive(false);
       setSuccessOpen(true);
-      setTimeout(() => setSuccessOpen(false), 4000);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (response.status === 200 && user.email) {
+        await sendEmail(response.data.orderId);
+      }
+      setSuccessOpen(false);
+      navigate("/user/orders");
     } catch (error) {
       console.log(error);
-    }
-    finally{
+    } finally {
       setIsActive(false);
     }
   };
@@ -220,14 +265,23 @@ setProduct(data);
       setTimeout(() => setShowNotification(false), 3000);
       return;
     }
+    if (getTotalWithWalletAndDiscount().total <= 0) {
+      setShowNotification1(true);
+      setTimeout(() => setShowNotification1(false), 3000);
+      return;
+    }
+     if(1){
+      console.log(orderDetails);
+      return;
+    }
     if (selectedPaymentMethod === "phonepe") {
       await handlePayment();
-     // await createOrder();
+      // await createOrder();
     } else {
       await createOrder();
-     
     }
   };
+
   if (loading)
     return (
       <div className="loader-container">
@@ -235,117 +289,89 @@ setProduct(data);
         <span className="loader"></span>
       </div>
     );
+
   const shippingFee = "FREE";
+
   return (
-    <div>
-        {showNotification && (
+    <>
+      {showNotification && (
         <div className="notification-container">
-   <div className="cart-notification" style={{ aspectRatio: 180 / 25 }}>
-          Select Address to Proceed
+          <div className="cart-notification" style={{ aspectRatio: 180 / 25 }}>
+            Select Address to Proceed
+          </div>
         </div>
+      )}
+      {showNotification1 && (
+        <div className="notification-container">
+          <div
+            className="cart-notification amount-notification"
+            style={{ aspectRatio: 180 / 25 }}
+          >
+            Amount Must be greater than zero
+          </div>
         </div>
-     
       )}
       {isActive && (
         <div className="spinner-overlay">
           <div></div>
         </div>
       )}
-         <div className="selected-address-container">
-        {selectedAddress ? (
+      <div className="selected-address-container">
+        {cartAddress || selectedAddress ? (
           <div className="selected-address">
             <h4>Delivery Address:</h4>
             <div style={{ display: "flex" }}>
-              <strong>{selectedAddress.name},</strong>{" "}
-              <strong>{selectedAddress.pinCode} </strong>
+              <strong>
+                {(cartAddress?.name || selectedAddress?.name) ?? ""},
+              </strong>{" "}
+              <strong>
+                {(cartAddress?.pinCode || selectedAddress?.pinCode) ?? ""}{" "}
+              </strong>
             </div>
 
-            <span>{selectedAddress.flatDetails},</span>
-            <span>{selectedAddress.areaDetails},</span>
-            {selectedAddress.landmark && (
-              <span>{selectedAddress.landmark},</span>
+            <span>
+              {(cartAddress?.flatDetails || selectedAddress?.flatDetails) ?? ""}
+              ,
+            </span>
+            <span>
+              {(cartAddress?.areaDetails || selectedAddress?.areaDetails) ?? ""}
+              ,
+            </span>
+            {(cartAddress?.landmark || selectedAddress?.landmark) && (
+              <span>
+                {(cartAddress?.landmark || selectedAddress?.landmark) ?? ""},
+              </span>
             )}
             <span>
-              {selectedAddress.townCity}, {selectedAddress.state},
+              {(cartAddress?.townCity || selectedAddress?.townCity) ?? ""},{" "}
+              {(cartAddress?.state || selectedAddress?.state) ?? ""},
             </span>
           </div>
         ) : (
           <p>No addresses found. Please add a new address.</p>
         )}
-        <PlaceOrder />
+        <AddressModal setCartAddress={setCartAddress} />
       </div>
+
+      <Success successOpen={successOpen} setSuccessOpen={setSuccessOpen} />
       <div className="cartitems">
-      <div className="select-all-buttons">
-  <div className="itemContainer-base-item">
-     <div className={`cartitems-format `}>
-      <div className="itemContainer-base-itemLeft">
-    
-        <img
-          style={{
-            background: "rgb(244, 255, 249)",
-            height: "155px",
-            width: "111px",
-          }}
-          src={imageURL} 
-          alt=""
-          className="image-base-imgResponsive"
-        />
-      </div>
-      <div className="itemContainer-base-itemRight">
-     
-        <div className="itemContainer-base-details">
-          <div className="itemContainer-base-brand">LUSHIO</div>
-       <div className="itemContainer-base-description">
-       {name} 
-          </div>
-          <p className="product-color">
-           {  heightCategory !== "null" && <p> <strong>Height:</strong> {heightCategory}</p>}
-          </p>
-          <p className="product-color">
-            <strong>Color:</strong> {selectedColor}
-            <span
-              className="color-box"
-              style={{ backgroundColor: "pink" }}
-            ></span>
-          </p>
-          <div className="itemContainer-base-sizeAndQtyContainer">
-            <div className="itemContainer-base-sizeAndQty">
-              <div className="itemComponents-base-size">
-                <span className="">Size:  {selectedSize}</span>
-                {/* <img src="/Images/icons/quantityDropdown.svg" alt=""/> */}
-              </div>
-
-              <div className="itemComponents-base-quantity">
-                <span className="">Qty: 1</span>
-                <img src="/Images/icons/quantityDropdown.svg" alt="" />
-              </div>
-            </div>
-          </div>
-          <div className="itemContainer-base-description">
-          {/* ₹ {item.product.price * item.quantity}  */}
-          </div>
-         
-        </div>
-
-        <div className="returnPeriod-base-returnItem">
-          <img
-            src="/Images/icons/return.svg"
-            alt=""
-            className="returnPeriod-base-returnIcon"
-          />
-
-          <div className="returnPeriod-base-returnText">
-            <span className="returnPeriod-base-returnDays">7 days</span> return
-            available
+        <div className="select-all-buttons">
+          <div className="cart-items">
+            <CartRow
+              // key={i}
+              item={product}
+              quantity={quantity}
+              setQuantity={setQuantity}
+              handleOpen={handleOpen}
+              handleClose={handleClose}
+              open={open}
+              selectedHeight={selectedHeight}
+              selectedColor={selectedColor}
+              selectedSize={selectedSize}
+            />
           </div>
         </div>
-      </div>
-      </div>
-    </div>
-
-  </div>
-      </div>
-      <PriceDetails
+        <PriceDetails
           couponApplied={couponApplied}
           setCouponApplied={setCouponApplied}
           discountPercentage={discountPercentage}
@@ -354,7 +380,9 @@ setProduct(data);
           useWalletPoints={useWalletPoints}
           handleWalletCheckboxChange={handleWalletCheckboxChange}
           getSelectedTotalAmount={getSelectedTotalAmount}
-          getSelectedAmount={getSelectedTotalAmount}
+          getSelectedAmount={getSelectedAmount}
+          additionalDiscountRef={additionalDiscountRef}
+          getTotalForCOD={getTotalForCOD}
           getTotalWithWalletAndDiscount={getTotalWithWalletAndDiscount}
           renderCartMessages={renderCartMessages}
           shippingFee={shippingFee}
@@ -362,16 +390,27 @@ setProduct(data);
           setSelectedPaymentMethod={setSelectedPaymentMethod}
           handleCreateOrder={handleCreateOrder}
         />
-     {/* <PriceDetails/> */}
-     <div className="priceBlock-button-mobile">
-      {selectedPaymentMethod==="cashOnDelivery" && <p>Pay Online to get ₹{additionalDiscountRef.current} OFF</p>}
-      {selectedPaymentMethod==="phonepe" && <p>Hurray you get ₹{additionalDiscountRef.current} OFF by paying online</p>}
+      </div>
+
+      <div className="priceBlock-button-mobile">
+        {selectedPaymentMethod === "cashOnDelivery" && (
+          <p className="discount-message">
+            💰 Upgrade to online payment and save ₹
+            {additionalDiscountRef.current} instantly!
+          </p>
+        )}
+        {selectedPaymentMethod === "phonepe" && (
+          <p className="discount-message">
+            🎉 Great choice! Enjoy ₹{additionalDiscountRef.current} off by
+            paying with PhonePe.
+          </p>
+        )}
         <button onClick={handleCreateOrder} className="proceed-to-pay-button">
-          PLACE ORDER ₹{getTotalWithWalletAndDiscount()}
+          🛒 Place Order – ₹{getTotalWithWalletAndDiscount().total || 0}
         </button>
       </div>
-    </div>
+    </>
   );
 };
 
-export default BuyNowPage;
+export default BuyNow;

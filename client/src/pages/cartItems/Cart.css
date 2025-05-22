@@ -207,6 +207,13 @@ margin-top: 3px;
     border-radius: 2px;
     line-height: 16px
 }
+.cart-quantity-select {
+  font-size: 14px;
+  padding: 3px 4px;
+  border-radius: 6px;
+  outline: none;
+}
+
 
 .itemComponents-base-quantityValue {
     background-color: #f5f5f6;

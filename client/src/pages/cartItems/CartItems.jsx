@@ -10,7 +10,7 @@ import { useWishlist } from "../../components/context/WishlistContext";
 import { useCart } from "../../components/context/CartContext";
 import { renderCartMessages } from "./cartUtils";
 import PriceDetails from "./PriceDetails";
-import PlaceOrder from "./PlaceOrder";
+import AddressModal from "./AddressModal";
 import Success from "./Success";
 import { useAddress } from "../../components/context/AddressContext";
 const CartItems = () => {
@@ -343,6 +343,7 @@ const getTotalForCOD = () => {
     onlinePaymentDiscount: getTotalWithWalletAndDiscount().additionalDiscount || 0,
     address: selectedAddress,
     orderedProducts: selectedProductDetails,
+    lushioCashBack: 0
  //   paymentData: paymentData,
   
   };
@@ -541,7 +542,7 @@ fetchCartCount();
   ) : (
     <p>No addresses found. Please add a new address.</p>
   )}
-  <PlaceOrder setCartAddress={setCartAddress}/>
+  <AddressModal setCartAddress={setCartAddress}/>
 </div>
 {/* <button onClick={()=>sendEmail("123456")}> Click Me</button> */}
       {/* <button onClick={()=>handleSubmit()}>submit </button> */}

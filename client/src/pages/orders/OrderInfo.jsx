@@ -3,11 +3,9 @@ import axios from "axios";
 import { toast } from 'react-toastify'; 
 import { useParams } from "react-router-dom";
 import { UserContext } from "../../components/context/UserContext";
+import AddressModal from "./AddressModal";
 import "./orderinfo.css";
-import TrackingDetails from "./Tracking/TrackingDetails";
-import InvoicePreview from "./InvoicePreview";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
+import DeliveryTrackingUI from "./Tracking/DeliveryTrackingUi";
 import OrderTracking from "./OrderTracking";
 //import { FaCopy, FaCheck } from "react-icons/fa";
 import { FiCopy } from "react-icons/fi";
@@ -15,7 +13,7 @@ import { FiCopy } from "react-icons/fi";
 import { AiOutlineCheck } from "react-icons/ai";
 import { FaChevronRight } from "react-icons/fa";
 import OrderedProducts from "./OrderedProducts";
-import ReturnExchange from "./ReturnExchange";
+//import ReturnExchange from "./ReturnExchange";
 import ReturnExchangeNotice from "./ReturnExchangeNotice";
 //import Accordion from "./Accordian";
 import { db } from '../../firebaseConfig'; 
@@ -69,20 +67,17 @@ function OrderInfo() {
   
     fetchData();
   }, [orderId]);
-  
-  const [invoiceData, setInvoiceData] = useState({
-    clientName: "Manoj",
-    invoiceNumber: "123456779669",
-    date: "23/12/24",
-    items:  [
-      { description: "hi there", quantity: 1, price: 1200 },
-      { description: "item two", quantity: 2, price: 800 },
-      { description: "item three", quantity: 3, price: 1500 },
-      { description: "item four", quantity: 1, price: 500 },
-      { description: "item five", quantity: 4, price: 2000 },
-    ],
-    totalAmount: 1200,
-  });
+  function getTotalPayableAmount(orderedProducts) {
+    console.log(orderedProducts);
+     if (!Array.isArray(orderedProducts)) return 0;
+  return orderedProducts.reduce((total, product) => {
+    const quantity = product.quantity || 0;
+    const discountedPrice = product.productDetails?.discountedPrice || 0;
+    return total + (quantity * discountedPrice);
+  }, 0);
+}
+
+ 
   const generateInvoice = async (orderId) => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/orderAdmin/invoice`, { oid: orderId });
@@ -94,7 +89,7 @@ function OrderInfo() {
     }
   };
   const handledownloadInvoice = async (orderDetails) => {
-  console.log(orderDetails?.shiprocket?.invoice?.invoice_url);
+ // console.log(orderDetails?.shiprocket?.invoice?.invoice_url);
     if(orderDetails?.shiprocket?.invoice?.invoice_url){
       window.location.href = orderDetails?.shiprocket?.invoice?.invoice_url;
     }
@@ -102,36 +97,6 @@ function OrderInfo() {
       await generateInvoice(orderId);
     }
      }
-  const downloadPDF = async () => {
-    const invoiceElement = document.getElementById("invoice-preview");
-  
-    // Generate canvas
-    const canvas = await html2canvas(invoiceElement, { scale: 2 });
-  
-    // Convert canvas to image data with reduced quality
-    const imgData = canvas.toDataURL("image/jpeg", 1.5); // Use JPEG with a quality setting (0.85 = 85% quality)
-  
-    // Initialize jsPDF
-    const pdf = new jsPDF("p", "mm", "a4");
-  
-    // Calculate the dimensions of the A4 page
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-  
-    // Scale the image proportionally to fit A4 dimensions
-    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-    const imgX = (pdfWidth - imgWidth * ratio) / 2; // Center the image horizontally
-    const imgY = 0; // Start at the top of the page
-  
-    // Add the image to the PDF
-    pdf.addImage(imgData, "JPEG", imgX, imgY, imgWidth * ratio, imgHeight * ratio, undefined, "FAST");
-  
-    // Save the PDF with compression
-    pdf.save(`invoice-${invoiceData.invoiceNumber || "preview"}.pdf`);
-  };
-
   if (loading)
     return (
       <div className="loader-container">
@@ -140,7 +105,7 @@ function OrderInfo() {
       </div>
     );
   return (
-    <>
+    <div className="order-info-wrapper">
       <div className="orderId-container">
         <div className="orderId-left">
           <h4 className="orderId-heading">ORDER ID</h4>
@@ -164,15 +129,11 @@ function OrderInfo() {
           )}
         </div>
       </div>
-      {/* <h1>Download Invoice</h1> */}
-      {/* <InvoiceForm invoiceData={invoiceData} setInvoiceData={setInvoiceData} /> */}
-      <InvoicePreview data={invoiceData} />
-      {/* <TrackingDetails oid="mUmJTgrZ1nu2lCvH5GAw" uid="WUMRFsuouMTVX802XL80kDSDMiP2" /> */}
 
       <ReturnExchangeNotice/>
       <OrderedProducts orderedProducts={orderDetails?.orderedProducts || []} canReturn={canReturn} orderId={orderId}/>
 
-      <div className="order-tracking-vertical-container">
+      {/* <div className="order-tracking-vertical-container">
         <h2 className="order-tracking-vertical-heading">Delivery Status</h2>
         <div className="order-tracking-progress-bar">
           <div
@@ -197,7 +158,7 @@ function OrderInfo() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
      
       <div className="orderId-container downloadInvoicePdf" onClick={()=>handledownloadInvoice(orderDetails)}>
         <div className="orderId-left" >
@@ -207,6 +168,7 @@ function OrderInfo() {
           <FaChevronRight />
         </div>
       </div>
+      <DeliveryTrackingUI/>
       {/* <OrderTrackingTimeline trackingData={trackingData} /> */}
   
         {/*  <ReturnExchange/> */}
@@ -219,7 +181,7 @@ function OrderInfo() {
         </div>
         <div className="order-price-row">
           <span className="order-price-label">Payable Amount</span>
-          <span className="order-price-value">₹{orderDetails?.totalAmount}</span>
+          <span className="order-price-value">₹{getTotalPayableAmount(orderDetails?.orderedProducts)}</span>
         </div>
        
         {orderDetails?.lushioCurrencyUsed > 0 && (
@@ -229,10 +191,20 @@ function OrderInfo() {
   </div>
   
 )}
- <div className="order-price-row">
-          <span className="order-price-label">Coupon Discount</span>
-          <span className="order-price-value">-₹{orderDetails?.totalAmount - orderDetails?.payableAmount - orderDetails?.discount}</span>
-        </div>
+  {orderDetails?.couponDiscount > 0 && (
+  <div className="order-price-row">
+    <span className="order-price-label">Coupon Discount</span>
+    <span className="order-price-value">-₹{orderDetails.couponDiscount}</span>
+  </div>
+  
+)}
+  {orderDetails?.onlinePaymentDiscount > 0 && (
+  <div className="order-price-row">
+    <span className="order-price-label">Online Payment Discount</span>
+    <span className="order-price-value">-₹{orderDetails.onlinePaymentDiscount}</span>
+  </div>
+  
+)}
 
      
         <div className="order-price-row order-total">
@@ -241,7 +213,11 @@ function OrderInfo() {
         </div>
       </div>
       <div className="order-delivery-container">
-        <h2 className="order-delivery-heading">Delivery Address</h2>
+        <div className="order-delivery-heading">
+          <img className="location-icon" src="/Images/location.png" alt="location-icon"/>
+   <h2 >Delivery Address</h2>
+        </div>
+     
         <div className="order-delivery-details">
           <p className="order-delivery-name">{orderDetails?.address.name}</p>
           <p className="order-delivery-address">
@@ -252,8 +228,10 @@ function OrderInfo() {
         {orderDetails?.address.landmark &&  <p><strong>Landmamrk: </strong>{orderDetails?.address.landmark}</p>} 
           <p className="order-delivery-contact">+{orderDetails?.address.contactNo}</p>
         </div>
+        {/* <button className="final-submit-button">Update Delivery Address</button> */}
+        <AddressModal orderId={orderId}/>
       </div>
-    </>
+    </div>
   );
 }
 

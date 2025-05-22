@@ -146,7 +146,7 @@ const MultiStepForm = ({productId, handleClose}) => {
       // Set state to "validate" upon success
       setButtonState("validate");
       await new Promise(resolve => setTimeout(resolve, 1250));
-            alert('Form submitted successfully!');
+            alert('Review submitted successfully!');
       // Reset form and close modal/steps
       setCurrentStep(1);
   
