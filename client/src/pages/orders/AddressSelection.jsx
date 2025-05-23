@@ -62,21 +62,13 @@ const handleSelectAddress = async () => {
       ...selectedAddress,
       contactNo: selectedAddress.contactNo.substring(2),
     };
- const res = await axios.put(`${process.env.REACT_APP_API_URL}/orders/address/update`, {
+   await axios.put(`${process.env.REACT_APP_API_URL}/orders/address/update`, {
       oid: orderId,
       address: updatedAddress,
       uid: user.uid,
     });
 handleClose();
-alert("Address Updated Successfully");
-//  toast.success("Address updated successfully", {
-//   position: "top-center",
-//   style: {
-//     marginTop: "100px",
-//   },
-// });
-
- //   console.log("Response:", res.data);
+toast.success("Address updated successfully");
    
   } catch (err) {
     console.error("Error while selecting address:", err);
@@ -92,7 +84,10 @@ alert("Address Updated Successfully");
 
   const handleSave = () => {
     if (!newAddress.name || !newAddress.pinCode || !newAddress.contactNo || !newAddress.flatDetails || !newAddress.areaDetails) {
-      alert("Please fill in all required fields!");
+   
+      toast.error("Please fill in all required fields!", {
+        className: "custom-toast-error",
+      });
       return;
     }
 // Extract numeric part (without country code)
@@ -100,7 +95,9 @@ const numericValue = newAddress.contactNo.replace(/\D/g, "");
 
 // Check if the phone number has exactly 10 digits
 if (numericValue.length !== 12) {
-  alert("Phone number must be exactly 10 digits.");
+  toast.error("Phone number must be exactly 10 digits.", {
+        className: "custom-toast-error",
+      });
   return;
 }
     if (editingIndex !== null) {
@@ -193,7 +190,7 @@ console.log(data);
         <h2>My Addresses</h2>
         <hr />
       </div>
-       <ToastContainer position="top-right" autoClose={3000} />
+       {/* <ToastContainer position="top-right" autoClose={3000} /> */}
       <AddressForm
         isAddingNew={isAddingNew}
         editingIndex={editingIndex}

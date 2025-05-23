@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { UserContext } from "./UserContext"; 
-
+import {toast} from 'react-toastify';
 const AddressContext = createContext();
 
 export const AddressProvider = ({ children }) => {
@@ -60,7 +60,9 @@ export const AddressProvider = ({ children }) => {
     const addressToRemove = addressData.find((address) => address.id === id);
 
   if (addressToRemove?.isDefault) {
-    alert("You cannot remove the default address. Please set another address as default first.");
+   
+           toast.error("You cannot remove the default address. Please set another address as default first.",{className:"custom-toast-error"})
+
     return;
   }
     if (window.confirm("Are you sure you want to delete this address?")) {

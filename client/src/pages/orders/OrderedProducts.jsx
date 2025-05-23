@@ -1,12 +1,13 @@
-import React, { useState,useContext } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import ReturnExchange from "./ReturnExchange";
 import axios from "axios";
 import { UserContext } from "../../components/context/UserContext";
-const OrderedProducts = ({ orderedProducts, canReturn,orderId }) => {
+import { toast } from "react-toastify";
+const OrderedProducts = ({ orderedProducts, canReturn, orderId }) => {
   const [items, setItems] = useState({});
   const [payloadForMail, setPayloadForMail] = useState([]);
-  const [loading,setLoading]= useState(false);
+  const [loading, setLoading] = useState(false);
   const { user } = useContext(UserContext);
   const updateItems = (newItem) => {
     setItems((prevItems) => ({
@@ -15,31 +16,30 @@ const OrderedProducts = ({ orderedProducts, canReturn,orderId }) => {
     }));
   };
 
-  const sendEmail = async() => {
+  const sendEmail = async () => {
     try {
       const payload = {
         email: user.email,
-        name :user.displayName || "User",
+        name: user.displayName || "User",
         type: "return-request",
         orderId: orderId,
-      //  address: orderDetails.email,
+        //  address: orderDetails.email,
         items: payloadForMail,
-       // item: items[0]?.name || '', // fallback for 'cancel' single item
+        // item: items[0]?.name || '', // fallback for 'cancel' single item
       };
-  
+
       await axios.post(`${process.env.REACT_APP_API_URL}/sendEmail`, payload);
-     
     } catch (err) {
-      console.error('Error:', err);
-     
+      console.error("Error:", err);
     }
-   }
+  };
   const handleSubmit = async () => {
     if (Object.keys(items).length === 0) {
-      alert("No items selected for return/exchange.");
+             toast.error("No items selected for Return/Exchange.",{className:"custom-toast-error"})
+
       return;
     }
-setLoading(true);
+    setLoading(true);
     const requestBody = {
       uid: user?.uid,
       oid: orderId,
@@ -47,22 +47,27 @@ setLoading(true);
     };
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/returnExchange/process-return-exchange`, requestBody);
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/returnExchange/process-return-exchange`,
+        requestBody
+      );
       console.log("Response:", response.data);
-      if(response.status===200 && user.email){
+      if (response.status === 200 && user.email) {
         await sendEmail();
       }
-      alert("Return/Exchange request submitted successfully!");
+      toast.success("Return/Exchange request submitted successfully!");
       setItems({});
     } catch (error) {
-      
-  if (error.response && error.response.status === 403) {
-    alert("Return already initiated");
-  } else {
-    alert("Failed to submit request. Try again.");
-  }
-    }
-    finally{
+      if (error.response && error.response.status === 403) {
+        toast.error("Return already initiated", {
+          className: "custom-toast-error",
+        });
+      } else {
+        toast.error("Failed to submit request. Try again.", {
+          className: "custom-toast-error",
+        });
+      }
+    } finally {
       setLoading(false);
     }
   };
@@ -92,17 +97,19 @@ setLoading(true);
                 <p className="ordered-product-name">
                   {product?.productName || product?.name}
                 </p>
-                 <p>
-                      <strong>Price:</strong> ₹{product.productDetails.discountedPrice} x {product.quantity} = ₹{product.productDetails.discountedPrice*product.quantity}
-                    </p>
-                     <p className="ordered-product-info">
+                <p>
+                  <strong>Price:</strong> ₹
+                  {product.productDetails.discountedPrice} x {product.quantity}{" "}
+                  = ₹{product.productDetails.discountedPrice * product.quantity}
+                </p>
+                <p className="ordered-product-info">
                   Quantity: {product?.quantity}
                 </p>
-              
+
                 <p className="ordered-product-info">
                   Height: {product?.heightType || "Normal"}
                 </p>
-               
+
                 <p className="ordered-product-info">
                   Color: {product?.color}
                   <span
@@ -112,39 +119,34 @@ setLoading(true);
                       marginLeft: "5px",
                       width: "10px",
                       height: "10px",
-                      backgroundColor: product?.productDetails?.colorOptions?.find(
-                        (color) => color.name === product?.color
-                      )?.code,
+                      backgroundColor:
+                        product?.productDetails?.colorOptions?.find(
+                          (color) => color.name === product?.color
+                        )?.code,
                     }}
                   ></span>
                 </p>
-                  <p className="ordered-product-info">Size: {product?.size}</p>
+                <p className="ordered-product-info">Size: {product?.size}</p>
               </div>
             </div>
 
-            {/* <ReturnExchange
+           
+            <ReturnExchange
+              key={product.id}
               title="RETURN/EXCHANGE PRODUCT"
               canReturn={canReturn}
-              identifier={index}
-          orderId={orderId}
-          product={product}
-            /> */}
-               <ReturnExchange
-          key={product.id}
-          title="RETURN/EXCHANGE PRODUCT"
-          canReturn={canReturn}
-          identifier={product.opid}
-          orderId={orderId}
-          product={product}
-          payloadForMail={payloadForMail}
-          setPayloadForMail={setPayloadForMail}
-          updateItems={updateItems}
-        />
+              identifier={product.opid}
+              orderId={orderId}
+              product={product}
+              payloadForMail={payloadForMail}
+              setPayloadForMail={setPayloadForMail}
+              updateItems={updateItems}
+            />
           </div>
         ))}
-            <button className="final-submit-button" onClick={handleSubmit}>
-        Submit Return/Exchange Request
-      </button>
+        <button className="final-submit-button" onClick={handleSubmit}>
+          Submit Return/Exchange Request
+        </button>
       </div>
     </div>
   );

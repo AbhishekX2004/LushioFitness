@@ -5,7 +5,8 @@ import { UserContext } from "../../components/context/UserContext.jsx";
 import PhoneInput from "react-phone-input-2";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import "react-phone-input-2/lib/style.css";
-
+import {toast} from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 function EditProfile() {
   const { user } = useContext(UserContext);
   const [userData, setUserData] = useState({
@@ -75,12 +76,12 @@ function EditProfile() {
 
     // Phone number validation
     if (userData.phoneNumber && !isValidPhoneNumber(userData.phoneNumber)) {
-      alert("Please enter a valid phone number.");
+       toast.error("Please enter a valid phone number.",{className:"custom-toast-error"})
       return;
     }
 
     if (Object.keys(changedFields).length === 0) {
-      alert("No changes detected!");
+     toast.error("No changes Detected!",{className:"custom-toast-error"})
       return;
     }
 
@@ -92,7 +93,7 @@ function EditProfile() {
       );
 
       setInitialData(userData);
-      alert("Profile updated successfully!");
+       toast.success("Profile Updated successfully!");
     } catch (error) {
       alert(
         `Error updating profile\n${

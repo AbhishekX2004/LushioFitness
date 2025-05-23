@@ -19,7 +19,7 @@ const AddressForm = ({
   return (
     (isAddingNew || editingIndex !== null) && (
       <div className="edit-address">
-        <h4>{editingIndex !== null ? "Edit Address" : "Add New Address"}</h4>
+        <h3>{editingIndex !== null ? "Edit Address" : "Add New Address"}</h3>
 
         <label htmlFor="name">Name</label>
         <input

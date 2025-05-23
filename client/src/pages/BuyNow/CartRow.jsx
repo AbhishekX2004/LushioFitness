@@ -1,9 +1,5 @@
-import React, { useState, useContext, useRef, useEffect } from "react";
-import { UserContext } from "../../components/context/UserContext";
-import { useWishlist } from "../../components/context/WishlistContext";
-import ResponsivePopup from "../cartItems/ResponsivePopUp";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-//import "./newcart.css";
 const CartRow = ({
   item,
   selectedHeight,
@@ -14,11 +10,7 @@ const CartRow = ({
 }) => {
 
   // State Variables
-  const [isPopupOneOpen, setPopupOneOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [totalQuantity, setTotalQuantity] = useState(0);
-  const [cartQuantity, setCartQuantity] = useState(0);
   const colorHex = item?.colorOptions?.find(
     (color) => color.name === selectedColor
   )?.code;
@@ -38,9 +30,7 @@ const CartRow = ({
   }, []);
 
   const handlePopUpOneOpen = async (e) => {
-    
-
-   // setPopupOneOpen(true);
+  
     setTotalQuantity(0);
     const data = {
       pid: e.id,
@@ -65,20 +55,6 @@ const CartRow = ({
     }
   };
   
-  const handleQuantityUpdate = async () => {
-   
-    try {
-      setIsUpdating(true);
-      
-      setPopupOneOpen(false);
-      
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
 
    const handleSelectChange = (e) => {
     const newQty = Number(e.target.value);
@@ -86,10 +62,7 @@ const CartRow = ({
     setIsEditing(false); // close dropdown
   };
 
-  const handleQuantityChange = (quantity) => {
-    setCartQuantity(quantity); 
-  };
-
+  
   return (
     <>
       <div className={`itemContainer-base-item`}>

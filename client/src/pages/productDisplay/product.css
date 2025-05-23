@@ -179,11 +179,11 @@
     rgb(242, 112, 156),
     rgb(255, 148, 114)
   );
-  clip-path: polygon(0 0, 91% 0, 100% 100%, 0% 100%);
+  clip-path: polygon(0 1%, 100% 0%, 88% 100%, 0% 100%);
   color: white;
   padding-inline: 2cqi;
   text-align: center;
-  border-radius: 2px;
+  border-radius: 4%;
   display: inline-block;
   width: fit-content;
 }

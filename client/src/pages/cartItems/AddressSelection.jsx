@@ -3,13 +3,13 @@ import axios from 'axios';
 import { useAddress } from '../../components/context/AddressContext';
 import "./addressSelection.css"
 import AddressForm from './AddressForm';
+import {toast} from 'react-toastify';
 import { UserContext } from "../../components/context/UserContext";
 const AddressSelection = ({handleClose,setCartAddress})=> {
   const {
     addressData,
     isChangingDefault,
     isLoading,
-    fetchAddresses,
     handleAddAddress,
     handleEditAddress,
     handleRemoveAddress,
@@ -70,6 +70,7 @@ if(res.status===200){
   setCartAddress(res.data.cartAddress);
 }
     handleClose();
+    toast.success("Address Updated successfully!");
     console.log(res);
   } catch (err) {
     console.error("Error while selecting address:", err);
@@ -85,7 +86,10 @@ if(res.status===200){
 
   const handleSave = () => {
     if (!newAddress.name || !newAddress.pinCode || !newAddress.contactNo || !newAddress.flatDetails || !newAddress.areaDetails) {
-      alert("Please fill in all required fields!");
+    
+      toast.error("Please fill in all required fields!", {
+        className: "custom-toast-error",
+      });
       return;
     }
 // Extract numeric part (without country code)
@@ -93,7 +97,9 @@ const numericValue = newAddress.contactNo.replace(/\D/g, "");
 
 // Check if the phone number has exactly 10 digits
 if (numericValue.length !== 12) {
-  alert("Phone number must be exactly 10 digits.");
+  toast.error("Phone number must be exactly 10 digits.", {
+        className: "custom-toast-error",
+      });
   return;
 }
     if (editingIndex !== null) {
@@ -153,7 +159,7 @@ if (numericValue.length !== 12) {
       const response = await fetch(`https://api.postalpincode.in/pincode/${code}`);
      
       const data = await response.json();
-console.log(data);
+//console.log(data);
       if (data && data[0] && data[0].Status === "Success") {
         setLocationInfo({
           district: data[0].PostOffice[0].District,
@@ -186,6 +192,8 @@ console.log(data);
         <h2>My Addresses</h2>
         <hr />
       </div>
+      
+
       <AddressForm
         isAddingNew={isAddingNew}
         editingIndex={editingIndex}

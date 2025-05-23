@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import signInWithGoogle from "../../auth/googleAuth";
+import {toast} from "react-toastify"
 import signInWithFacebook from "../../auth/facebookAuth";
 import { handleEmailLogin, sendEmailSignInLink } from "../../auth/emailAuth";
 import { sendOtp, verifyOtpForLogin } from "../../auth/phoneAuth";
@@ -119,7 +120,8 @@ const Login = () => {
         } catch (error) {
           console.error("Error logging in with email ::", error);
           setIsButtonDisabled(false);
-          alert("Invalid email/password");
+                 toast.error("Invalid email/password",{className:"custom-toast-error"})
+
         }
       }
     }

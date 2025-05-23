@@ -42,39 +42,39 @@ function User() {
     if (confirmLogout) {
       signOut(auth)
         .then(() => {
-          toast.success("Logged out Successfully!", {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-            style: {
-              backgroundColor: "#4caf50", // Green background
-              color: "#fff",
-              fontSize: "1rem",
-              padding: "10px 20px",
-            },
-          });
+          // toast.success("Logged out Successfully!", {
+          //   position: "top-center",
+          //   autoClose: 2000,
+          //   hideProgressBar: true,
+          //   closeOnClick: true,
+          //   pauseOnHover: false,
+          //   draggable: false,
+          //   style: {
+          //     backgroundColor: "#4caf50", 
+          //     color: "#fff",
+          //     fontSize: "1rem",
+          //     padding: "10px 20px",
+          //   },
+          // });
           setTimeout(() => (window.location.href = "/"), 2000);
         })
         .catch((error) => {
           console.error("Error signing out:", error);
-          toast.error("Couldn't Log out, please try again.", {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-            style: { backgroundColor: "#ff3e3e", color: "#fff" },
-          });
+          // toast.error("Couldn't Log out, please try again.", {
+          //   position: "top-center",
+          //   autoClose: 2000,
+          //   hideProgressBar: true,
+          //   closeOnClick: true,
+          //   pauseOnHover: false,
+          //   draggable: false,
+          //   style: { backgroundColor: "#ff3e3e", color: "#fff" },
+          // });
         });
     }
   };
   return (
     <>
-   <ToastContainer />
+   {/* <ToastContainer /> */}
    {user && <h1 className="user-greet">Welcome{userName ? `, ${userName}` : ""}</h1>}
 
       <p className="user-question">What would you like to do?</p>

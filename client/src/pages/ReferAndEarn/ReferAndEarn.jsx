@@ -3,6 +3,7 @@ import "./refer-earn.css";
 import axios from 'axios';
 import ShareComponent from "./ShareComp";
 import { UserContext } from "../../components/context/UserContext";
+import {toast} from 'react-toastify';
 function ReferAndEarn() {
   const textRef = useRef(null);
   const { user } = useContext(UserContext);
@@ -30,7 +31,7 @@ const [referralCode,setReferralCode] = useState(null);
     const textToCopy = textRef.current.innerText;
     navigator.clipboard.writeText(textToCopy)
       .then(() => {
-        alert("Text copied to clipboard!");
+        toast.success("Text copied to clipboard!");
       })
       .catch((err) => {
         console.error("Failed to copy text: ", err);
