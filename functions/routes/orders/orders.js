@@ -11,6 +11,7 @@ const db = getFirestore();
 const {generateToken, destroyToken} = require("./shiprocketAuth");
 const logger = require("firebase-functions/logger");
 const getStatusDescription = require("./statusDescription");
+const admin = require("firebase-admin");
 
 // Validation middleware
 const validateOrderRequest = (req, res, next) => {
@@ -244,6 +245,8 @@ router.post("/createOrder", validateOrderRequest, async (req, res) => {
         throw new Error("Invalid response from Shiprocket API");
       }
 
+      // ENABLE BEFORE DEPLOY
+
       // const awbResponse = await axios.post(
       //     `${SHIPROCKET_API_URL}/courier/assign/awb`,
       //     {
@@ -398,10 +401,78 @@ router.get("/:orderId", async (req, res) => {
   }
 });
 
-// Get all orders for a user
+// // Get all orders for a user
+// router.get("/", async (req, res) => {
+//   try {
+//     const {uid, limit = 5, lastOrderId} = req.query;
+
+//     // Validate if `uid` is provided
+//     if (!uid) {
+//       return res.status(400).json({message: "User ID is required"});
+//     }
+
+//     // Check if the `uid` exists in the `users` collection
+//     const userDoc = await db.collection("users").doc(uid).get();
+//     if (!userDoc.exists) {
+//       return res.status(404).json({message: "Invalid User ID"});
+//     }
+
+//     // Build the base query for fetching orders
+//     let query = db.collection("orders").where("uid", "==", uid).orderBy("dateOfOrder", "desc").limit(parseInt(limit));
+
+//     // Add pagination if `lastOrderId` is provided
+//     if (lastOrderId) {
+//       const lastOrderDoc = await db.collection("orders").doc(lastOrderId).get();
+//       if (lastOrderDoc.exists) {
+//         query = query.startAfter(lastOrderDoc);
+//       }
+//     }
+
+//     // Execute the query to get orders
+//     const ordersSnapshot = await query.get();
+
+//     // Process orders and fetch their orderedProducts
+//     const orders = await Promise.all(
+//         ordersSnapshot.docs.map(async (doc) => {
+//         // Get the orderedProducts subcollection for this order
+//           const orderedProductsSnapshot = await doc.ref.collection("orderedProducts").get();
+
+//           const orderedProducts = orderedProductsSnapshot.docs.map((productDoc) => ({
+//             opid: productDoc.id,
+//             ...productDoc.data(),
+//           }));
+
+//           return {
+//             orderId: doc.id,
+//             ...doc.data(),
+//             orderedProducts,
+//           };
+//         }),
+//     );
+
+//     // Pagination metadata
+//     const lastVisible = ordersSnapshot.docs[ordersSnapshot.docs.length - 1];
+
+//     res.status(200).json({
+//       orders,
+//       pagination: {
+//         hasMore: orders.length === parseInt(limit),
+//         lastOrderId: lastVisible?.id,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error fetching orders:", error);
+//     res.status(500).json({
+//       message: "Failed to fetch orders",
+//       error: error.message,
+//     });
+//   }
+// });
+
+// Get all orders for a user with flexible time range filtering
 router.get("/", async (req, res) => {
   try {
-    const {uid, limit = 5, lastOrderId} = req.query;
+    const {uid, limit = 5, lastOrderId, timeRange} = req.query;
 
     // Validate if `uid` is provided
     if (!uid) {
@@ -414,8 +485,75 @@ router.get("/", async (req, res) => {
       return res.status(404).json({message: "Invalid User ID"});
     }
 
+    // Parse time range and calculate date filters
+    let startDate = null;
+    let endDate = null;
+
+    if (timeRange) {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+
+      if (/^\d+W$/i.test(timeRange)) { // Case 1: xW -> last x weeks (e.g., "2W" for last 2 weeks)
+        const weeks = parseInt(timeRange.replace(/W$/i, ""));
+        startDate = new Date(now.getTime() - (weeks * 7 * 24 * 60 * 60 * 1000));
+        endDate = now;
+      } else if (/^\d+M$/i.test(timeRange)) { // Case 2: yM -> last y months (e.g., "3M" for last 3 months, 1 month = 30 days)
+        const months = parseInt(timeRange.replace(/M$/i, ""));
+        startDate = new Date(now.getTime() - (months * 30 * 24 * 60 * 60 * 1000));
+        endDate = now;
+      } else if (/^\d+Y$/i.test(timeRange)) { // Case 3: zY -> last z years (e.g., "1Y" for last year, handles leap years)
+        const years = parseInt(timeRange.replace(/Y$/i, ""));
+        startDate = new Date(now);
+        startDate.setFullYear(now.getFullYear() - years);
+        endDate = now;
+      } else if (/^Year\d{4}$/i.test(timeRange)) { // Case 4: YearXXXX -> all orders in the year XXXX (e.g., "Year2024")
+        const year = parseInt(timeRange.replace(/Year/i, ""));
+        startDate = new Date(year, 0, 1); // January 1st of the year
+        endDate = new Date(year, 11, 31, 23, 59, 59, 999); // December 31st of the year
+      } else if (/^Month(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/i.test(timeRange)) { // Case 5: MonthMMM -> all orders of MMM month of current year (e.g., "MonthJan")
+        const monthMap = {
+          "jan": 0, "feb": 1, "mar": 2, "apr": 3, "may": 4, "jun": 5,
+          "jul": 6, "aug": 7, "sep": 8, "oct": 9, "nov": 10, "dec": 11,
+        };
+        const monthAbbr = timeRange.replace(/Month/i, "").toLowerCase();
+        const monthIndex = monthMap[monthAbbr];
+
+        startDate = new Date(currentYear, monthIndex, 1); // First day of the month
+        endDate = new Date(currentYear, monthIndex + 1, 0, 23, 59, 59, 999); // Last day of the month
+      } else if (/^MonYr(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\d{4}$/i.test(timeRange)) { // Case 6: MonYrMMMYYYY -> MMM month of YYYY year (e.g., "MonYrJan2024")
+        const monthMap = {
+          "jan": 0, "feb": 1, "mar": 2, "apr": 3, "may": 4, "jun": 5,
+          "jul": 6, "aug": 7, "sep": 8, "oct": 9, "nov": 10, "dec": 11,
+        };
+        const match = timeRange.match(/^MonYr(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(\d{4})$/i);
+        const monthAbbr = match[1].toLowerCase();
+        const year = parseInt(match[2]);
+        const monthIndex = monthMap[monthAbbr];
+
+        startDate = new Date(year, monthIndex, 1); // First day of the month
+        endDate = new Date(year, monthIndex + 1, 0, 23, 59, 59, 999); // Last day of the month
+      } else { // Invalid time range format
+        return res.status(400).json({
+          message: "Invalid timeRange format. Supported formats: xW, yM, zY, YearXXXX, MonthMMM, MonYrMMMYYYY",
+        });
+      }
+    }
+
     // Build the base query for fetching orders
-    let query = db.collection("orders").where("uid", "==", uid).orderBy("dateOfOrder", "desc").limit(parseInt(limit));
+    let query = db.collection("orders").where("uid", "==", uid);
+
+    // Add date range filters if timeRange is specified
+    if (startDate && endDate) {
+      // Convert JavaScript dates to Firestore Timestamps
+      // const startTimestamp = admin.firestore.Timestamp.fromDate(startDate);
+      // const endTimestamp = admin.firestore.Timestamp.fromDate(endDate);
+
+      query = query.where("dateOfOrder", ">=", startDate)
+          .where("dateOfOrder", "<=", endDate);
+    }
+
+    // Apply ordering and limit
+    query = query.orderBy("dateOfOrder", "desc").limit(parseInt(limit));
 
     // Add pagination if `lastOrderId` is provided
     if (lastOrderId) {
@@ -456,6 +594,12 @@ router.get("/", async (req, res) => {
         hasMore: orders.length === parseInt(limit),
         lastOrderId: lastVisible?.id,
       },
+      // Include applied filters in response for debugging/confirmation
+      appliedFilters: {
+        timeRange: timeRange || "all",
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+      },
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -465,6 +609,42 @@ router.get("/", async (req, res) => {
     });
   }
 });
+
+/*
+TIME RANGE QUERY PARAMETER EXAMPLES:
+
+1. Last X Weeks:
+   - "2W" -> Orders from last 2 weeks
+   - "4W" -> Orders from last 4 weeks
+
+2. Last Y Months (30 days each):
+   - "1M" -> Orders from last month
+   - "6M" -> Orders from last 6 months
+
+3. Last Z Years (handles leap years):
+   - "1Y" -> Orders from last year
+   - "2Y" -> Orders from last 2 years
+
+4. Specific Year:
+   - "Year2024" -> All orders from 2024
+   - "Year2023" -> All orders from 2023
+
+5. Specific Month of Current Year:
+   - "MonthJan" -> All orders from January of current year
+   - "MonthDec" -> All orders from December of current year
+
+6. Specific Month of Specific Year:
+   - "MonYrJan2024" -> All orders from January 2024
+   - "MonYrDec2023" -> All orders from December 2023
+
+7. Default (no timeRange parameter):
+   - Returns all orders as before
+
+USAGE:
+GET /orders?uid=user123&timeRange=2W&limit=10
+GET /orders?uid=user123&timeRange=MonthJan&limit=5
+GET /orders?uid=user123&timeRange=Year2024
+*/
 
 // Cancel an order
 router.post("/cancel", async (req, res) => {

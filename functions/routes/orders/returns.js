@@ -155,7 +155,7 @@ router.post("/create", async (req, res) => {
         return_reason: returnData.return_reason,
         discount: productData.perUnitDiscount,
 
-        // qc_enable: true,
+        // qc_enable: true,             // ENABLE BEFORE DEPLOY
         // qc_color: productData.color,
         // qc_size: productData.size,
         // qc_product_name: productData.productName,
@@ -243,7 +243,7 @@ router.post("/create", async (req, res) => {
       throw new Error("Shipment ID not found in return order response");
     }
 
-    // // Generate AWB for return shipment
+    // // Generate AWB for return shipment    ENABLE BEFORE DEPLOY
     // const awbResponse = await axios.post(
     //     `${SHIPROCKET_API_URL}/courier/assign/awb`,
     //     {
