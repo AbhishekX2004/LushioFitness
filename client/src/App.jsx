@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { doc, onSnapshot } from "firebase/firestore";
+import axios from "axios";
 import { db } from "./firebaseConfig";
 import { ToastContainer, Zoom } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -64,8 +65,54 @@ import "./App.css";
 function App() {
   const [backend, setBackend] = useState(null);
   const [admin, setAdmin] = useState(null);
+  const [backendHealthCheck, setBackendHealthCheck] = useState(null); // null = checking, true = healthy, false = unhealthy
+  const [healthCheckAttempts, setHealthCheckAttempts] = useState(0);
+  const API = process.env.REACT_APP_API_URL;
+
+  // Configuration for health check retry logic
+  const MAX_RETRY_ATTEMPTS = 3;
+  const RETRY_DELAYS = [2000, 5000, 10000]; // 2s, 5s, 10s
+  const REQUEST_TIMEOUT = 10000; // 10 seconds per request
 
   useEffect(() => {
+    // Enhanced backend health check with retry logic
+    const checkBackendHealth = async (attemptNumber = 0) => {
+      try {
+        console.log(`Backend health check attempt ${attemptNumber + 1}/${MAX_RETRY_ATTEMPTS}`);
+        
+        const response = await axios.get(`${API}/helloWorld`, { 
+          timeout: REQUEST_TIMEOUT 
+        });
+        
+        if (response.status === 200) {
+          console.log("Backend health check successful");
+          setBackendHealthCheck(true);
+          setHealthCheckAttempts(attemptNumber + 1);
+          return;
+        }
+      } catch (error) {
+        console.error(`Backend health check attempt ${attemptNumber + 1} failed:`, error.message);
+        
+        // If we haven't exhausted all attempts, retry after delay
+        if (attemptNumber < MAX_RETRY_ATTEMPTS - 1) {
+          const delay = RETRY_DELAYS[attemptNumber];
+          console.log(`Retrying in ${delay / 1000} seconds...`);
+          
+          setTimeout(() => {
+            checkBackendHealth(attemptNumber + 1);
+          }, delay);
+        } else {
+          // All attempts failed
+          console.error("All backend health check attempts failed");
+          setBackendHealthCheck(false);
+          setHealthCheckAttempts(attemptNumber + 1);
+        }
+      }
+    };
+
+    // Start the health check process
+    checkBackendHealth();
+
     // Setup realtime listener for admin engine control using Firestore
     const adminDocRef = doc(db, "controls", "admin");
     const unsubscribeAdmin = onSnapshot(adminDocRef, (docSnap) => {
@@ -87,19 +134,27 @@ function App() {
       unsubscribeAdmin();
       unsubscribeBackend();
     };
-  }, []);
+  }, [API]);
 
-  if (backend === null || admin === null) {
+  // Show loading state while initial checks are in progress
+  if (backend === null || admin === null || backendHealthCheck === null) {
     return (
       <div className="loader-container">
-        {" "}
         <span className="loader"></span>
+        {backendHealthCheck === null && healthCheckAttempts > 0 && (
+          <p style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+            Connecting to server... (Attempt {healthCheckAttempts}/{MAX_RETRY_ATTEMPTS})
+          </p>
+        )}
       </div>
     );
   }
 
+  // Determine if backend is truly available based on both Firestore flag and API health check
+  const isBackendAvailable = backend && backendHealthCheck;
+
   if (admin) {
-    if (!backend) {
+    if (!isBackendAvailable) {
       return (
         <BrowserRouter>
           <Routes>

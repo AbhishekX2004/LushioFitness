@@ -37,6 +37,7 @@ require("dotenv-safe").config({
 // logger.log("Loaded environment variables:", process.env);
 
 // Import routes
+const helloWorldRoute = require("./routes/helloWorld.js");
 const userRoutes = require("./routes/users.js");
 const productsRoute = require("./routes/products.js");
 const reviewRoute = require("./routes/reviews.js");
@@ -63,6 +64,7 @@ const returnExchangeRoute = require("./routes/orders/returnExchange.js");
 const bannerRoute = require("./routes/banners.js");
 
 // Use routes
+app.use("/helloWorld", helloWorldRoute);
 app.use("/user", userRoutes);
 app.use("/products", productsRoute);
 app.use("/filters", productFilterRoute);

@@ -36,7 +36,7 @@ router.post("/process-return-exchange", async (req, res) => {
       return res.status(403).json({success: false, message: "Return already initiated."});
     }
 
-    // Validate return/exchange period
+    // Validate return/exchange period    ENABLE BEFORE DEPLOY
     // const normalizeToDate = (date) => {
     //   const normalized = new Date(date);
     //   normalized.setHours(0, 0, 0, 0);

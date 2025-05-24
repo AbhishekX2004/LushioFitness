@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
       return res.status(403).json({error: "Unauthorized access"});
     }
 
-    // 2. Check exchange/return period
+    // 2. Check exchange/return period    ENABLE BEFORE DEPLOY
     // const currentTime = new Date().getTime();
     // const deliveredOn = order.deliveredOn?.toDate()?.getTime();
     // const returnExchangeExpiresOn = order.returnExchangeExpiresOn?.toDate()?.getTime();
