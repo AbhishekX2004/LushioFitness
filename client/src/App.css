@@ -106,3 +106,51 @@ height: 50px;
     
   }
 }
+/* General Toast Container Styling */
+.custom-toast-success, .custom-toast-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to right, #38b000, #70e000); /* green gradient */
+   background: linear-gradient(to right, #10b981, #14b8a6);
+  color: white;
+  min-width: 240px;
+  /* max-width: 90vw; */
+  max-width: fit-content;
+  padding: 17px;
+  margin: 20px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.custom-toast-error{
+   background: linear-gradient(to right, #ef4444, #dc2626);
+}
+/* Toast Body (text inside) */
+.custom-toast-body {
+   padding: 0 !important; /* remove inner padding from react-toastify */
+  margin: 0;
+  font-family: "Assistant";
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Fix icon color visibility */
+ .custom-toast-success  .Toastify__toast-icon {
+  svg {
+    fill: white !important;
+    stroke: white !important;
+  }
+}
+.custom-toast-error .Toastify__toast-icon svg {
+  fill: white !important;
+  stroke: white !important;
+}
+/* Responsive position adjustment */
+@media (max-width: 768px) {
+  .Toastify__toast-container {
+    bottom: 60px !important;
+    top: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}

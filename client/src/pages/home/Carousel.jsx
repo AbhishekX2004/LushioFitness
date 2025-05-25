@@ -7,7 +7,7 @@ import "./Home.css";
 function Carousel({ images }) {
   const [current, setCurrent] = useState(0);
   const timeOutRef = useRef(null);
-console.log(images);
+//console.log(images);
   // Slide right logic
   const slideRight = useCallback(() => {
     setCurrent((prev) => (prev === images.length - 1 ? 0 : prev + 1));

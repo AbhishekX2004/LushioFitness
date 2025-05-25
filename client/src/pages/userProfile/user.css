@@ -140,7 +140,9 @@
     box-sizing: border-box;
     user-select: none;
 }
-
+.edit-profile input[type="tel"]{
+    padding-left: 40px;
+}
 .edit-profile input:focus {
     border-color: #333;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
@@ -170,6 +172,10 @@
     font-size: 14px;
     accent-color: #1c1b1b;
     color: #444;
+     transition: all 0.9s ease;
+}
+.react-tel-input .form-control {
+  padding-left: 50px !important;
 }
 
 .edit-profile button {

@@ -10,7 +10,7 @@ import { useWishlist } from "../../components/context/WishlistContext";
 import { useCart } from "../../components/context/CartContext";
 import { renderCartMessages } from "./cartUtils";
 import PriceDetails from "./PriceDetails";
-import PlaceOrder from "./PlaceOrder";
+import AddressModal from "./AddressModal";
 import Success from "./Success";
 import { useAddress } from "../../components/context/AddressContext";
 const CartItems = () => {
@@ -60,8 +60,9 @@ const [loading, setLoading] = useState(false);
         `${process.env.REACT_APP_API_URL}/cart/${user.uid}`
       );
       setCartProducts(response.data.cartItems);
-    setCartAddress(response.data.cartAddress);
-   // console.log(response.data.cart.cartAddress);
+    setCartAddress(response.data.cart.cartAddress);
+    // console.log(cartAddress);
+    // console.log(response.data.cart.cartAddress);
     } catch (err) {
       console.error(err);
     } finally {
@@ -223,7 +224,7 @@ const getTotalForCOD = () => {
         updatedSelections[item.id] = true;
       }
     });
-  
+   setSelectedItems(updatedSelections); 
     setIsAllSelected(true);
   
   };
@@ -317,8 +318,11 @@ const getTotalForCOD = () => {
       setCartProducts((prevCartProducts) =>
         prevCartProducts.filter((item) => item.id !== cartItemId)
       );
-
+      setSelectedProduct(null);
+ setTimeout(() => {
       handleClose();
+    }, 100);
+      //handleClose();
     } catch (error) {
       console.error(
         "Error removing item from cart:",
@@ -339,6 +343,7 @@ const getTotalForCOD = () => {
     onlinePaymentDiscount: getTotalWithWalletAndDiscount().additionalDiscount || 0,
     address: selectedAddress,
     orderedProducts: selectedProductDetails,
+    lushioCashBack: 0
  //   paymentData: paymentData,
   
   };
@@ -537,7 +542,7 @@ fetchCartCount();
   ) : (
     <p>No addresses found. Please add a new address.</p>
   )}
-  <PlaceOrder />
+  <AddressModal setCartAddress={setCartAddress}/>
 </div>
 {/* <button onClick={()=>sendEmail("123456")}> Click Me</button> */}
       {/* <button onClick={()=>handleSubmit()}>submit </button> */}

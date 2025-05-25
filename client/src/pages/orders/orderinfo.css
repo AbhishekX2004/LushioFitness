@@ -1,3 +1,6 @@
+.order-info-wrapper *{
+  font-family: "Assistant";
+}
 .orderId-container {
     display: flex;
     align-items: center;
@@ -124,8 +127,14 @@
     background-color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
-  
+  .location-icon{
+    height: 22px;
+    width: 22px;
+  }
   .order-delivery-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin: 0;
     font-size: 18px;
     font-weight: bold;
@@ -139,6 +148,7 @@
     font-size: 16px;
     color: #555;
     line-height: 1.6;
+    margin-bottom: 10px;
   }
   
   .order-delivery-name {
@@ -285,6 +295,7 @@ width: 4px;
   }
   .ordered-product-wrapper{
     background-color: #f7f7f7;
+     transition: all 0.3s ease-in-out;
     border: 1px solid #ddd;
   }
   .ordered-product {
@@ -292,7 +303,7 @@ width: 4px;
     gap: 15px;
     padding: 10px;
     border-radius: 8px;
-   
+    transition: all 0.3s ease-in-out;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     align-items: center;
   }

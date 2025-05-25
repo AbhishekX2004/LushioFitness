@@ -5,6 +5,7 @@ import { storage } from "../../firebaseConfig"; // Import storage from Firebase 
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import './MultiStepForm.css';
+import {toast} from 'react-toastify';
 import axios from "axios";
 import { UserContext } from '../../components/context/UserContext';
 
@@ -29,14 +30,15 @@ const MultiStepForm = ({productId, handleClose}) => {
 
     // Limit to 3 files
     if (files.length > 3) {
-      alert('You can only upload a maximum of 3 files.');
+       toast.error("You can only upload a maximum of 3 files.",{className:"custom-toast-error"})
       return;
     }
 
     // Check that each file is less than 15 MB
     for (const file of files) {
       if (file.size > 15 * 1024 * 1024) { // 15 MB in bytes
-        alert(`File ${file.name} is larger than 15 MB. Please choose smaller files.`);
+               toast.error(`File ${file.name} is larger than 15 MB. Please choose smaller files.`,{className:"custom-toast-error"})
+
         return;
       }
     }
@@ -134,7 +136,7 @@ const MultiStepForm = ({productId, handleClose}) => {
   
     
   
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/reviews/${productId}`, payload, {
+       await axios.post(`${process.env.REACT_APP_API_URL}/reviews/${productId}`, payload, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -146,7 +148,8 @@ const MultiStepForm = ({productId, handleClose}) => {
       // Set state to "validate" upon success
       setButtonState("validate");
       await new Promise(resolve => setTimeout(resolve, 1250));
-            alert('Form submitted successfully!');
+          
+           toast.success("Review added successfully!")
       // Reset form and close modal/steps
       setCurrentStep(1);
   

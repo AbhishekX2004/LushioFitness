@@ -5,7 +5,7 @@ import { AiOutlineLoading } from "react-icons/ai";
 import "./Coupon.css";
 import { UserContext } from "../../components/context/UserContext";
 
-function Coupon({ setDiscount, cartAmount, setCouponApplied }) {
+function Coupon({ setDiscountPercentage, cartAmount, setCouponApplied }) {
   const [open, setOpen] = useState(false);
   const { user } = useContext(UserContext);
   const [coupons, setCoupons] = useState([]);
@@ -82,7 +82,7 @@ function Coupon({ setDiscount, cartAmount, setCouponApplied }) {
         }
       );
       const discountValue = response.data.discount;
-      setDiscount(discountValue); // Update discount in parent component
+      setDiscountPercentage(discountValue); // Update discount in parent component
       setCouponApplied(couponCode); // Set applied coupon code
       setSuccessMessage(
         `Coupon applied successfully! Discount: ₹${discountValue}`

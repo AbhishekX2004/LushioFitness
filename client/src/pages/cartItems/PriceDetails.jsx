@@ -44,6 +44,12 @@ const PriceDetails = ({
 
     fetchAdminControls();
   }, []);
+
+   const handleRemoveCoupon = () => {
+    setCouponApplied(""); 
+    setDiscountPercentage(0);
+   
+  };
   return (
     <div className="priceBlock-base-wrapper">
       <div className="priceBlock-base-container">
@@ -55,12 +61,19 @@ const PriceDetails = ({
           <Coupon
             couponApplied={couponApplied}
             setCouponApplied={setCouponApplied}
-            discount={discountPercentage}
-            setDiscount={setDiscountPercentage}
+           // discount={discountPercentage}
+            setDiscountPercentage={setDiscountPercentage}
             cartAmount={getSelectedTotalAmount()}
           />
         </div>
       </div>
+      {
+        couponApplied && <div className="coupon-applied-container">
+  <div className="coupon-applied-left">✅<p> Coupon Applied {couponApplied}</p></div>
+
+  <div className="coupon-applied-right" onClick={handleRemoveCoupon}>REMOVE ❌</div>
+</div>
+      }
 
       <div className="priceBlock-base-priceHeader">PRICE DETAILS (1 Item)</div>
       <div className="priceBreakUp-base-orderSummary" id="priceBlock">

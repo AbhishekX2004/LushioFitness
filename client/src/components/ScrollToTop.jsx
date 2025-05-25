@@ -5,10 +5,13 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0); // Scroll to the top of the page
-  }, [pathname]); // Trigger when the pathname changes
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // Enables smooth scroll
+    });
+  }, [pathname]);
 
-  return null; // No UI needed
+  return null;
 };
 
 export default ScrollToTop;

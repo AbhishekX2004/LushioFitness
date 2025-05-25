@@ -11,7 +11,7 @@ const About = () => {
       </div>
 
       <div className="about-content">
-        <img className="about-image"  src="/Images/icons/card-image-6.webp" alt="" />
+        <img className="about-image"  src="/Images/card-image-6.webp" alt="" />
 
         <div className="about-text">
           <p>

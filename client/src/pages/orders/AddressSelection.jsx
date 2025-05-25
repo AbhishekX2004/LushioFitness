@@ -1,15 +1,16 @@
 import React, { useState,useEffect,useContext} from 'react';
 import axios from 'axios';
 import { useAddress } from '../../components/context/AddressContext';
-import "./addressSelection.css"
-import AddressForm from './AddressForm';
-import {toast} from 'react-toastify';
+import AddressForm from '../cartItems/AddressForm';
 import { UserContext } from "../../components/context/UserContext";
-const AddressSelection = ({handleClose,setCartAddress})=> {
+import { toast,ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+const AddressSelection = ({handleClose,orderId})=> {
   const {
     addressData,
     isChangingDefault,
     isLoading,
+  //  fetchAddresses,
     handleAddAddress,
     handleEditAddress,
     handleRemoveAddress,
@@ -61,17 +62,14 @@ const handleSelectAddress = async () => {
       ...selectedAddress,
       contactNo: selectedAddress.contactNo.substring(2),
     };
-
-    const res = await axios.post(
-      `${process.env.REACT_APP_API_URL}/cart/address/${user.uid}`,
-      updatedAddress
-    );
-if(res.status===200){
-  setCartAddress(res.data.cartAddress);
-}
-    handleClose();
-    toast.success("Address Updated successfully!");
-    console.log(res);
+   await axios.put(`${process.env.REACT_APP_API_URL}/orders/address/update`, {
+      oid: orderId,
+      address: updatedAddress,
+      uid: user.uid,
+    });
+handleClose();
+toast.success("Address updated successfully");
+   
   } catch (err) {
     console.error("Error while selecting address:", err);
   } finally {
@@ -86,7 +84,7 @@ if(res.status===200){
 
   const handleSave = () => {
     if (!newAddress.name || !newAddress.pinCode || !newAddress.contactNo || !newAddress.flatDetails || !newAddress.areaDetails) {
-    
+   
       toast.error("Please fill in all required fields!", {
         className: "custom-toast-error",
       });
@@ -159,7 +157,7 @@ if (numericValue.length !== 12) {
       const response = await fetch(`https://api.postalpincode.in/pincode/${code}`);
      
       const data = await response.json();
-//console.log(data);
+console.log(data);
       if (data && data[0] && data[0].Status === "Success") {
         setLocationInfo({
           district: data[0].PostOffice[0].District,
@@ -192,8 +190,7 @@ if (numericValue.length !== 12) {
         <h2>My Addresses</h2>
         <hr />
       </div>
-      
-
+       {/* <ToastContainer position="top-right" autoClose={3000} /> */}
       <AddressForm
         isAddingNew={isAddingNew}
         editingIndex={editingIndex}

@@ -1,0 +1,72 @@
+.summary-card {
+  display: flex;
+  gap: 10px;
+  padding-bottom: 18px;
+  align-items: center;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border: 1px solid rgb(235, 232, 232);
+}
+
+.credit-icon {
+  height: 19px;
+  width: 23px;
+}
+
+.summary-card-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.summary-card-date {
+  color: #737E93;
+  margin-top: 10px;
+  font-size: 10px;
+}
+
+.summary-card-title {
+  color: #292D35;
+  font-weight: 500;
+  font-size: 0.875rem;
+  font-size: 11px;
+  padding-top: 6px;
+}
+
+.summary-card-validity {
+  color: #292D35;
+  font-weight: 500;
+  font-size: 0.875rem;
+  font-size: 11px;
+  padding-top: 0.55rem;
+}
+.summary-card-validity.expired {
+  color: #ff9900;
+}
+
+.summary-card-amount {
+  color: #008C2D;
+  font-weight: 500;
+  font-size: 1rem;
+}
+.summary-card-amount.negative {
+  color: #ff4444;
+}
+
+.summary-card-amount.expired {
+  color: #ff9900;
+}
+
+.summary-card-amount.used {
+  color: #ff9900;
+}
+.transaction-button{
+    margin-inline: auto;
+
+}
+.transactions-container{
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+  margin-inline: 10px;
+}

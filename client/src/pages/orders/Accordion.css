@@ -1,9 +1,9 @@
-.accordion {
+ .accordion {
    
     border-radius: 5px;
     margin:  0;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease-in-out;
   }
   
   .accordion-header {
@@ -27,7 +27,7 @@
   
   .accordion-icon {
     font-size: 1.5rem;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease-in-out;
   }
   
   .accordion-icon.open {
@@ -36,13 +36,14 @@
   
   .accordion-content {
     overflow: hidden;
-    transition: max-height 0.3s ease, padding 0.3s ease;
+     transform-origin: top;
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease;
     max-height: 0;
     padding: 0px;
   }
   
   .accordion-content.expanded {
-    max-height: 500px;
-    padding: 15px 0px;
+    /* max-height: 500px; */
+    padding: 15px 15px;
   }
-  
+   

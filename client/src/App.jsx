@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { doc, onSnapshot } from "firebase/firestore";
 import axios from "axios";
 import { db } from "./firebaseConfig";
+import { ToastContainer, Zoom } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Components
 import Navbar from "./components/Navbar";
@@ -22,6 +24,7 @@ import PaymentSuccess from "./pages/orders/PaymentSuccess";
 import PaymentFailed from "./pages/orders/PaymentFailure";
 import Address from "./pages/userProfile/Address";
 import Wallet from "./pages/wallet/Wallet";
+import Transaction from "./pages/wallet/Transaction";
 import ShopCategory from "./pages/shopCategory/ShopCategory";
 import ReferAndEarn from "./pages/ReferAndEarn/ReferAndEarn";
 import BuyNow from "./pages/BuyNow/BuyNow";
@@ -167,13 +170,41 @@ function App() {
         <BrowserRouter>
           <Navbar />
           <ScrollToTop />
+          <ToastContainer
+            position="top-center"
+            autoClose={3000}
+            hideProgressBar
+            closeOnClick={false}
+            pauseOnHover
+            draggable
+            theme="light"
+            transition={Zoom}
+            toastClassName="custom-toast-success"
+            bodyClassName="custom-toast-body"
+            closeButton={false}
+          />
+
           <Routes>
             {/* Home and Categories */}
             <Route path="/" element={<Home />} />
             <Route path="/:category/:subCategory" element={<CategoryPage />} />
-            <Route path="/men" element={<ShopCategory banner={men_banner} category="men" />} />
-            <Route path="/women" element={<ShopCategory banner={women_banner} category="women" />} />
-            <Route path="/accessories" element={<ShopCategory banner={accessories_banner} category="accessories" />} />
+            <Route
+              path="/men"
+              element={<ShopCategory banner={men_banner} category="men" />}
+            />
+            <Route
+              path="/women"
+              element={<ShopCategory banner={women_banner} category="women" />}
+            />
+            <Route
+              path="/accessories"
+              element={
+                <ShopCategory
+                  banner={accessories_banner}
+                  category="accessories"
+                />
+              }
+            />
             <Route path="/search" element={<Search />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
@@ -199,6 +230,10 @@ function App() {
 
             {/* Wallet and Orders */}
             <Route path="/wallet" element={<Wallet />} />
+            <Route
+              path="/wallet/transactions/:type"
+              element={<Transaction />}
+            />
             <Route path="/orderInfo/:orderId" element={<OrderInfo />} />
             <Route path="/buyNow" element={<BuyNow />} />
 
@@ -225,7 +260,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/lushioGods" element={<AdminPanel />} />
-        <Route path="*" element={<Maintenance/>} />
+        <Route path="*" element={<Maintenance />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,12 +1,16 @@
 import React, { useState } from "react";
-//import axios from "axios";
 import "./Accordion.css";
 import "./ReturnExchange.css";
-//import { UserContext } from "../../components/context/UserContext";
-
-const ReturnExchange = ({ title, canReturn, identifier, orderId, product, updateItems, setPayloadForMail }) => {
- // const { user } = useContext(UserContext);
-
+import { toast } from "react-toastify";
+const ReturnExchange = ({
+  title,
+  canReturn,
+  identifier,
+  orderId,
+  product,
+  updateItems,
+  setPayloadForMail,
+}) => {
   const [state, setState] = useState({
     isOpen: false,
     selectedOption: "exchange",
@@ -14,7 +18,7 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
     selectedSize: "",
     selectedQuantity: 1,
     otherReason: "",
-    exchangeReason: "Wrong size selected", // Default exchange reason
+    exchangeReason: "Wrong size selected",
   });
 
   const toggleAccordion = () => {
@@ -45,12 +49,12 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
   };
 
   const handleExchangeReasonChange = (reason) => {
-    setState((prev) => ({ ...prev, exchangeReason: reason, otherReason: reason === "Other" ? "" : prev.otherReason }));
+    setState((prev) => ({
+      ...prev,
+      exchangeReason: reason,
+      otherReason: reason === "Other" ? "" : prev.otherReason,
+    }));
   };
-
-  // const handleSizeSelect = (size) => {
-  //   setState((prev) => ({ ...prev, selectedSize: size }));
-  // };
 
   const handleQuantityChange = (e) => {
     setState((prev) => ({ ...prev, selectedQuantity: Number(e.target.value) }));
@@ -58,38 +62,49 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
 
   const handleAddItem = () => {
     if (!canReturn) {
-      alert("This product is not eligible for return/exchange.");
+      toast.error("This product is not eligible for Return/exchange.", {
+        className: "custom-toast-error",
+      });
       return;
     }
 
-    if (!state.selectedReason || (state.selectedReason === "other" && !state.otherReason.trim())) {
-      alert(`Please provide a reason for ${title}.`);
+    if (
+      !state.selectedReason ||
+      (state.selectedReason === "other" && !state.otherReason.trim())
+    ) {
+      toast.error(`Please provide a reason for ${title}.`, {
+        className: "custom-toast-error",
+      });
       return;
     }
-
-    // if (state.selectedOption === "exchange" && !state.selectedSize) {
-    //   alert(`Please select a size for exchange on ${title}.`);
-    //   return;
-    // }
 
     const itemData = {
       [identifier]: {
         exchange: state.selectedOption === "exchange",
         units: state.selectedQuantity,
-        reason: state.selectedReason === "other" ? state.otherReason : state.selectedReason,
-        exchangeReason: state.selectedOption === "exchange" ? (state.exchangeReason === "Other" ? state.otherReason : state.exchangeReason) : "",
+        reason:
+          state.selectedReason === "other"
+            ? state.otherReason
+            : state.selectedReason,
+        exchangeReason:
+          state.selectedOption === "exchange"
+            ? state.exchangeReason === "Other"
+              ? state.otherReason
+              : state.exchangeReason
+            : "",
       },
     };
     const finalReason =
-    state.selectedOption === "exchange"
-      ? state.exchangeReason === "Other"
+      state.selectedOption === "exchange"
+        ? state.exchangeReason === "Other"
+          ? state.otherReason
+          : state.exchangeReason
+        : state.selectedReason === "other"
         ? state.otherReason
-        : state.exchangeReason
-      : state.selectedReason === "other"
-      ? state.otherReason
-      : state.selectedReason;
-     // 👇 Update the new payloadForMail state
-     const payloadItem = {
+        : state.selectedReason;
+
+    // 👇 Update the new payloadForMail state
+    const payloadItem = {
       identifier: identifier,
       exchange: state.selectedOption === "exchange",
       productName: product.productName,
@@ -98,10 +113,10 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
       size: product.size,
       reason: finalReason,
     };
-  
-  setPayloadForMail((prev) => [...prev, payloadItem]);
+
+    setPayloadForMail((prev) => [...prev, payloadItem]);
     updateItems(itemData);
-    alert(`Added ${title} to return/exchange list!`);
+    toast.success(`Added ${title} to return/exchange list!`);
   };
 
   return (
@@ -115,7 +130,10 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
         </div>
 
         {state.isOpen && (
-          <div className={`accordion-content ${state.isOpen ? "expanded" : ""}`}>
+          <div
+            className={`accordion-content ${state.isOpen ? "expanded" : ""}`}
+            style={{ maxHeight: state.isOpen ? "1000px" : "0" }}
+          >
             <div className="return-exchange-options">
               <label className="radio-label">
                 <input
@@ -140,24 +158,20 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
             </div>
 
             <h3>Select Quantity:</h3>
-            {/* <select value={state.selectedQuantity} onChange={handleQuantityChange} className="quantity-dropdown">
-              {[1, 2, 3, 4, 5].map((num) => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select> */}
-             <select
-                value={state.selectedQuantity}
-                onChange={handleQuantityChange}
-                className="quantity-select"
-              >
-                {Array.from({ length: product.quantity }, (_, i) => i + 1).map((num) => (
+
+            <select
+              value={state.selectedQuantity}
+              onChange={handleQuantityChange}
+              className="quantity-select"
+            >
+              {Array.from({ length: product.quantity }, (_, i) => i + 1).map(
+                (num) => (
                   <option key={num} value={num}>
                     {num}
                   </option>
-                ))}
-              </select>
+                )
+              )}
+            </select>
 
             {state.selectedOption === "return" && (
               <div className="return-section">
@@ -206,27 +220,19 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
 
             {state.selectedOption === "exchange" && (
               <div className="exchange-section">
-            
-
                 <h3>Select Reason for Exchange:</h3>
                 <div className="exchange-reasons">
-                  {/* <label className="radio-label">
-                    <input
-                      type="radio"
-                      name={`exchangeReason-${identifier}`}
-                      value="Wrong size selected"
-                      checked={state.exchangeReason === "Wrong size selected"}
-                      onChange={() => handleExchangeReasonChange("Wrong size selected")}
-                    />
-                    Wrong size selected
-                  </label> */}
                   <label className="radio-label">
                     <input
                       type="radio"
                       name={`exchangeReason-${identifier}`}
                       value="Wrong product received"
-                      checked={state.exchangeReason === "Wrong product received"}
-                      onChange={() => handleExchangeReasonChange("Wrong product received")}
+                      checked={
+                        state.exchangeReason === "Wrong product received"
+                      }
+                      onChange={() =>
+                        handleExchangeReasonChange("Wrong product received")
+                      }
                     />
                     Wrong product received
                   </label>
@@ -236,7 +242,9 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
                       name={`exchangeReason-${identifier}`}
                       value="Product defective"
                       checked={state.exchangeReason === "Product defective"}
-                      onChange={() => handleExchangeReasonChange("Product defective")}
+                      onChange={() =>
+                        handleExchangeReasonChange("Product defective")
+                      }
                     />
                     Product defective
                   </label>
@@ -262,7 +270,10 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
               </div>
             )}
 
-            <button className="submit-button add-request-button" onClick={handleAddItem}>
+            <button
+              className="submit-button add-request-button"
+              onClick={handleAddItem}
+            >
               Add to Request
             </button>
           </div>
@@ -273,4 +284,3 @@ const ReturnExchange = ({ title, canReturn, identifier, orderId, product, update
 };
 
 export default ReturnExchange;
-

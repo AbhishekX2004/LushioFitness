@@ -1,17 +1,22 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import { Modal, Box, Fade, Backdrop } from "@mui/material";
-import AddressSelection from "./AddressSelection"
-const PlaceOrder = ()=> {
-  const [open, setOpen] = useState(false);
+import BuyNow from "./BuyNow";
+const BuyNowModal = ({
+  className,
+  open,
+  handleOpen,
+  setOpen,
+  product,
+  selectedHeight,
+  selectedColor,
+  selectedSize,
+}) => {
   const handleClose = () => setOpen(false);
- const handleOpen = () => {
-        setOpen(true);
-  };
- 
+
   return (
-    <div>
-     <button onClick={handleOpen} className="address-selection-button open-rating-button">
-       Change
+    <>
+      <button onClick={handleOpen} className={className}>
+        Buy Now
       </button>
       <Modal
         open={open}
@@ -24,13 +29,13 @@ const PlaceOrder = ()=> {
       >
         <Fade in={open}>
           <Box
-           className="address-modal"
+            className="address-modal"
             sx={{
               position: "absolute",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-            
+
               padding: "0px",
               bgcolor: "background.paper",
               border: ".5px solid #000",
@@ -45,13 +50,17 @@ const PlaceOrder = ()=> {
               className="address-modal-close"
               onClick={handleClose}
             />
-<AddressSelection handleClose={handleClose}/>
-
+            <BuyNow
+              product={product}
+              selectedHeight={selectedHeight}
+              selectedColor={selectedColor}
+              selectedSize={selectedSize}
+            />
           </Box>
         </Fade>
       </Modal>
-    </div>
+    </>
   );
-}
+};
 
-export default PlaceOrder;
+export default BuyNowModal;

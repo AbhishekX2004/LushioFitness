@@ -1,0 +1,536 @@
+
+/* Container */
+.tracking-container {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+/* Header Card */
+.tracking-header-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tracking-main-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+/* Search Section */
+.tracking-search-section {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.tracking-search-input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.tracking-search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.tracking-search-input:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  border-color: transparent;
+}
+
+.tracking-search-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.tracking-search-button:hover {
+  background-color: #1d4ed8;
+}
+
+.tracking-search-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Sample IDs Section */
+.tracking-sample-ids {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+}
+
+.tracking-sample-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.tracking-sample-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tracking-sample-button {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-family: monospace;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tracking-sample-button:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.tracking-sample-button-active {
+  background-color: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+/* Order Summary */
+.tracking-order-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 0.5rem;
+}
+
+.tracking-order-info {
+  flex: 1;
+}
+
+.tracking-order-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.tracking-customer-name,
+.tracking-delivery-address {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.tracking-estimated-delivery {
+  text-align: right;
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+
+.tracking-estimated-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.tracking-estimated-date {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Status Card */
+.tracking-status-card {
+  background: linear-gradient(to right, #dbeafe, #dcfce7);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tracking-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.tracking-status-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.tracking-status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid;
+}
+.tracking-timeline-app-status{
+    margin-top: 10px;
+    padding: 3px 10px;
+    border-radius: 10px;
+}
+/* Status Badge Colors */
+
+
+.tracking-status-delivered {
+  background-color: #e6f7ec;
+  color: #2e7d32;
+  border: 1px solid #c5e1c5;
+}
+
+.tracking-status-out-for-delivery {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+}
+
+.tracking-status-shipped {
+  background-color: #fff8e1;
+  color: #f9a825;
+  border: 1px solid #ffe082;
+}
+
+.tracking-status-processing {
+  background-color: #ede7f6;
+  color: #5e35b1;
+  border: 1px solid #d1c4e9;
+}
+
+.tracking-status-cancelled {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.tracking-status-return {
+  background-color: #e0f7fa;
+  color: #006064;
+  border: 1px solid #b2ebf2;
+}
+
+.tracking-status-issue {
+  background-color: #fff3e0;
+  color: #ef6c00;
+  border: 1px solid #ffcc80;
+}
+
+.tracking-status-delayed {
+  background-color: #fbe9e7;
+  color: #d84315;
+  border: 1px solid #ffab91;
+}
+
+.tracking-status-partial {
+  background-color: #f3e5f5;
+  color: #8e24aa;
+  border: 1px solid #ce93d8;
+}
+
+.tracking-status-pending {
+  background-color: #e0f2f1;
+  color: #00897b;
+  border: 1px solid #b2dfdb;
+}
+
+.tracking-status-default {
+  background-color: #eceff1;
+  color: #546e7a;
+  border: 1px solid #cfd8dc;
+}
+
+/* Optional shared styles for layout and padding */
+.tracking-status-common {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  gap: 4px;
+}
+
+
+/* Progress Bar */
+.tracking-progress-container {
+  width: 100%;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  height: 0.5rem;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.tracking-progress-bar {
+  background-color: #2563eb;
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s ease-in-out;
+}
+
+.tracking-id-display {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.tracking-id-code {
+  font-family: monospace;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Timeline Card */
+.tracking-timeline-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.tracking-timeline-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+/* Timeline Container */
+.tracking-timeline-container {
+  position: relative;
+}
+
+.tracking-timeline-line {
+  position: absolute;
+  left: 2rem;
+  top: 0;
+  bottom: 0;
+  width: 0.125rem;
+  background-color: #e5e7eb;
+}
+
+.tracking-timeline-item {
+  position: relative;
+  display: flex;
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+.tracking-timeline-item-current {
+  padding-bottom: 3rem;
+}
+
+/* Timeline Icons */
+.tracking-timeline-icon-container {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tracking-timeline-icon-current {
+  background-color: #dbeafe;
+  ring: 4px;
+  ring-color: #eff6ff;
+}
+
+.tracking-timeline-icon-default {
+  background-color: white;
+  border: 2px solid #e5e7eb;
+}
+
+.tracking-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.tracking-icon-delivered {
+  color: #2e7d32; /* green */
+}
+
+.tracking-icon-out-for-delivery {
+  color: #1565c0; /* blue */
+}
+
+.tracking-icon-shipped {
+  color: #f9a825; /* yellow */
+}
+
+.tracking-icon-processing {
+  color: #5e35b1; /* purple */
+}
+
+.tracking-icon-cancelled {
+  color: #c62828; /* red */
+}
+
+.tracking-icon-return {
+  color: #006064; /* teal */
+}
+
+.tracking-icon-issue {
+  color: #ef6c00; /* orange */
+}
+
+.tracking-icon-delayed {
+  color: #d84315; /* dark orange */
+}
+
+.tracking-icon-partial {
+  color: #8e24aa; /* violet */
+}
+
+.tracking-icon-pending {
+  color: #00897b; /* aqua */
+}
+
+.tracking-icon-default {
+  color: #546e7a; /* grey */
+}
+
+/* Timeline Content */
+.tracking-timeline-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.tracking-timeline-content-card {
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.tracking-timeline-content-current {
+  background-color: #eff6ff;
+  border-left: 4px solid #2563eb;
+}
+
+.tracking-timeline-content-default {
+  background-color: #f9fafb;
+}
+
+.tracking-timeline-content-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.tracking-timeline-content-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.tracking-timeline-status-title {
+  font-weight: 600;
+  color: #111827;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.tracking-timeline-activity {
+  color: #6b7280;
+  margin-top: 0.25rem;
+  line-height: 1.5;
+   margin-bottom: 10px;
+}
+
+.tracking-timeline-datetime {
+  text-align: right;
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+
+.tracking-timeline-date {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.tracking-timeline-time {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Timeline Location */
+.tracking-timeline-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+ 
+}
+
+.tracking-timeline-location-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #6b7280;
+  }
+  @media (max-width: 480px) {
+.tracking-container {
+ padding: 10px;
+}
+.tracking-timeline-card{
+    padding: 15px;
+}
+.tracking-timeline-item {
+    padding-bottom: 20px;
+    gap: 10px;
+}
+.tracking-timeline-icon-container{
+    height: 30px;
+    width: 30px;
+}
+.tracking-icon {
+  width: 1rem;
+  height: 1rem;
+}
+.tracking-timeline-app-status{
+    padding: 3px 8px;
+    border-radius: 7px;
+}
+.tracking-timeline-content-card {
+ 
+  padding: 10px;
+}
+.tracking-timeline-content-card *{
+font-size: 9px;
+}
+.tracking-timeline-status-title{
+    font-size: 15px;
+}
+.tracking-timeline-line {
+    left: 15px;
+}
+  }

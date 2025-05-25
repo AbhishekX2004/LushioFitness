@@ -5,8 +5,8 @@ import EmptyOrder from "./EmptyOrder";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../components/context/UserContext";
 import "./order.css";
-import OrderDetailsModal from "../admin/OrderDetailsModal";
-import RatingModal from "../productDisplay/RatingModal"
+import {toast} from 'react-toastify';
+import RatingModal from "../productDisplay/RatingModal";
 
 function formatDate(seconds) {
   const date = new Date(seconds * 1000);
@@ -27,22 +27,24 @@ export default function Orders() {
     hasMore: true,
     lastOrderId: null,
   });
- 
 
   const fetchOrders = async (isInitialLoad = false) => {
     if (loading) return; // Prevent duplicate calls
     setLoading(true);
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/orders`, {
-        params: {
-          uid: user.uid,
-          limit: 5,
-          lastOrderId: isInitialLoad ? null : pagination.lastOrderId,
-        },
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/orders`,
+        {
+          params: {
+            uid: user.uid,
+            limit: 5,
+            lastOrderId: isInitialLoad ? null : pagination.lastOrderId,
+          },
+        }
+      );
 
       const { orders: newOrders, pagination: newPagination } = response.data;
-  
+
       setOrders((prevOrders) =>
         isInitialLoad ? newOrders : [...prevOrders, ...newOrders]
       );
@@ -53,62 +55,64 @@ export default function Orders() {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
     if (user && orders.length === 0) {
       fetchOrders(true);
     }
   }, [user]); // Only runs when 'user' changes and orders are empty
-  
-  const sendEmail = async(orderId, orderedProducts) => {
+
+  const sendEmail = async (orderId, orderedProducts) => {
     try {
       const payload = {
         email: user.email,
-        name :user.displayName || "User",
+        name: user.displayName || "User",
         type: "cancel",
         orderId: orderId,
-      //  address: orderDetails.email,
+        //  address: orderDetails.email,
         items: orderedProducts,
-       // item: items[0]?.name || '', // fallback for 'cancel' single item
+        // item: items[0]?.name || '', // fallback for 'cancel' single item
       };
-  
+
       await axios.post(`${process.env.REACT_APP_API_URL}/sendEmail`, payload);
-     
     } catch (err) {
-      console.error('Error:', err);
-     
+      console.error("Error:", err);
     }
-   }
- 
+  };
+
   const handleCancelOrder = async (orderId, orderedProducts) => {
     // Show a confirmation dialog
-    const confirmCancel = window.confirm("Are you sure you want to cancel this order?");
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this order?"
+    );
     if (!confirmCancel) return; // Exit if the user clicks "Cancel"
-  
+
     setIsCancelling(true);
-  
+
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/orders/cancel`, {
-        oid: orderId,
-        uid: user.uid,
-      });
-  if(response.status===200){
-    await sendEmail(orderId, orderedProducts);
-  }
-      // Show a success alert after the cancellation
-      alert("Order cancelled successfully!");
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/orders/cancel`,
+        {
+          oid: orderId,
+          uid: user.uid,
+        }
+      );
+      if (response.status === 200) {
+        await sendEmail(orderId, orderedProducts);
+      }
+
+      toast.success("Order cancelled successfully!");
     } catch (error) {
       console.error(error);
-  
-      // Show an error alert if the cancellation fails
-      alert("Failed to cancel the order. Please try again.");
+      toast.error("Failed to cancel the order. Please try again.", {
+        className: "custom-toast-error",
+      });
     } finally {
       setIsCancelling(false);
     }
   };
-  const handleCancelItem = async (oid,itemId) => {
-    const apiUrl = `${process.env.REACT_APP_API_URL}/orders/updateOrder`; // Replace with your API endpoint
+  const handleCancelItem = async (oid, itemId) => {
+    const apiUrl = `${process.env.REACT_APP_API_URL}/orders/updateOrder`; 
 
     const requestBody = {
       oid: oid,
@@ -122,16 +126,11 @@ export default function Orders() {
       alert(" successful!");
     } catch (error) {
       console.error("Error making API call:", error);
-      //alert("API call failed. Check console for details.");
+     
     }
   };
 
-  const handleLoadMore = () => {
-    if (pagination.hasMore) {
-      fetchOrders();
-    }
-  };
-  if(loading && orders.length===0){
+  if (loading && orders.length === 0) {
     return (
       <div className="loader-container">
         {" "}
@@ -144,7 +143,7 @@ export default function Orders() {
   }
   return (
     <div className="order-wrapper">
-        {isCancelling && (
+      {isCancelling && (
         <div className="spinner-overlay">
           <div></div>
         </div>
@@ -165,50 +164,62 @@ export default function Orders() {
             <div className="order-products">
               {order.orderedProducts.map((product, index) => (
                 <div className="product-details" key={index}>
-                    <Link to={`/product/${product?.productId}`}>
+                  <Link to={`/product/${product?.productId}`}>
                     <img
-                    src={product.productDetails.cardImages[0]}
-                    alt={product.productName}
-                    className="product-image"
-                  />
-                    </Link>
-               
+                      src={product.productDetails.cardImages[0]}
+                      alt={product.productName}
+                      className="product-image"
+                    />
+                  </Link>
+
                   <div className="product-info">
                     <h3>{product?.productName || product?.name}</h3>
+                    <p>
+                      <strong>Price:</strong> ₹
+                      {product.productDetails.discountedPrice} x{" "}
+                      {product.quantity} = ₹
+                      {product.productDetails.discountedPrice *
+                        product.quantity}
+                    </p>
                     <p>
                       <strong>Quantity:</strong> {product.quantity}
                     </p>
                     <p>
-                      <strong>Price:</strong> Rs. {product.price}
+                      <strong>Height:</strong> {product.heightType}
                     </p>
                     <p>
                       <strong>Size:</strong> {product.size}
                     </p>
+
                     <p className="product-color">
                       <strong>Color:</strong> {product.color}
                       <span
-                      className="color-box"
-                      style={{
-                      backgroundColor: product.productDetails.colorOptions.find(
-                        (color) => color.name === product.color
-                        )?.code,
+                        className="color-box"
+                        style={{
+                          backgroundColor:
+                            product.productDetails.colorOptions.find(
+                              (color) => color.name === product.color
+                            )?.code,
                         }}
-                         ></span>
-
+                      ></span>
                     </p>
                     {/* Individual Cancel and Rate Us Buttons */}
                     <div className="item-button-container">
-                      {
-                         order?.orderedProducts?.length>1 &&       <button
-                        className="open-rating-button"
-                        onClick={() => handleCancelItem(order.orderId,product?.productDetails?.id)}
-                      >
-                        Cancel
-                      </button>
-                      }
-                
-                    
-                      <RatingModal productId={product.productDetails.id}/>
+                      {order?.orderedProducts?.length > 1 && (
+                        <button
+                          className="open-rating-button"
+                          onClick={() =>
+                            handleCancelItem(
+                              order.orderId,
+                              product?.productDetails?.id
+                            )
+                          }
+                        >
+                          Cancel
+                        </button>
+                      )}
+
+                      <RatingModal productId={product.productDetails.id} />
                     </div>
                   </div>
                 </div>
@@ -237,10 +248,11 @@ export default function Orders() {
                 className="delivery-icon"
               />
               <span>
-                <strong>Order Date: </strong> {formatDate(order.dateOfOrder._seconds)}
+                <strong>Order Date: </strong>{" "}
+                {formatDate(order.dateOfOrder._seconds)}
               </span>
             </div>
-        
+
             <span className={`order-status ${order.status.toLowerCase()}`}>
               {order.status.toUpperCase()}
             </span>
@@ -249,7 +261,9 @@ export default function Orders() {
               {/* Cancel Order Button */}
               <button
                 className="open-rating-button"
-                onClick={() => handleCancelOrder(order.orderId,order.orderedProducts)}
+                onClick={() =>
+                  handleCancelOrder(order.orderId, order.orderedProducts)
+                }
               >
                 Cancel Order
               </button>
