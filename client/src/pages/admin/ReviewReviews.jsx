@@ -153,50 +153,6 @@ const ReviewReviews = () => {
       </div>
     </div>
   );
-
-
-  //     <div className="admin-review-list">
-  //       {reviews.map((review) => (
-  //         <div
-  //           key={review.id}
-  //           className={`admin-review-card ${review.approved ? "review-approved" : ""}`}
-  //         >
-  //           <p>Review ID: {review.id}</p>
-  //           <p>Rating: {review.rating}</p>
-  //           <button onClick={() => handleReview(review)}>Review</button>
-            
-  //         </div>
-  //       ))}
-  //     </div>
-  //     <div className="admin-review-details">
-  //       {selectedReview && (
-  //         <div>
-  //           <h3>Review Details</h3>
-  //           <p><strong>Quality:</strong> {selectedReview.quality}</p>
-  //           <p><strong>Fit:</strong> {selectedReview.fit}</p>
-  //           <p><strong>Review:</strong> {selectedReview.review}</p>
-  //           <p><strong>Rating:</strong> {selectedReview.rating}</p>
-  //           <p><strong>Media:</strong></p>
-  //           <div className="admin-review-media">
-  //             {selectedReview.media.map((url, index) => (
-  //               // <div key={index}>
-  //               //   {url.endsWith('.mp4') ? (
-  //               //     <video src={url} controls />
-  //               //   ) : (
-  //               //     <img src={url} alt={`media-${index}`} />
-  //               //   )}
-  //               // </div>
-  //               <div key={index}>  <URLMediaRenderer  src={url} alt={`media-${index}`}/> </div>
-              
-  //             ))}
-  //           </div>
-  //           <button onClick={handleApprove}>Approve</button>
-  //           <button onClick={() => handleDelete(selectedReview.id)}>Delete</button>
-  //         </div>
-  //       )}
-  //     </div>
-  //   </div>
-  // );
 };
 
 export default ReviewReviews;

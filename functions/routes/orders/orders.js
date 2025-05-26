@@ -11,7 +11,6 @@ const db = getFirestore();
 const {generateToken, destroyToken} = require("./shiprocketAuth");
 const logger = require("firebase-functions/logger");
 const getStatusDescription = require("./statusDescription");
-const admin = require("firebase-admin");
 
 // Validation middleware
 const validateOrderRequest = (req, res, next) => {
@@ -401,74 +400,6 @@ router.get("/:orderId", async (req, res) => {
   }
 });
 
-// // Get all orders for a user
-// router.get("/", async (req, res) => {
-//   try {
-//     const {uid, limit = 5, lastOrderId} = req.query;
-
-//     // Validate if `uid` is provided
-//     if (!uid) {
-//       return res.status(400).json({message: "User ID is required"});
-//     }
-
-//     // Check if the `uid` exists in the `users` collection
-//     const userDoc = await db.collection("users").doc(uid).get();
-//     if (!userDoc.exists) {
-//       return res.status(404).json({message: "Invalid User ID"});
-//     }
-
-//     // Build the base query for fetching orders
-//     let query = db.collection("orders").where("uid", "==", uid).orderBy("dateOfOrder", "desc").limit(parseInt(limit));
-
-//     // Add pagination if `lastOrderId` is provided
-//     if (lastOrderId) {
-//       const lastOrderDoc = await db.collection("orders").doc(lastOrderId).get();
-//       if (lastOrderDoc.exists) {
-//         query = query.startAfter(lastOrderDoc);
-//       }
-//     }
-
-//     // Execute the query to get orders
-//     const ordersSnapshot = await query.get();
-
-//     // Process orders and fetch their orderedProducts
-//     const orders = await Promise.all(
-//         ordersSnapshot.docs.map(async (doc) => {
-//         // Get the orderedProducts subcollection for this order
-//           const orderedProductsSnapshot = await doc.ref.collection("orderedProducts").get();
-
-//           const orderedProducts = orderedProductsSnapshot.docs.map((productDoc) => ({
-//             opid: productDoc.id,
-//             ...productDoc.data(),
-//           }));
-
-//           return {
-//             orderId: doc.id,
-//             ...doc.data(),
-//             orderedProducts,
-//           };
-//         }),
-//     );
-
-//     // Pagination metadata
-//     const lastVisible = ordersSnapshot.docs[ordersSnapshot.docs.length - 1];
-
-//     res.status(200).json({
-//       orders,
-//       pagination: {
-//         hasMore: orders.length === parseInt(limit),
-//         lastOrderId: lastVisible?.id,
-//       },
-//     });
-//   } catch (error) {
-//     console.error("Error fetching orders:", error);
-//     res.status(500).json({
-//       message: "Failed to fetch orders",
-//       error: error.message,
-//     });
-//   }
-// });
-
 // Get all orders for a user with flexible time range filtering
 router.get("/", async (req, res) => {
   try {
@@ -544,12 +475,7 @@ router.get("/", async (req, res) => {
 
     // Add date range filters if timeRange is specified
     if (startDate && endDate) {
-      // Convert JavaScript dates to Firestore Timestamps
-      // const startTimestamp = admin.firestore.Timestamp.fromDate(startDate);
-      // const endTimestamp = admin.firestore.Timestamp.fromDate(endDate);
-
-      query = query.where("dateOfOrder", ">=", startDate)
-          .where("dateOfOrder", "<=", endDate);
+      query = query.where("dateOfOrder", ">=", startDate).where("dateOfOrder", "<=", endDate);
     }
 
     // Apply ordering and limit

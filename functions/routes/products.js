@@ -133,11 +133,6 @@ router.post("/addProduct", async (req, res) => {
     // Add the product to the "products" collection in Firestore
     const productRef = await db.collection("products").add(productData);
 
-    // Create a subcollection for reviews
-    // await productRef.collection("reviews").add({
-    //   // add an initial review here if needed, or leave it empty
-    // });
-
     // Return a success response with the product ID
     return res.status(201).json({
       message: "Product added successfully!",
@@ -213,25 +208,10 @@ router.get("/:id", async (req, res) => {
 
     const productData = doc.data();
 
-    // Fetch review references
-    const reviewRefsSnapshot = await productRef.collection("reviews").get();
-    const reviewIds = reviewRefsSnapshot.docs.map((doc) => doc.id);
-
-    // Fetch actual reviews from the reviews collection
-    const reviewsPromises = reviewIds.map((id) =>
-      db.collection("reviews").doc(id).get(),
-    );
-    const reviewDocs = await Promise.all(reviewsPromises);
-    const reviews = reviewDocs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    // Return the product data along with its reviews
+    // Return the product data
     return res.status(200).json({
       id: doc.id,
       ...productData,
-      reviews: reviews,
     });
   } catch (error) {
     console.error("Error fetching product:", error);

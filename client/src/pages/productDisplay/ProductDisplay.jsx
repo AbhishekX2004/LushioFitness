@@ -178,12 +178,12 @@ function ProductDisplay() {
         setProduct(data);
         console.log(data);
         // Sort the reviews based on the length of the media array, with safeguards
-        const sortedReviews = data.reviews.sort((a, b) => {
-          const mediaA = Array.isArray(a.media) ? a.media.length : 0;
-          const mediaB = Array.isArray(b.media) ? b.media.length : 0;
-          return mediaB - mediaA;
-        });
-        setReviews(sortedReviews);
+        // const sortedReviews = data.reviews.sort((a, b) => {
+        //   const mediaA = Array.isArray(a.media) ? a.media.length : 0;
+        //   const mediaB = Array.isArray(b.media) ? b.media.length : 0;
+        //   return mediaB - mediaA;
+        // });
+        // setReviews(sortedReviews);
 
         // setReviews(data.reviews);
         setImage(data.allImages[0]);
@@ -344,7 +344,7 @@ function ProductDisplay() {
                 </strong>
                 {/* <SingleStar review="3.7" /> */}
                 <img src="/Images/icons/star.png" alt="icon" />
-                <p>({product.reviews.length})</p>
+                {/* <p>({product.reviews.length})</p> */}
               </span>
             </div>
           </div>
@@ -522,7 +522,7 @@ function ProductDisplay() {
           <h5>Product Review</h5>
           <RatingModal productId={product.id} />
         </div>
-        <div className="reviews-container">
+        {/* <div className="reviews-container">
           {reviews.length > 0 ? (
             <div className="reviews-list">
               {reviews.map((review, index) => (
@@ -532,7 +532,7 @@ function ProductDisplay() {
           ) : (
             <p className="no-reviews-message">No reviews available.</p>
           )}
-        </div>
+        </div> */}
       </div>
     </>
   );

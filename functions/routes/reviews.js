@@ -196,7 +196,7 @@ router.get("/", async (req, res) => {
 
     // Build query with ordering by timestamp ascending
     let query = db.collection("reviews")
-        .orderBy("timestamp", "asc")
+        .orderBy("timestamp", "desc")
         .limit(limit + 1); // Get one extra to check if more exist
 
     // If we have a lastDocId, get that document and start after it
