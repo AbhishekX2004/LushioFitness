@@ -100,9 +100,11 @@ exports.api = onRequest(app);
 // Import and export cloud functions
 exports.generateReferralCode = require("./cloudFunctions/generateReferralCode.js");
 exports.coinsToReferred = require("./cloudFunctions/coinsToReferred.js");
+exports.coinsToReferrer = require("./cloudFunctions/coinsToReferrer.js");
 
 // Import and export cron jobs
 exports.assignBirthdayCoins = require("./cronjobs/birthdayAnniversaryCoins.js").assignBirthdayCoins;
 exports.assignAnniversaryCoins = require("./cronjobs/birthdayAnniversaryCoins.js").assignAnniversaryCoins;
 exports.assignAccountAgeCoins = require("./cronjobs/accountAgeCoins.js");
-exports.removeExpiredCoins = require("./cronjobs/expireCoins.js");
+exports.updateExpiredCoins = require("./cronjobs/expireCoins.js");
+exports.autoCompleteOrders = require("./cronjobs/autoCompleteOrders.js");
