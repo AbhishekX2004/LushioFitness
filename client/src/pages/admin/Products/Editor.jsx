@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { storage } from "../../firebaseConfig";
+import { storage } from "../../../firebaseConfig";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import URLMedia from "../../components/URLMediaRenderer";
+import URLMedia from "../../../components/URLMediaRenderer";
 const Editor = ({ product: initialProduct,onClose}) => {
   const [product, setProduct] = useState(null);
   const [newColor, setNewColor] = useState({ name: '', code: '#43da86' });

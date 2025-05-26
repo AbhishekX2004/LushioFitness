@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../firebaseConfig'; // Adjust the import path to your Firebase config
+import { db } from "../../../../firebaseConfig";
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import './OrderLogistics.css';
-import Pickups from './Pickups';
+import Pickups from '../Pickups/Pickups';
 
 const OrderLogistics = () => {
   const [showPickups, setShowPickups] = useState(false);

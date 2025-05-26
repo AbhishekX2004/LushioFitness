@@ -38,7 +38,7 @@ function EditProfile() {
             `${process.env.REACT_APP_API_URL}/user/details/${user.uid}`
           );
           const data = response.data;
-
+          console.log("Fetched user data:", data);
           const formattedData = {
             ...data,
             dob: formatDateForInput(data.dob),
@@ -50,6 +50,8 @@ function EditProfile() {
 
           setUserData(formattedData);
           setInitialData(formattedData);
+          console.log("Initial data set:", formattedData);
+          console.log("User data after setting:", userData);
         } catch (error) {
           console.error("Error fetching user data:", error);
         } finally {

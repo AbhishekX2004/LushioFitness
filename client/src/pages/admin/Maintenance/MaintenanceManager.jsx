@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { doc, getDoc, updateDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../firebaseConfig'; // Adjust the path as needed
+import { db } from '../../../firebaseConfig'; // Adjust the path as needed
 import './MaintenanceManager.css';
 
 /**

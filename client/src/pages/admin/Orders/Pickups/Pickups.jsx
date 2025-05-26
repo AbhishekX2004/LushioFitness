@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../firebaseConfig'; // Adjust the import path as needed
+import { db } from '../../../../firebaseConfig';
 import axios from 'axios';
 import './Pickups.css';
 

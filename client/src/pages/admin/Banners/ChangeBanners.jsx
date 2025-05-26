@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { db, storage } from '../../firebaseConfig';
-import URLMedia from '../../components/URLMediaRenderer';
+import { db, storage } from '../../../firebaseConfig';
+import URLMedia from '../../../components/URLMediaRenderer';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';

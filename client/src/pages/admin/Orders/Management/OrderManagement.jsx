@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "./OrderManagement.css";
-import OrderDetailsModal from './OrderDetailsModal';
+import OrderDetailsModal from '../OrderDetails/OrderDetailsModal';
 
 const API = process.env.REACT_APP_API_URL;
 
