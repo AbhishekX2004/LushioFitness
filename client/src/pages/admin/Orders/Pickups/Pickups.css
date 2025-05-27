@@ -35,12 +35,26 @@
   font-size: 0.9em;
 }
 
-.close-button {
+.pickup-close-button {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
-  padding: 5px;
+  padding: 8px;
+  color: #666;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.pickup-close-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
 }
 
 .add-pickup-button {
@@ -51,6 +65,11 @@
   border-radius: 4px;
   cursor: pointer;
   margin-bottom: 20px;
+}
+
+.add-pickup-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 .pickup-locations-list {
@@ -139,7 +158,41 @@
   font-size: 0.9em;
 }
 
-/* Rest of the existing styles remain the same */
+/* Loader Styles */
+.pickup-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.pickup-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #4CAF50;
+  border-radius: 50%;
+  animation: pickup-spin 1s linear infinite;
+}
+
+@keyframes pickup-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Button spinner for submit button */
+.button-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: pickup-spin 1s linear infinite;
+}
+
+/* Form Styles */
 .pickup-form {
   background-color: #f8f8f8;
   padding: 20px;
@@ -168,6 +221,11 @@
   border-radius: 4px;
 }
 
+.form-group input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -180,6 +238,13 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.form-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .form-actions button[type="button"] {
@@ -189,6 +254,10 @@
 .form-actions button[type="submit"] {
   background-color: #4CAF50;
   color: white;
+}
+
+.form-actions button[type="submit"].submitting {
+  background-color: #45a049;
 }
 
 .custom-alert {
