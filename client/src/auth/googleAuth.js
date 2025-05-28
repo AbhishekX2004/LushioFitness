@@ -1,6 +1,6 @@
 import { auth, db } from "../firebaseConfig";
 import { GoogleAuthProvider, signInWithPopup, signOut, deleteUser } from "firebase/auth";
-import { doc, setDoc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 
 const googleProvider = new GoogleAuthProvider();
 
