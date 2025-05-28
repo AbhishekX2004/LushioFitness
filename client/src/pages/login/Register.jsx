@@ -120,10 +120,10 @@ const Register = () => {
   const handleGoogleSignIn = async () => {
     setIsButtonDisabled(true);
     try {
-      await signInWithGoogle(referralCode);
+      await signInWithGoogle(referralCode, true);
       navigate("/user");
     } catch (error) {
-      console.error("Error during Google sign-in", error);
+      console.error("Error during Google sign-up", error);
       toast.error("Google sign-up failed. Please try again.", { className: "custom-toast-error" });
       setIsButtonDisabled(false);
     }
@@ -132,10 +132,10 @@ const Register = () => {
   const handleFacebookSignIn = async () => {
     setIsButtonDisabled(true);
     try {
-      await signInWithFacebook(referralCode);
+      await signInWithFacebook(referralCode, true);
       navigate("/user");
     } catch (error) {
-      console.error("Error during Facebook sign-in", error);
+      console.error("Error during Facebook sign-up", error);
       toast.error("Facebook sign-up failed. Please try again.", { className: "custom-toast-error" });
       setIsButtonDisabled(false);
     }

@@ -83,11 +83,16 @@ const Login = () => {
   const handleGoogleSignIn = async () => {
     setIsButtonDisabled(true);
     try {
-      await signInWithGoogle();
+      await signInWithGoogle(null, false);
       navigate("/user");
     } catch (error) {
-      console.error("Error during Google sign-in", error);
-      toast.error("Google sign-in failed. Please try again.", { className: "custom-toast-error" });
+      console.error("Error during Google sign-in", error);      
+      if (error.message === "ACCOUNT_NOT_EXISTS") {
+        toast.error("No account found. Please sign up first.", { className: "custom-toast-error" });
+        setTimeout(() => navigate("/register"), 2000);
+      } else {
+        toast.error("Google sign-in failed. Please try again.", { className: "custom-toast-error" });
+      }
       setIsButtonDisabled(false);
     }
   };
@@ -95,11 +100,16 @@ const Login = () => {
   const handleFacebookSignIn = async () => {
     setIsButtonDisabled(true);
     try {
-      await signInWithFacebook();
+      await signInWithFacebook(null, false);
       navigate("/user");
     } catch (error) {
-      console.error("Error during Facebook sign-in", error);
-      toast.error("Facebook sign-in failed. Please try again.", { className: "custom-toast-error" });
+      console.error("Error during Facebook sign-in", error);      
+      if (error.message === "ACCOUNT_NOT_EXISTS") {
+        toast.error("No account found. Please sign up first.", { className: "custom-toast-error" });
+        setTimeout(() => navigate("/register"), 2000);
+      } else {
+        toast.error("Facebook sign-in failed. Please try again.", { className: "custom-toast-error" });
+      }
       setIsButtonDisabled(false);
     }
   };
