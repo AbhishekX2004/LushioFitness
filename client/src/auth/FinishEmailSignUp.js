@@ -1,4 +1,3 @@
-// FinishEmailSignUp.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebaseConfig";
@@ -12,7 +11,7 @@ const FinishEmailSignUp = () => {
   useEffect(() => {
     const handleEmailLinkSignIn = async () => {
       if (isSignInWithEmailLink(auth, window.location.href)) {
-        let email = window.localStorage.getItem("emailForSignIn");
+        let email = window.emailForSignIn || window.localStorage?.getItem("emailForSignIn");
         if (!email) {
           email = window.prompt("Please provide your email for confirmation");
         }
@@ -27,7 +26,14 @@ const FinishEmailSignUp = () => {
             lastSignInTime: new Date()
           });
 
-          window.localStorage.removeItem("emailForSignIn");
+          // Clean up stored email
+          if (window.emailForSignIn) {
+            delete window.emailForSignIn;
+          }
+          if (window.localStorage) {
+            window.localStorage.removeItem("emailForSignIn");
+          }
+          
           setMessage("Login successful!");
           navigate("/user");
         } catch (error) {
@@ -44,8 +50,10 @@ const FinishEmailSignUp = () => {
   }, [navigate]);
 
   return (
-    <div>
-      <h2>{message}</h2>
+    <div className="auth-container">
+      <div className="auth-form">
+        <h2>{message}</h2>
+      </div>
     </div>
   );
 };

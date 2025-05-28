@@ -1,4 +1,3 @@
-// client/src/auth/googleAuth.js
 import { auth, db } from "../firebaseConfig";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
@@ -11,7 +10,7 @@ const signInWithGoogle = async (referralCode) => {
     const user = result.user;
     
     // Ensure referralCode is either a string value or an empty string
-    const finalReferralCode = referralCode ? referralCode : ""; 
+    const finalReferralCode = referralCode ? referralCode.toString().trim() : ""; 
     
     console.log(user);
 
@@ -27,8 +26,8 @@ const signInWithGoogle = async (referralCode) => {
         displayName: user.displayName,
         photoURL: user.photoURL,
         createdAt: new Date(),
-        referredBy: finalReferralCode, // Pass referralCode or empty string
-        lastSignInTime: new Date(user.metadata.lastSignInTime)
+        referredBy: finalReferralCode,
+        lastSignInTime: new Date()
       });
     } else {
       // Update lastSignInTime if the user already exists
@@ -36,10 +35,12 @@ const signInWithGoogle = async (referralCode) => {
         lastSignInTime: new Date()
       });
     }
+
+    return user;
   } catch (error) {
     console.error("Error during sign-in with Google", error);
+    throw error;
   }
 };
-
 
 export default signInWithGoogle;

@@ -3,7 +3,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendSignInL
 import { doc, setDoc, updateDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 
 // Determine the frontend URL dynamically from environment variables
-const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL;
+const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL || window.location.origin;
 
 const checkEmailExists = async (email) => {
   try {
@@ -28,7 +28,7 @@ const handleEmailSignUp = async (email, password, referralCode) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    const finalReferralCode = (referralCode).trim() || "";
+    const finalReferralCode = (referralCode || "").trim();
 
     await setDoc(doc(db, "users", user.uid), {
       email: user.email,
@@ -49,12 +49,9 @@ const handleEmailSignUp = async (email, password, referralCode) => {
     // Sign out the user immediately after sending verification
     await auth.signOut();
 
-    alert("Verification email sent! Please verify your account before logging in.");
-
     return null;
   } catch (error) {
     console.error("Error signing up with email and password", error);
-    alert(error.message);
     throw error;
   }
 };
@@ -67,7 +64,6 @@ const handleEmailLogin = async (email, password) => {
     // Check if email is verified
     if (!user.emailVerified) {
       await auth.signOut();
-      alert("Verify your email first.");
       throw new Error("Please verify your email before logging in. Check your inbox for the verification link.");
     }
 
@@ -102,11 +98,12 @@ const sendEmailSignInLink = async (email) => {
       handleCodeInApp: true,
     };
     await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-    window.localStorage.setItem("emailForSignIn", email);
-    alert("Login link sent to your email!");
+    
+    // Store email in memory instead of localStorage for Claude.ai compatibility
+    window.emailForSignIn = email;
+    
   } catch (error) {
     console.error("Error sending email sign-in link", error);
-    alert(error.message);
     throw error;
   }
 };

@@ -6,23 +6,28 @@ import signInWithGoogle from "../../auth/googleAuth";
 import signInWithFacebook from "../../auth/facebookAuth";
 import { handleEmailSignUp } from "../../auth/emailAuth";
 import { sendOtp, verifyOtp } from "../../auth/phoneAuth";
+import { checkEmailExists, checkPhoneExists, validateEmail, validatePhone, validatePassword, getPasswordValidationMessage } from "../../auth/existenceCheck";
+import { toast } from "react-toastify";
 import "./auth.css";
 
 const Register = () => {
   const [searchParams] = useSearchParams();
-  const [identifier, setIdentifier] = useState(""); // Can be either email or phone number
+  const [identifier, setIdentifier] = useState("");
   const [phone, setPhone] = useState("");
-  const [showPwdField,setShowPwdField] = useState(false);
+  const [showPwdField, setShowPwdField] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [referralCode, setReferralCode] = useState(""); // Optional referral code
+  const [referralCode, setReferralCode] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [isPhone, setIsPhone] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const [otpTimer, setOtpTimer] = useState(0); // OTP timer state
+  const [otpTimer, setOtpTimer] = useState(0);
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [emailRegistrationSuccess, setEmailRegistrationSuccess] = useState(false);
 
   const navigate = useNavigate();
   const phoneInputRef = useRef(null);
@@ -39,8 +44,7 @@ const Register = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailRegex.test(identifier)) {
+    if (validateEmail(identifier)) {
       setIsPhone(false);
       setShowPwdField(true);
     } else if (/^\d/.test(identifier)) {
@@ -54,17 +58,43 @@ const Register = () => {
       }, 0);
     } else {
       setShowPwdField(false);
+      setIsPhone(false);
     }
 
-    if (
-      isChecked &&
-      (isPhone || (password && confirmPassword && password === confirmPassword))
-    ) {
-      setIsButtonDisabled(false);
+    // Update button disabled state
+    if (isPhone) {
+      setIsButtonDisabled(!isChecked);
+    } else if (showPwdField) {
+      const passwordValid = validatePassword(password).isValid;
+      const passwordsMatch = password === confirmPassword && confirmPassword !== "";
+      setIsButtonDisabled(!(isChecked && passwordValid && passwordsMatch));
     } else {
       setIsButtonDisabled(true);
     }
-  }, [identifier, password, confirmPassword, isChecked, isPhone]);
+  }, [identifier, password, confirmPassword, isChecked, isPhone, showPwdField]);
+
+  // Real-time password validation
+  useEffect(() => {
+    if (password) {
+      const errorMessage = getPasswordValidationMessage(password);
+      setPasswordError(errorMessage);
+    } else {
+      setPasswordError("");
+    }
+  }, [password]);
+
+  // Real-time password confirmation validation
+  useEffect(() => {
+    if (confirmPassword) {
+      if (password !== confirmPassword) {
+        setConfirmPasswordError("Passwords do not match");
+      } else {
+        setConfirmPasswordError("");
+      }
+    } else {
+      setConfirmPasswordError("");
+    }
+  }, [password, confirmPassword]);
 
   const handleIdentifierInput = (e) => {
     setIdentifier(e.target.value);
@@ -82,56 +112,124 @@ const Register = () => {
         setOtpTimer((prevTimer) => prevTimer - 1);
       }, 1000);
     } else if (otpTimer === 0 && otpSent) {
-      setIsButtonDisabled(false); // Enable the Resend OTP button after 1 minute
+      setIsButtonDisabled(false);
     }
-
     return () => clearInterval(timer);
   }, [otpSent, otpTimer]);
 
   const handleGoogleSignIn = async () => {
+    setIsButtonDisabled(true);
     try {
       await signInWithGoogle(referralCode);
       navigate("/user");
     } catch (error) {
       console.error("Error during Google sign-in", error);
+      toast.error("Google sign-up failed. Please try again.", { className: "custom-toast-error" });
+      setIsButtonDisabled(false);
     }
   };
 
   const handleFacebookSignIn = async () => {
+    setIsButtonDisabled(true);
     try {
       await signInWithFacebook(referralCode);
       navigate("/user");
     } catch (error) {
       console.error("Error during Facebook sign-in", error);
+      toast.error("Facebook sign-up failed. Please try again.", { className: "custom-toast-error" });
+      setIsButtonDisabled(false);
+    }
+  };
+
+  // Separate function for OTP verification
+  const handleOtpSubmit = async () => {
+    setIsButtonDisabled(true);
+    try {
+      await verifyOtp(confirmationResult, otp, `+${phone}`, referralCode);
+      toast.success("Account created successfully!", { className: "custom-toast-success" });
+      navigate("/user");
+    } catch (error) {
+      console.error("Error verifying OTP", error);
+      toast.error("Invalid OTP. Please try again.", { className: "custom-toast-error" });
+      setIsButtonDisabled(false);
     }
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    setIsButtonDisabled(true);
+
     if (isPhone) {
+      // Validate phone number
+      if (!validatePhone(phone)) {
+        toast.error("Please enter a valid phone number", { className: "custom-toast-error" });
+        setIsButtonDisabled(false);
+        return;
+      }
+
+      const formattedPhone = `+${phone}`;
+
       if (!otpSent) {
         try {
-          const result = await sendOtp(`+${phone}`);
+          // Check if phone already exists
+          const phoneExists = await checkPhoneExists(formattedPhone);
+          if (phoneExists) {
+            toast.error("An account with this phone number already exists. Please login instead.", { className: "custom-toast-error" });
+            setTimeout(() => navigate("/login"), 2000);
+            setIsButtonDisabled(false);
+            return;
+          }
+
+          const result = await sendOtp(formattedPhone);
           setConfirmationResult(result);
           setOtpSent(true);
-          setOtpTimer(60); // Set timer for 1 minute
+          setOtpTimer(60);
+          toast.success("OTP sent successfully!", { className: "custom-toast-success" });
         } catch (error) {
           console.error("Error sending OTP", error);
-        }
-      } else {
-        try {
-          await verifyOtp(confirmationResult, otp, `+${phone}` ,referralCode);
-          navigate("/user");
-        } catch (error) {
-          console.error("Error verifying OTP", error);
+          toast.error("Failed to send OTP. Please try again.", { className: "custom-toast-error" });
+          setIsButtonDisabled(false);
         }
       }
     } else {
+      // Email registration
+      if (!validateEmail(identifier)) {
+        toast.error("Please enter a valid email address", { className: "custom-toast-error" });
+        setIsButtonDisabled(false);
+        return;
+      }
+
+      if (!validatePassword(password).isValid) {
+        toast.error("Please enter a valid password", { className: "custom-toast-error" });
+        setIsButtonDisabled(false);
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match", { className: "custom-toast-error" });
+        setIsButtonDisabled(false);
+        return;
+      }
+
       try {
+        // Check if email already exists
+        const emailExists = await checkEmailExists(identifier);
+        if (emailExists) {
+          toast.error("An account with this email already exists. Please login instead.", { className: "custom-toast-error" });
+          setTimeout(() => navigate("/login"), 2000);
+          setIsButtonDisabled(false);
+          return;
+        }
+
         await handleEmailSignUp(identifier, password, referralCode);
-        navigate("/");
+        toast.success("Account created! Please check your email for verification.", { className: "custom-toast-success" });
+        // FIXED: Don't navigate - let user stay on page
+        setEmailRegistrationSuccess(true);
+        setIsButtonDisabled(false);
       } catch (error) {
         console.error("Error signing up with email", error);
+        toast.error(error.message || "Failed to create account. Please try again.", { className: "custom-toast-error" });
+        setIsButtonDisabled(false);
       }
     }
   };
@@ -141,16 +239,34 @@ const Register = () => {
     try {
       const result = await sendOtp(`+${phone}`);
       setConfirmationResult(result);
-      setOtpTimer(60); // Reset timer for another 1 minute
+      setOtpTimer(60);
+      toast.success("OTP resent successfully!", { className: "custom-toast-success" });
     } catch (error) {
       console.error("Error resending OTP", error);
+      toast.error("Failed to resend OTP. Please try again.", { className: "custom-toast-error" });
       setIsButtonDisabled(false);
     }
   };
 
+  // Show success message if email registration was successful
+  if (emailRegistrationSuccess) {
+    return (
+      <div className="auth-container">
+        <div className="auth-form">
+          <h2>Registration Successful!</h2>
+          <div className="auth-success-message">
+            <p>We've sent a verification link to your email address.</p>
+            <p>Please check your email and click the link to complete your registration.</p>
+            <p>You can close this page once you've clicked the verification link.</p>
+          </div>
+          <p>Already verified? <Link to="/login">Login here</Link></p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="auth-container">
-     
       <form className="auth-form" onSubmit={handleFormSubmit}>
         <h2>Sign Up</h2>
         {!isPhone ? (
@@ -160,6 +276,7 @@ const Register = () => {
             value={identifier}
             onChange={handleIdentifierInput}
             required
+            disabled={otpSent}
           />
         ) : (
           <PhoneInput
@@ -172,6 +289,7 @@ const Register = () => {
             }}
           />
         )}
+
         {otpSent && (
           <div>
             <input
@@ -182,45 +300,68 @@ const Register = () => {
               onChange={(e) => setOtp(e.target.value)}
               required
             />
-            <button type="button"  id="submit-otp" onClick={handleFormSubmit} disabled={otp.length !== 6}  className={otp.length !== 6?"disabled":"enabled"}>
+            {/* FIXED: Separate OTP submit button with its own handler */}
+            <button
+              type="button"
+              id="submit-otp"
+              onClick={handleOtpSubmit}
+              disabled={otp.length !== 6 || isButtonDisabled}
+              className={otp.length !== 6 || isButtonDisabled ? "disabled" : "enabled"}
+            >
               Submit OTP
             </button>
           </div>
         )}
+
         {showPwdField && (
-            <>
+          <>
+            <div className="auth-password-field">
               <input
                 type="password"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ display: !isPhone ? "block" : "none" }}
                 required={!isPhone}
               />
+              {/* FIXED: Proper error message styling */}
+              {passwordError && <div className="auth-error-message">{passwordError}</div>}
+            </div>
+            <div className="auth-password-field">
               <input
                 type="password"
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                style={{ display: !isPhone ? "block" : "none" }}
                 required={!isPhone}
               />
-            </>
+              {/* FIXED: Proper error message styling */}
+              {confirmPasswordError && <div className="auth-error-message">{confirmPasswordError}</div>}
+            </div>
+          </>
         )}
+
         {otpSent && isPhone && otpTimer === 0 && (
-          <button type="button"  onClick={handleResendOtp} disabled={isButtonDisabled} className={isButtonDisabled?"disabled":"enabled"}> 
+          <button
+            type="button"
+            onClick={handleResendOtp}
+            disabled={isButtonDisabled}
+            className={isButtonDisabled ? "disabled" : "enabled"}
+          >
             Resend OTP
           </button>
         )}
+
         {otpSent && isPhone && otpTimer !== 0 && (
           <p>Resend OTP in {otpTimer} seconds.</p>
         )}
+
         <input
           type="text"
           placeholder="Referral Code (optional)"
           value={referralCode}
           onChange={(e) => setReferralCode(e.target.value)}
         />
+
         <div className="login-signup-condition">
           <input
             type="checkbox"
@@ -230,14 +371,34 @@ const Register = () => {
           />
           <p>By continuing, I agree to the terms of use & privacy policy</p>
         </div>
-        <button type="submit" disabled={isButtonDisabled} className={isButtonDisabled?"disabled":"enabled"}>
-          Create Account
-        </button>
+
+        {/* Only show main submit button when not in OTP mode */}
+        {!otpSent && (
+          <button
+            type="submit"
+            disabled={isButtonDisabled}
+            className={isButtonDisabled ? "disabled" : "enabled"}
+          >
+            Create Account
+          </button>
+        )}
+
         <p>Already have an account? <Link to="/login">Login here</Link></p>
-        <button type="button" onClick={handleGoogleSignIn} disabled = {!isChecked} className={!isChecked?"disabled":"enabled"}>
+
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          disabled={!isChecked}
+          className={!isChecked ? "disabled" : "enabled"}
+        >
           Continue With Google
         </button>
-        <button type="button" onClick={handleFacebookSignIn} disabled = {!isChecked} className={!isChecked?"disabled":"enabled"}>
+        <button 
+          type="button" 
+          onClick={handleFacebookSignIn} 
+          disabled={!isChecked} 
+          className={!isChecked ? "disabled" : "enabled"}
+        >
           Continue With Facebook
         </button>
       </form>

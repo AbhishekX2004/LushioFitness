@@ -12,7 +12,7 @@ const signInWithFacebook = async (referralCode) => {
     console.log(user);
 
     // Ensure referralCode is either a string value or an empty string
-    const finalReferralCode = referralCode ? referralCode : "";
+    const finalReferralCode = referralCode ? referralCode.toString().trim() : "";
 
     // Reference to the user document in Firestore
     const userDoc = doc(db, "users", user.uid);
@@ -25,9 +25,9 @@ const signInWithFacebook = async (referralCode) => {
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
-        referredBy: finalReferralCode, // Pass referralCode or empty string
+        referredBy: finalReferralCode,
         createdAt: new Date(),
-        lastSignInTime: new Date()  // Set lastSignInTime for new user
+        lastSignInTime: new Date()
       });
     } else {
       // Update lastSignInTime if the user already exists
@@ -36,8 +36,10 @@ const signInWithFacebook = async (referralCode) => {
       });
     }
 
+    return user;
   } catch (error) {
     console.error("Error during sign-in with Facebook", error);
+    throw error;
   }
 };
 

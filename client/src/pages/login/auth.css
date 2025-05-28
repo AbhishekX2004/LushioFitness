@@ -127,3 +127,35 @@
         padding: 15px 20px;
     }
 }
+
+.auth-error-message {
+  color: #ff4444;
+  font-size: 12px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.auth-success-message {
+  color: #28a745;
+  font-size: 12px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.auth-password-field {
+  margin-bottom: 10px;
+}
+
+.auth-success-message {
+  text-align: center;
+  padding: 20px;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 5px;
+  margin: 20px 0;
+}
+
+.auth-success-message p {
+  margin: 10px 0;
+  color: #155724;
+}
