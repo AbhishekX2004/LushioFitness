@@ -126,12 +126,30 @@ router.post("/process-return-exchange", async (req, res) => {
 
     const updatePromises = productDocs.map((doc) => {
       const itemData = items[doc.id];
-      return orderedProductsRef.doc(doc.id).update({
-        status: itemData.exchange ? "exchanged" : "returned",
+      const productData = doc.data();
+      const originalQuantity = productData.quantity;
+      const processedQuantity = itemData.units;
+
+      // Determine the appropriate status based on quantity comparison
+      let newStatus;
+      if (processedQuantity >= originalQuantity) {
+      // Full return/exchange
+        newStatus = itemData.exchange ? "exchanged" : "returned";
+      } else {
+      // Partial return/exchange
+        newStatus = itemData.exchange ? "partially_exchanged" : "partially_returned";
+      }
+
+      // Prepare update object
+      const updateData = {
+        status: newStatus,
         updatedAt: new Date(),
         [itemData.exchange ? "exchange_reason" : "return_reason"]: itemData.reason,
         [itemData.exchange ? "exchangedOn" : "returnedOn"]: new Date(),
-      });
+        [itemData.exchange ? "exchanged_qty" : "returned_qty"]: processedQuantity,
+      };
+
+      return orderedProductsRef.doc(doc.id).update(updateData);
     });
 
     // update user timestamp
