@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
@@ -35,6 +36,30 @@ const Register = () => {
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
   };
+
+  // Validate referral code
+
+  const validateReferralCode = async (code) => {
+    if (!code || code.trim() === "") return true; // Empty referral code is valid
+
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/search/refCode`, {
+        referralCode: code.trim(),
+      });
+
+      // If 200 OK, referral exists, return true
+      return true;
+    } catch (error) {
+      // If 404, code not found, return false
+      if (error.response && error.response.status === 404) {
+        return false;
+      }
+      // Log and assume invalid on any other error
+      console.error("Error validating referral code:", error);
+      return false;
+    }
+  };
+
 
   useEffect(() => {
     const referredBy = searchParams.get("referredBy");
@@ -111,8 +136,6 @@ const Register = () => {
       timer = setInterval(() => {
         setOtpTimer((prevTimer) => prevTimer - 1);
       }, 1000);
-    } else if (otpTimer === 0 && otpSent) {
-      setIsButtonDisabled(false);
     }
     return () => clearInterval(timer);
   }, [otpSent, otpTimer]);
@@ -120,6 +143,13 @@ const Register = () => {
   const handleGoogleSignIn = async () => {
     setIsButtonDisabled(true);
     try {
+      // Validate referral code before proceeding
+      if (referralCode && !(await validateReferralCode(referralCode))) {
+        toast.error("Invalid referral code. Please check and try again.", { className: "custom-toast-error" });
+        setIsButtonDisabled(false);
+        return;
+      }
+
       await signInWithGoogle(referralCode, true);
       navigate("/user");
     } catch (error) {
@@ -132,6 +162,13 @@ const Register = () => {
   const handleFacebookSignIn = async () => {
     setIsButtonDisabled(true);
     try {
+      // Validate referral code before proceeding
+      if (referralCode && !(await validateReferralCode(referralCode))) {
+        toast.error("Invalid referral code. Please check and try again.", { className: "custom-toast-error" });
+        setIsButtonDisabled(false);
+        return;
+      }
+
       await signInWithFacebook(referralCode, true);
       navigate("/user");
     } catch (error) {
@@ -145,6 +182,13 @@ const Register = () => {
   const handleOtpSubmit = async () => {
     setIsButtonDisabled(true);
     try {
+      // Validate referral code before OTP verification
+      if (referralCode && !(await validateReferralCode(referralCode))) {
+        toast.error("Invalid referral code. Please check and try again.", { className: "custom-toast-error" });
+        setIsButtonDisabled(false);
+        return;
+      }
+
       await verifyOtp(confirmationResult, otp, `+${phone}`, referralCode);
       toast.success("Account created successfully!", { className: "custom-toast-success" });
       navigate("/user");
@@ -158,6 +202,13 @@ const Register = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsButtonDisabled(true);
+
+    // Validate referral code first (for both phone and email)
+    if (referralCode && !(await validateReferralCode(referralCode))) {
+      toast.error("Invalid referral code. Please check and try again.", { className: "custom-toast-error" });
+      setIsButtonDisabled(false);
+      return;
+    }
 
     if (isPhone) {
       // Validate phone number
@@ -185,6 +236,7 @@ const Register = () => {
           setOtpSent(true);
           setOtpTimer(60);
           toast.success("OTP sent successfully!", { className: "custom-toast-success" });
+          setIsButtonDisabled(false);
         } catch (error) {
           console.error("Error sending OTP", error);
           toast.error("Failed to send OTP. Please try again.", { className: "custom-toast-error" });
@@ -223,7 +275,6 @@ const Register = () => {
 
         await handleEmailSignUp(identifier, password, referralCode);
         toast.success("Account created! Please check your email for verification.", { className: "custom-toast-success" });
-        // FIXED: Don't navigate - let user stay on page
         setEmailRegistrationSuccess(true);
         setIsButtonDisabled(false);
       } catch (error) {
@@ -241,6 +292,7 @@ const Register = () => {
       setConfirmationResult(result);
       setOtpTimer(60);
       toast.success("OTP resent successfully!", { className: "custom-toast-success" });
+      setIsButtonDisabled(false);
     } catch (error) {
       console.error("Error resending OTP", error);
       toast.error("Failed to resend OTP. Please try again.", { className: "custom-toast-error" });
@@ -300,13 +352,12 @@ const Register = () => {
               onChange={(e) => setOtp(e.target.value)}
               required
             />
-            {/* FIXED: Separate OTP submit button with its own handler */}
             <button
               type="button"
               id="submit-otp"
               onClick={handleOtpSubmit}
-              disabled={otp.length !== 6 || isButtonDisabled}
-              className={otp.length !== 6 || isButtonDisabled ? "disabled" : "enabled"}
+              disabled={otp.length !== 6}
+              className={otp.length !== 6 ? "disabled" : "enabled"}
             >
               Submit OTP
             </button>
@@ -323,7 +374,6 @@ const Register = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required={!isPhone}
               />
-              {/* FIXED: Proper error message styling */}
               {passwordError && <div className="auth-error-message">{passwordError}</div>}
             </div>
             <div className="auth-password-field">
@@ -334,7 +384,6 @@ const Register = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required={!isPhone}
               />
-              {/* FIXED: Proper error message styling */}
               {confirmPasswordError && <div className="auth-error-message">{confirmPasswordError}</div>}
             </div>
           </>
@@ -393,10 +442,10 @@ const Register = () => {
         >
           Continue With Google
         </button>
-        <button 
-          type="button" 
-          onClick={handleFacebookSignIn} 
-          disabled={!isChecked} 
+        <button
+          type="button"
+          onClick={handleFacebookSignIn}
+          disabled={!isChecked}
           className={!isChecked ? "disabled" : "enabled"}
         >
           Continue With Facebook

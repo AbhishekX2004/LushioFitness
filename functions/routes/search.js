@@ -6,7 +6,7 @@ const router = express.Router();
 const {getFirestore} = require("firebase-admin/firestore");
 const db = getFirestore();
 
-// search
+// search products
 router.post("/", async (req, res) => {
   try {
     const {
@@ -127,5 +127,29 @@ function sortProductsByMatchPriority(products) {
     return priorityOrder[a.matchType] - priorityOrder[b.matchType];
   });
 }
+
+// search referral codes
+router.post("/refCode", async (req, res) => {
+  const {referralCode} = req.body;
+
+  if (!referralCode) {
+    return res.status(400).json({error: "Referral code is required"});
+  }
+
+  try {
+    const usersRef = db.collection("users");
+    const snapshot = await usersRef.where("referralCode", "==", referralCode).get();
+
+    if (snapshot.empty) {
+      return res.status(404).json({error: "Referral code not found"});
+    }
+
+    return res.status(200).json({message: "Referral code exists"});
+  } catch (error) {
+    console.error("Error checking referral code:", error);
+    return res.status(500).json({error: "Internal server error"});
+  }
+});
+
 
 module.exports = router;
