@@ -28,6 +28,7 @@ import ColorOptions from "./ColorOptions";
 import HeightBasedSelection from "./HeightBasedSelection";
 import SizeChart from "./SizeChart";
 import BuyNowModal from "../BuyNow/BuyNowModal";
+import Reviews from "./Reviews"
 //import SingleStar from "./SingleStar";
 const formatDateTime = (timestamp) => {
   if (!timestamp || !timestamp._seconds || !timestamp._nanoseconds) {
@@ -344,7 +345,7 @@ function ProductDisplay() {
                 </strong>
                 {/* <SingleStar review="3.7" /> */}
                 <img src="/Images/icons/star.png" alt="icon" />
-                {/* <p>({product.reviews.length})</p> */}
+                <p>({product?.reviewCount})</p>
               </span>
             </div>
           </div>
@@ -522,8 +523,8 @@ function ProductDisplay() {
           <h5>Product Review</h5>
           <RatingModal productId={product.id} />
         </div>
-        {/* <div className="reviews-container">
-          {reviews.length > 0 ? (
+        <div className="review-container">
+          {/* {reviews.length > 0 ? (
             <div className="reviews-list">
               {reviews.map((review, index) => (
                 <ReviewCard key={index} {...review} />
@@ -531,8 +532,9 @@ function ProductDisplay() {
             </div>
           ) : (
             <p className="no-reviews-message">No reviews available.</p>
-          )}
-        </div> */}
+          )} */}
+          <Reviews productId={productID}/>
+        </div>
       </div>
     </>
   );
