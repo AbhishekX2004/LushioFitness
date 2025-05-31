@@ -7,37 +7,45 @@ import './Pickups.css';
 const API = process.env.REACT_APP_API_URL;
 
 const CustomAlert = ({ message, type, onClose }) => (
-  <div className={`custom-alert ${type}`}>
+  <div className={`admin-pickup-modal-custom-alert ${type}`}>
     <span>{message}</span>
-    <button onClick={onClose} className="alert-close-button">&times;</button>
+    <button onClick={onClose} className="admin-pickup-modal-alert-close-button">&times;</button>
   </div>
 );
 
 const StatusBadge = ({ status }) => {
   let statusText = "Unknown";
-  let statusClass = "status-unknown";
+  let statusClass = "admin-pickup-modal-status-unknown";
 
   switch (status) {
     case 1:
       statusText = "Active";
-      statusClass = "status-active";
+      statusClass = "admin-pickup-modal-status-active";
       break;
     case 2:
       statusText = "Primary";
-      statusClass = "status-primary";
+      statusClass = "admin-pickup-modal-status-primary";
       break;
     default:
       break;
   }
 
-  return <span className={`status-badge ${statusClass}`}>{statusText}</span>;
+  return <span className={`admin-pickup-modal-status-badge ${statusClass}`}>{statusText}</span>;
 };
+
+const Loader = () => (
+  <div className="admin-pickup-modal-loader">
+    <div className="admin-pickup-modal-spinner"></div>
+  </div>
+);
 
 const Pickups = ({ onClose }) => {
   const [pickupLocations, setPickupLocations] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     pickup_location: '',
     name: '',
@@ -52,6 +60,12 @@ const Pickups = ({ onClose }) => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
   useEffect(() => {
     fetchPickupLocations();
@@ -76,6 +90,7 @@ const Pickups = ({ onClose }) => {
   };
 
   const fetchPickupLocations = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(`${API}/pickup/pickup-locations`);
       const responseData = response.data;
@@ -86,6 +101,8 @@ const Pickups = ({ onClose }) => {
       }
     } catch (error) {
       setError('Failed to fetch pickup locations');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -118,6 +135,7 @@ const Pickups = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const response = await axios.post(`${API}/pickup/add`, formData, {
         headers: {
@@ -150,18 +168,20 @@ const Pickups = ({ onClose }) => {
       }
     } catch (error) {
       setError('Failed to add pickup location');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="pickup-modal-overlay">
-      <div className="pickup-modal">
-        <div className="pickup-modal-header">
+    <div className="admin-pickup-modal-overlay" onClick={handleOverlayClick}>
+      <div className="admin-pickup-modal">
+        <div className="admin-pickup-modal-header">
           <div>
             <h2>Pickup Locations</h2>
-            {companyName && <p className="company-name">{companyName}</p>}
+            {companyName && <p className="admin-pickup-modal-company-name">{companyName}</p>}
           </div>
-          <button onClick={onClose} className="close-button">&times;</button>
+          <button onClick={onClose} className="admin-pickup-modal-close-button">&times;</button>
         </div>
 
         {error && (
@@ -180,58 +200,63 @@ const Pickups = ({ onClose }) => {
           />
         )}
 
-        <div className="pickup-content">
+        <div className="admin-pickup-modal-content">
           {!showAddForm ? (
             <>
               <button 
-                className="add-pickup-button" 
+                className="admin-pickup-modal-add-button" 
                 onClick={() => setShowAddForm(true)}
+                disabled={isLoading}
               >
                 Add New Pickup Location
               </button>
 
-              <div className="pickup-locations-list">
-                {pickupLocations.map((location) => (
-                  <div key={location.id} className="pickup-location-card">
-                    <div className="pickup-header">
-                      <div className="pickup-header-left">
-                        <input
-                          type="radio"
-                          name="pickupLocation"
-                          checked={selectedLocation === location.pickup_location}
-                          onChange={() => handleLocationSelect(location)}
-                          className="pickup-radio"
-                        />
-                        <h3>{location.pickup_location} (ID : {location.id})</h3>
+              {isLoading ? (
+                <Loader />
+              ) : (
+                <div className="admin-pickup-modal-locations-list">
+                  {pickupLocations.map((location) => (
+                    <div key={location.id} className="admin-pickup-modal-location-card">
+                      <div className="admin-pickup-modal-pickup-header">
+                        <div className="admin-pickup-modal-header-left">
+                          <input
+                            type="radio"
+                            name="pickupLocation"
+                            checked={selectedLocation === location.pickup_location}
+                            onChange={() => handleLocationSelect(location)}
+                            className="admin-pickup-modal-radio"
+                          />
+                          <h3>{location.pickup_location} (ID : {location.id})</h3>
+                        </div>
+                        <StatusBadge status={location.status} />
                       </div>
-                      <StatusBadge status={location.status} />
+                      {location.is_primary_location === 1 && (
+                        <div className="admin-pickup-modal-primary-badge">Primary Location</div>
+                      )}
+                      <p><strong>Name:</strong> {location.name}</p>
+                      <p><strong>Email:</strong> {location.email}</p>
+                      <p><strong>Phone:</strong> {location.phone}</p>
+                      <div className="admin-pickup-modal-address-section">
+                        <p><strong>Address:</strong> {location.address}</p>
+                        {location.address_2 && <p className="admin-pickup-modal-address-2">{location.address_2}</p>}
+                        <p>{location.city}, {location.state}, {location.country} - {location.pin_code}</p>
+                      </div>
+                      {location.instruction && (
+                        <p className="admin-pickup-modal-instruction"><strong>Instructions:</strong> {location.instruction}</p>
+                      )}
+                      {location.phone_verified === 1 && (
+                        <div className="admin-pickup-modal-verified-badge">Phone Verified</div>
+                      )}
                     </div>
-                    {location.is_primary_location === 1 && (
-                      <div className="primary-badge">Primary Location</div>
-                    )}
-                    <p><strong>Name:</strong> {location.name}</p>
-                    <p><strong>Email:</strong> {location.email}</p>
-                    <p><strong>Phone:</strong> {location.phone}</p>
-                    <div className="address-section">
-                      <p><strong>Address:</strong> {location.address}</p>
-                      {location.address_2 && <p className="address-2">{location.address_2}</p>}
-                      <p>{location.city}, {location.state}, {location.country} - {location.pin_code}</p>
-                    </div>
-                    {location.instruction && (
-                      <p className="instruction"><strong>Instructions:</strong> {location.instruction}</p>
-                    )}
-                    {location.phone_verified === 1 && (
-                      <div className="verified-badge">Phone Verified</div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </>
           ) : (
-            <form onSubmit={handleSubmit} className="pickup-form">
-              <div className="form-grid">
+            <form onSubmit={handleSubmit} className="admin-pickup-modal-form">
+              <div className="admin-pickup-modal-form-grid">
                 {Object.keys(formData).map((field) => (
-                  <div key={field} className="form-group">
+                  <div key={field} className="admin-pickup-modal-form-group">
                     <label>{field.replace('_', ' ').toUpperCase()}</label>
                     <input
                       type="text"
@@ -239,15 +264,33 @@ const Pickups = ({ onClose }) => {
                       value={formData[field]}
                       onChange={handleInputChange}
                       required={['pickup_location', 'name', 'email', 'phone', 'address', 'city', 'state', 'country', 'pin_code'].includes(field)}
+                      disabled={isSubmitting}
                     />
                   </div>
                 ))}
               </div>
-              <div className="form-actions">
-                <button type="button" onClick={() => setShowAddForm(false)}>
+              <div className="admin-pickup-modal-form-actions">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddForm(false)}
+                  disabled={isSubmitting}
+                >
                   Cancel
                 </button>
-                <button type="submit">Add Pickup Location</button>
+                <button 
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={isSubmitting ? 'admin-pickup-modal-submitting' : ''}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="admin-pickup-modal-button-spinner"></span>
+                      Adding...
+                    </>
+                  ) : (
+                    'Add Pickup Location'
+                  )}
+                </button>
               </div>
             </form>
           )}

@@ -329,7 +329,7 @@ router.post("/create", async (req, res) => {
     await db.collection("orders").doc(oid).update({
       "shiprocket.return_order": returnOrderResponse.data,
       // "shiprocket.return_awb": awbResponse.data,
-      "returnItems": returnItems,
+      // "returnItems": returnItems,
       "status": "return_initiated",
       "returnDate": new Date(),
       "updatedAt": new Date(),

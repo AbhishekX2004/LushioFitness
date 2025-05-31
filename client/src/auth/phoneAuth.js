@@ -28,6 +28,11 @@ const sendOtp = async (formattedPhoneNumber) => {
     return confirmationResult;
   } catch (error) {
     console.error("Error during OTP sending", error);
+    // Reset recaptcha on error
+    if (window.recaptchaVerifier) {
+      window.recaptchaVerifier.clear();
+      window.recaptchaVerifier = null;
+    }
     throw error;
   }
 };
@@ -51,14 +56,13 @@ const verifyOtp = async (confirmationResult, otp, formattedPhoneNumber, referral
       // Save new user data in Firestore
       await setDoc(userDoc, {
         phoneNumber: formattedPhoneNumber,
-        referredBy: referralCode || "", // Pass empty string if referralCode is undefined
+        referredBy: referralCode || "",
         createdAt: new Date(),
         lastSignInTime: new Date(),
       });
     }
 
     console.log(user);
-
     return user;
   } catch (error) {
     console.error("Error during OTP verification", error);
@@ -80,10 +84,10 @@ const verifyOtpForLogin = async (confirmationResult, otp) => {
     });
 
     console.log(user);
-
     return user;
   } catch (error) {
     console.error("Error verifying OTP for login", error);
+    throw error;
   }
 };
 

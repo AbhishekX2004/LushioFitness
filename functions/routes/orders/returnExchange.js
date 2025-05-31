@@ -63,6 +63,7 @@ router.post("/process-return-exchange", async (req, res) => {
     let sub_discount = 0;
     const returnItems = {};
     const exchangeItems = [];
+    const returnExchangedItems = items; // Use the original items as they already have the structure we want
 
     const order_items = productDocs.map((doc) => {
       const productData = doc.data();
@@ -72,6 +73,7 @@ router.post("/process-return-exchange", async (req, res) => {
         units: itemData.units,
         return_reason: itemData.reason,
       };
+
       if (itemData.exchange) {
         sub_total += (Number(productData.productDetails.price)) * itemData.units;
         sub_discount += Number((productData.perUnitDiscount) - (productData.productDetails.price-productData.productDetails.discountedPrice)) * itemData.units;
@@ -97,7 +99,7 @@ router.post("/process-return-exchange", async (req, res) => {
         discount: productData.perUnitDiscount,
       };
     });
-    // console.log({uid, oid, returnItems});
+    // console.log({uid, oid, returnExchangedItems});
 
     // console.log(sub_total);
     if (Object.keys(returnItems).length > 0) {
@@ -117,6 +119,9 @@ router.post("/process-return-exchange", async (req, res) => {
         orderedProducts: exchangeItems,
         isExchange: true,
         exchangeOrderId: oid,
+        onlinePaymentDiscount: 0,
+        couponDiscount: 0,
+        lushioCashBack: 0,
       };
       // console.log( "CREATE ORDER INPUT - ", newOrderBody);
 
@@ -126,12 +131,30 @@ router.post("/process-return-exchange", async (req, res) => {
 
     const updatePromises = productDocs.map((doc) => {
       const itemData = items[doc.id];
-      return orderedProductsRef.doc(doc.id).update({
-        status: itemData.exchange ? "exchanged" : "returned",
+      const productData = doc.data();
+      const originalQuantity = productData.quantity;
+      const processedQuantity = itemData.units;
+
+      // Determine the appropriate status based on quantity comparison
+      let newStatus;
+      if (processedQuantity >= originalQuantity) {
+      // Full return/exchange
+        newStatus = itemData.exchange ? "exchanged" : "returned";
+      } else {
+      // Partial return/exchange
+        newStatus = itemData.exchange ? "partially_exchanged" : "partially_returned";
+      }
+
+      // Prepare update object
+      const updateData = {
+        status: newStatus,
         updatedAt: new Date(),
         [itemData.exchange ? "exchange_reason" : "return_reason"]: itemData.reason,
         [itemData.exchange ? "exchangedOn" : "returnedOn"]: new Date(),
-      });
+        [itemData.exchange ? "exchanged_qty" : "returned_qty"]: processedQuantity,
+      };
+
+      return orderedProductsRef.doc(doc.id).update(updateData);
     });
 
     // update user timestamp
@@ -140,12 +163,16 @@ router.post("/process-return-exchange", async (req, res) => {
     });
 
     await Promise.all(updatePromises);
-    await orderRef.update({status: "return_exchange_initiated", updatedAt: new Date()});
+    await orderRef.update({
+      status: "return_exchange_initiated",
+      updatedAt: new Date(),
+      returnExchangedItems: returnExchangedItems,
+    });
 
     return res.status(200).json({success: true, message: "Return/Exchange processed successfully."});
   } catch (error) {
     console.error("Error processing return/exchange:", error.data);
-    return res.status(500).json({success: false, message: "Internal server error."});
+    return res.status(500).json({success: false, message: "Internal server error.", error: error.message});
   }
 });
 

@@ -1,5 +1,5 @@
 /* Pickups.css */
-.pickup-modal-overlay {
+.admin-pickup-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -12,7 +12,7 @@
   z-index: 1000;
 }
 
-.pickup-modal {
+.admin-pickup-modal {
   background-color: white;
   border-radius: 8px;
   padding: 20px;
@@ -22,28 +22,42 @@
   overflow-y: auto;
 }
 
-.pickup-modal-header {
+.admin-pickup-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
 }
 
-.company-name {
+.admin-pickup-modal-company-name {
   color: #666;
   margin-top: 4px;
   font-size: 0.9em;
 }
 
-.close-button {
+.admin-pickup-modal-close-button {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
-  padding: 5px;
+  padding: 8px;
+  color: #666;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
-.add-pickup-button {
+.admin-pickup-modal-close-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.admin-pickup-modal-add-button {
   background-color: #4CAF50;
   color: white;
   padding: 10px 20px;
@@ -53,13 +67,18 @@
   margin-bottom: 20px;
 }
 
-.pickup-locations-list {
+.admin-pickup-modal-add-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.admin-pickup-modal-locations-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
 
-.pickup-location-card {
+.admin-pickup-modal-location-card {
   background-color: #f8f8f8;
   padding: 15px;
   border-radius: 6px;
@@ -67,36 +86,36 @@
   position: relative;
 }
 
-.pickup-header {
+.admin-pickup-modal-pickup-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.status-badge {
+.admin-pickup-modal-status-badge {
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 0.8em;
   font-weight: 500;
 }
 
-.status-active {
+.admin-pickup-modal-status-active {
   background-color: #e8f5e9;
   color: #2e7d32;
 }
 
-.status-primary {
+.admin-pickup-modal-status-primary {
   background-color: #e3f2fd;
   color: #1565c0;
 }
 
-.status-unknown {
+.admin-pickup-modal-status-unknown {
   background-color: #f5f5f5;
   color: #616161;
 }
 
-.primary-badge {
+.admin-pickup-modal-primary-badge {
   position: absolute;
   top: -10px;
   right: -10px;
@@ -108,7 +127,7 @@
   font-weight: 500;
 }
 
-.verified-badge {
+.admin-pickup-modal-verified-badge {
   display: inline-block;
   margin-top: 10px;
   padding: 4px 8px;
@@ -119,19 +138,19 @@
   font-weight: 500;
 }
 
-.address-section {
+.admin-pickup-modal-address-section {
   margin: 10px 0;
   padding: 10px;
   background-color: #fff;
   border-radius: 4px;
 }
 
-.address-2 {
+.admin-pickup-modal-address-2 {
   color: #666;
   font-style: italic;
 }
 
-.instruction {
+.admin-pickup-modal-instruction {
   margin-top: 10px;
   padding: 8px;
   background-color: #fff3e0;
@@ -139,59 +158,109 @@
   font-size: 0.9em;
 }
 
-/* Rest of the existing styles remain the same */
-.pickup-form {
+/* Loader Styles */
+.admin-pickup-modal-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.admin-pickup-modal-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #4CAF50;
+  border-radius: 50%;
+  animation: admin-pickup-modal-spin 1s linear infinite;
+}
+
+@keyframes admin-pickup-modal-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Button spinner for submit button */
+.admin-pickup-modal-button-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: admin-pickup-modal-spin 1s linear infinite;
+}
+
+/* Form Styles */
+.admin-pickup-modal-form {
   background-color: #f8f8f8;
   padding: 20px;
   border-radius: 6px;
 }
 
-.form-grid {
+.admin-pickup-modal-form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
 }
 
-.form-group {
+.admin-pickup-modal-form-group {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.form-group label {
+.admin-pickup-modal-form-group label {
   font-weight: 500;
 }
 
-.form-group input {
+.admin-pickup-modal-form-group input {
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
 
-.form-actions {
+.admin-pickup-modal-form-group input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.admin-pickup-modal-form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
 }
 
-.form-actions button {
+.admin-pickup-modal-form-actions button {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
-.form-actions button[type="button"] {
+.admin-pickup-modal-form-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.admin-pickup-modal-form-actions button[type="button"] {
   background-color: #f0f0f0;
 }
 
-.form-actions button[type="submit"] {
+.admin-pickup-modal-form-actions button[type="submit"] {
   background-color: #4CAF50;
   color: white;
 }
 
-.custom-alert {
+.admin-pickup-modal-form-actions button[type="submit"].admin-pickup-modal-submitting {
+  background-color: #45a049;
+}
+
+.admin-pickup-modal-custom-alert {
   padding: 12px 20px;
   margin-bottom: 20px;
   border-radius: 4px;
@@ -200,19 +269,19 @@
   align-items: center;
 }
 
-.custom-alert.error {
+.admin-pickup-modal-custom-alert.error {
   background-color: #ffebee;
   color: #c62828;
   border: 1px solid #ffcdd2;
 }
 
-.custom-alert.success {
+.admin-pickup-modal-custom-alert.success {
   background-color: #e8f5e9;
   color: #2e7d32;
   border: 1px solid #c8e6c9;
 }
 
-.alert-close-button {
+.admin-pickup-modal-alert-close-button {
   background: none;
   border: none;
   font-size: 18px;
@@ -221,24 +290,28 @@
   margin-left: 10px;
 }
 
-.alert-close-button:hover {
+.admin-pickup-modal-alert-close-button:hover {
   opacity: 0.7;
 }
 
-.pickup-header-left {
+.admin-pickup-modal-header-left {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.pickup-radio {
+.admin-pickup-modal-radio {
   margin: 0;
   cursor: pointer;
 }
 
 /* Make radio button more visible */
-.pickup-radio {
+.admin-pickup-modal-radio {
   width: 18px;
   height: 18px;
   accent-color: #4CAF50;
+}
+
+.admin-pickup-modal-content {
+  /* Add any content-specific styles if needed */
 }

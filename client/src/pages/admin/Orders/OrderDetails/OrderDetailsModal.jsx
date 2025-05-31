@@ -26,16 +26,23 @@ const OrderDetailsModal = ({ order: initialOrder, onClose, ...props }) => {
 
     if (loading) {
         return (
-            <div className="modal-overlay">
-                <div className="modal-content loading">Loading...</div>
+            <div className="admin-orderDetails-modal-overlay">
+                <div className="admin-orderDetails-modal-content admin-orderDetails-modal-loading">
+                    <div className="admin-orderDetails-modal-spinner"></div>
+                    <p>Loading order details...</p>
+                </div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="modal-overlay">
-                <div className="modal-content error">Error: {error}</div>
+            <div className="admin-orderDetails-modal-overlay" onClick={onClose}>
+                <div className="admin-orderDetails-modal-content admin-orderDetails-modal-error" onClick={(e) => e.stopPropagation()}>
+                    <div className="admin-orderDetails-modal-error-icon">⚠️</div>
+                    <p>Error loading order details</p>
+                    <span className="admin-orderDetails-modal-error-message">{error}</span>
+                </div>
             </div>
         );
     }
@@ -83,124 +90,154 @@ const OrderDetailsModal = ({ order: initialOrder, onClose, ...props }) => {
         }
     };
 
-    const actionButtons = (
-        <div className="admin-action-buttons">
-          {order.invoice ? (
-            <a
-              href={order.invoice_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="admin-action-button invoice"
-            >
-              Print Invoice
-            </a>
-          ) : (
-            <button
-              onClick={() => generateInvoice(order.oid)}
-              className="admin-action-button invoice"
-            >
-              Generate Invoice
-            </button>
-          )}
-    
-          {order.label ? (
-            <a
-              href={order.label_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="admin-action-button label"
-            >
-              Print Label
-            </a>
-          ) : (
-            <button
-              onClick={() => generateLabel(order.oid)}
-              className="admin-action-button label"
-            >
-              Generate Label
-            </button>
-          )}
-    
-          <button
-            onClick={() => requestPickup(order.oid)}
-            disabled={order.pickup}
-            className="admin-action-button pickup"
-          >
-            Request Pickup
-          </button>
-    
-          {order.manifest ? (
-            <a
-              href={order.manifest_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="admin-action-button manifest"
-            >
-              Print Manifest
-            </a>
-          ) : (
-            <button
-              onClick={() => generateManifest(order.oid)}
-              disabled={!order.pickup}
-              className="admin-action-button manifest"
-            >
-              Generate Manifest
-            </button>
-          )}
-        </div>
-      );
+    const getStatusBadge = (status) => {
+        const statusClass = status?.toLowerCase().replace(/\s+/g, '-') || 'pending';
+        return <span className={`admin-orderDetails-modal-status-badge admin-orderDetails-modal-${statusClass}`}>{status}</span>;
+    };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content"  onClick={(e) => e.stopPropagation()} >
-                <div className="modal-header">
-                    <h2>Order Details</h2>
-                    <button className="close-button" onClick={onClose}>×</button>
+        <div className="admin-orderDetails-modal-overlay" onClick={onClose}>
+            <div className="admin-orderDetails-modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="admin-orderDetails-modal-header">
+                    <div>
+                        <h2>Order Details</h2>
+                        <span className="admin-orderDetails-modal-order-id">#{details.oid}</span>
+                    </div>
+                    <button className="admin-orderDetails-modal-close-button" onClick={onClose}>×</button>
                 </div>
 
-                <div className="modal-body">
-                    <div className="order-info-grid">
-                        <div className="info-section">
-                            <h3>Order Information</h3>
-                            <p>Order ID: {details.oid}</p>
-                            <p>Order Date: {new Date(details.dateOfOrder._seconds * 1000).toLocaleDateString()}</p>
-                            <p>Status: {details.status}</p>
-                            <p>Total Amount: ₹{details.totalAmount}</p>
-                            <p>Payment Mode: {details.modeOfPayment}</p>
+                <div className="admin-orderDetails-modal-body">
+                    <div className="admin-orderDetails-modal-order-summary">
+                        <div className="admin-orderDetails-modal-summary-item">
+                            <span className="admin-orderDetails-modal-label">Status</span>
+                            {getStatusBadge(details.status)}
                         </div>
-
-                        <div className="info-section">
-                            <h3>Shipping Address</h3>
-                            <p>{details.address.name}</p>
-                            <p>{details.address.flatDetails}</p>
-                            <p>{details.address.areaDetails}</p>
-                            <p>{details.address.townCity}, {details.address.state}</p>
-                            <p>{details.address.pinCode}</p>
-                            <p>Phone: {details.address.contactNo}</p>
+                        <div className="admin-orderDetails-modal-summary-item">
+                            <span className="admin-orderDetails-modal-label">Total Amount</span>
+                            <span className="admin-orderDetails-modal-amount">₹{details.payableAmount}</span>
+                        </div>
+                        <div className="admin-orderDetails-modal-summary-item">
+                            <span className="admin-orderDetails-modal-label">Order Date</span>
+                            <span>{new Date(details.dateOfOrder._seconds * 1000).toLocaleDateString('en-IN', { 
+                                day: 'numeric', 
+                                month: 'short', 
+                                year: 'numeric' 
+                            })}</span>
+                        </div>
+                        <div className="admin-orderDetails-modal-summary-item">
+                            <span className="admin-orderDetails-modal-label">Payment</span>
+                            <span>{details.modeOfPayment}</span>
                         </div>
                     </div>
 
-                    <div className="admin-products-section">
-                        <h3>Products</h3>
-                        {orderedProducts.map((product, index) => (
-                            <div key={index} className="admin-product-card">
-                                <div className="admin-product-info">
-                                    <img
-                                        src={product.productDetails.cardImages[0]}
-                                        alt={product.productName}
-                                        className="admin-product-image"
-                                    />
-                                    <div className="admin-product-details">
-                                        <p className="admin-product-name">{product.productName}</p>
-                                        <p>Size: {product.size}</p>
-                                        <p>Color: {product.color}</p>
-                                        <p>Quantity: {product.quantity}</p>
-                                    </div>
+                    <div className="admin-orderDetails-modal-content-grid">
+                        <div className="admin-orderDetails-modal-shipping-section">
+                            <h3>Shipping Address</h3>
+                            <div className="admin-orderDetails-modal-address-card">
+                                <div className="admin-orderDetails-modal-address-name">{details.address.name}</div>
+                                <div className="admin-orderDetails-modal-address-details">
+                                    {details.address.flatDetails}<br />
+                                    {details.address.areaDetails}<br />
+                                    {details.address.townCity}, {details.address.state}<br />
+                                    <strong>{details.address.pinCode}</strong>
+                                </div>
+                                <div className="admin-orderDetails-modal-contact-info">
+                                    📞 +{details.address.contactNo}
                                 </div>
                             </div>
-                        ))}
+                        </div>
+
+                        <div className="admin-orderDetails-modal-products-section">
+                            <h3>Products ({orderedProducts.length})</h3>
+                            <div className="admin-orderDetails-modal-products-list">
+                                {orderedProducts.map((product, index) => (
+                                    <div key={index} className="admin-orderDetails-modal-product-card">
+                                        <img
+                                            src={product.productDetails.cardImages[0]}
+                                            alt={product.productName}
+                                            className="admin-orderDetails-modal-product-image"
+                                        />
+                                        <div className="admin-orderDetails-modal-product-info">
+                                            <div className="admin-orderDetails-modal-product-name">{product.productName}</div>
+                                            <div className="admin-orderDetails-modal-product-variants">
+                                                <span className="admin-orderDetails-modal-variant">Size: {product.size}</span>
+                                                <span className="admin-orderDetails-modal-variant">Color: {product.color}</span>
+                                            </div>
+                                            <div className="admin-orderDetails-modal-product-quantity">Qty: {product.quantity}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                    {actionButtons}                                                                               
+
+                    <div className="admin-orderDetails-modal-action-section">
+                        <h3>Actions</h3>
+                        <div className="admin-orderDetails-modal-action-buttons">
+                            {order.invoice ? (
+                                <a
+                                    href={order.invoice_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="admin-orderDetails-modal-action-button admin-orderDetails-modal-invoice admin-orderDetails-modal-completed"
+                                >
+                                    📄 View Invoice
+                                </a>
+                            ) : (
+                                <button
+                                    onClick={() => generateInvoice(order.oid)}
+                                    className="admin-orderDetails-modal-action-button admin-orderDetails-modal-invoice"
+                                >
+                                    📄 Generate Invoice
+                                </button>
+                            )}
+
+                            {order.label ? (
+                                <a
+                                    href={order.label_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="admin-orderDetails-modal-action-button admin-orderDetails-modal-label admin-orderDetails-modal-completed"
+                                >
+                                    🏷️ View Label
+                                </a>
+                            ) : (
+                                <button
+                                    onClick={() => generateLabel(order.oid)}
+                                    className="admin-orderDetails-modal-action-button admin-orderDetails-modal-label"
+                                >
+                                    🏷️ Generate Label
+                                </button>
+                            )}
+
+                            <button
+                                onClick={() => requestPickup(order.oid)}
+                                disabled={order.pickup}
+                                className={`admin-orderDetails-modal-action-button admin-orderDetails-modal-pickup ${order.pickup ? 'admin-orderDetails-modal-completed' : ''}`}
+                            >
+                                🚚 {order.pickup ? 'Pickup Requested' : 'Request Pickup'}
+                            </button>
+
+                            {order.manifest ? (
+                                <a
+                                    href={order.manifest_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="admin-orderDetails-modal-action-button admin-orderDetails-modal-manifest admin-orderDetails-modal-completed"
+                                >
+                                    📋 View Manifest
+                                </a>
+                            ) : (
+                                <button
+                                    onClick={() => generateManifest(order.oid)}
+                                    disabled={!order.pickup}
+                                    className="admin-orderDetails-modal-action-button admin-orderDetails-modal-manifest"
+                                >
+                                    📋 Generate Manifest
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

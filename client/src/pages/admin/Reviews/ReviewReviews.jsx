@@ -90,7 +90,7 @@ const ReviewReviews = () => {
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, i) => (
-      <span key={i} className={`star ${i < rating ? 'star-filled' : 'star-empty'}`}>
+      <span key={i} className={`admin-review-star ${i < rating ? 'admin-review-star-filled' : 'admin-review-star-empty'}`}>
         ★
       </span>
     ));
@@ -151,12 +151,12 @@ const ReviewReviews = () => {
         <div className="admin-review-header">
           <h2 className="admin-review-title">Review Management</h2>
           <div className="admin-review-controls">
-            <label className="limit-label">
+            <label className="admin-review-limit-label">
               Reviews per page:
               <select 
                 value={limit} 
                 onChange={(e) => setLimit(Number(e.target.value))}
-                className="limit-select"
+                className="admin-review-limit-select"
               >
                 <option value={5}>5</option>
                 <option value={10}>10</option>
@@ -171,34 +171,34 @@ const ReviewReviews = () => {
           {reviews.map((review) => (
             <div
               key={review.id}
-              className={`admin-review-card ${review.approved ? "review-approved" : ""} ${selectedReview?.id === review.id ? "review-selected" : ""}`}
+              className={`admin-review-card ${review.approved ? "admin-review-approved" : ""} ${selectedReview?.id === review.id ? "admin-review-selected" : ""}`}
             >
-              <div className="review-card-header">
-                <span className="review-id">#{review.id.slice(-6)}</span>
-                <div className="review-status">
+              <div className="admin-review-card-header">
+                <span className="admin-review-id">#{review.id.slice(-6)}</span>
+                <div className="admin-review-status">
                   {review.approved ? (
-                    <span className="status-badge status-approved">Approved</span>
+                    <span className="admin-review-status-badge admin-review-status-approved">Approved</span>
                   ) : (
-                    <span className="status-badge status-pending">Pending</span>
+                    <span className="admin-review-status-badge admin-review-status-pending">Pending</span>
                   )}
                 </div>
               </div>
               
-              <div className="review-rating">
+              <div className="admin-review-rating">
                 {renderStars(review.rating)}
-                <span className="rating-text">({review.rating}/5)</span>
+                <span className="admin-review-rating-text">({review.rating}/5)</span>
               </div>
               
-              <div className="review-preview">
+              <div className="admin-review-preview">
                 {review.review && (
-                  <p className="review-text-preview">
+                  <p className="admin-review-text-preview">
                     {review.review.length > 60 ? `${review.review.substring(0, 60)}...` : review.review}
                   </p>
                 )}
               </div>
               
               <button 
-                className="review-select-btn"
+                className="admin-review-select-btn"
                 onClick={() => handleReview(review)}
               >
                 View Details
@@ -207,23 +207,23 @@ const ReviewReviews = () => {
           ))}
 
           {reviews.length === 0 && !isLoading && (
-            <div className="no-reviews">
-              <div className="no-reviews-icon">📝</div>
-              <p className="no-reviews-text">No reviews found</p>
+            <div className="admin-review-no-reviews">
+              <div className="admin-review-no-reviews-icon">📝</div>
+              <p className="admin-review-no-reviews-text">No reviews found</p>
             </div>
           )}
         </div>
 
         {hasMore && (
-          <div className="load-more-container">
+          <div className="admin-review-load-more-container">
             <button 
               onClick={handleLoadMore} 
               disabled={isLoading}
-              className="load-more-button"
+              className="admin-review-load-more-button"
             >
               {isLoading ? (
                 <>
-                  <span className="loading-spinner"></span>
+                  <span className="admin-review-loading-spinner"></span>
                   Loading...
                 </>
               ) : (
@@ -236,61 +236,61 @@ const ReviewReviews = () => {
 
       <div className="admin-review-details">
         {selectedReview ? (
-          <div className="review-details-content">
-            <div className="details-header">
-              <h3 className="details-title">Review Details</h3>
+          <div className="admin-review-details-content">
+            <div className="admin-review-details-header">
+              <h3 className="admin-review-details-title">Review Details</h3>
               <button 
-                className="close-details-btn"
+                className="admin-review-close-details-btn"
                 onClick={() => setSelectedReview(null)}
               >
                 ✕
               </button>
             </div>
             
-            <div className="details-section">
-              <div className="detail-item">
-                <span className="detail-label">Rating:</span>
-                <div className="detail-rating">
+            <div className="admin-review-details-section">
+              <div className="admin-review-detail-item">
+                <span className="admin-review-detail-label">Rating:</span>
+                <div className="admin-review-detail-rating">
                   {renderStars(selectedReview.rating)}
-                  <span className="rating-number">({selectedReview.rating}/5)</span>
+                  <span className="admin-review-rating-number">({selectedReview.rating}/5)</span>
                 </div>
               </div>
               
               {selectedReview.quality && (
-                <div className="detail-item">
-                  <span className="detail-label">Quality:</span>
-                  <span className="detail-value">{selectedReview.quality}</span>
+                <div className="admin-review-detail-item">
+                  <span className="admin-review-detail-label">Quality:</span>
+                  <span className="admin-review-detail-value">{selectedReview.quality}</span>
                 </div>
               )}
               
               {selectedReview.fit && (
-                <div className="detail-item">
-                  <span className="detail-label">Fit:</span>
-                  <span className="detail-value">{selectedReview.fit}</span>
+                <div className="admin-review-detail-item">
+                  <span className="admin-review-detail-label">Fit:</span>
+                  <span className="admin-review-detail-value">{selectedReview.fit}</span>
                 </div>
               )}
               
               {selectedReview.review && (
-                <div className="detail-item detail-review">
-                  <span className="detail-label">Review:</span>
-                  <p className="detail-review-text">{selectedReview.review}</p>
+                <div className="admin-review-detail-item admin-review-detail-review">
+                  <span className="admin-review-detail-label">Review:</span>
+                  <p className="admin-review-detail-review-text">{selectedReview.review}</p>
                 </div>
               )}
             </div>
 
             {selectedReview.media && selectedReview.media.length > 0 && (
-              <div className="details-section">
-                <span className="detail-label">Media:</span>
+              <div className="admin-review-details-section">
+                <span className="admin-review-detail-label">Media:</span>
                 <div className="admin-review-media">
                   {selectedReview.media.map((url, index) => (
                     <div 
                       key={index} 
-                      className="media-item"
+                      className="admin-review-media-item"
                       onClick={() => openFullscreenMedia(selectedReview.media, index)}
                     >
                       <URLMediaRenderer src={url} alt={`media-${index}`} />
-                      <div className="media-overlay">
-                        <span className="media-overlay-icon">🔍</span>
+                      <div className="admin-review-media-overlay">
+                        <span className="admin-review-media-overlay-icon">🔍</span>
                       </div>
                     </div>
                   ))}
@@ -298,50 +298,50 @@ const ReviewReviews = () => {
               </div>
             )}
             
-            <div className="details-actions">
+            <div className="admin-review-details-actions">
               {!selectedReview.approved && (
-                <button className="approve-btn" onClick={handleApprove}>
-                  <span className="btn-icon">✓</span>
+                <button className="admin-review-approve-btn" onClick={handleApprove}>
+                  <span className="admin-review-btn-icon">✓</span>
                   Approve Review
                 </button>
               )}
               <button 
-                className="delete-btn" 
+                className="admin-review-delete-btn" 
                 onClick={() => handleDelete(selectedReview.id)}
               >
-                <span className="btn-icon">🗑</span>
+                <span className="admin-review-btn-icon">🗑</span>
                 Delete Review
               </button>
             </div>
           </div>
         ) : (
-          <div className="no-selection">
-            <div className="no-selection-icon">👈</div>
-            <h3 className="no-selection-title">Select a Review</h3>
-            <p className="no-selection-text">Choose a review from the list to view its details and take actions.</p>
+          <div className="admin-review-no-selection">
+            <div className="admin-review-no-selection-icon">👈</div>
+            <h3 className="admin-review-no-selection-title">Select a Review</h3>
+            <p className="admin-review-no-selection-text">Choose a review from the list to view its details and take actions.</p>
           </div>
         )}
       </div>
 
       {/* Fullscreen Media Modal */}
       {fullscreenMedia && (
-        <div className="fullscreen-modal" onClick={closeFullscreenMedia}>
-          <div className="fullscreen-content" onClick={(e) => e.stopPropagation()}>
-            <button className="fullscreen-close" onClick={closeFullscreenMedia}>
+        <div className="admin-review-fullscreen-modal" onClick={closeFullscreenMedia}>
+          <div className="admin-review-fullscreen-content" onClick={(e) => e.stopPropagation()}>
+            <button className="admin-review-fullscreen-close" onClick={closeFullscreenMedia}>
               ✕
             </button>
             
             {fullscreenMedia.length > 1 && (
               <>
                 <button 
-                  className="fullscreen-nav fullscreen-prev" 
+                  className="admin-review-fullscreen-nav admin-review-fullscreen-prev" 
                   onClick={prevMedia}
                   disabled={currentMediaIndex === 0}
                 >
                   ←
                 </button>
                 <button 
-                  className="fullscreen-nav fullscreen-next" 
+                  className="admin-review-fullscreen-nav admin-review-fullscreen-next" 
                   onClick={nextMedia}
                   disabled={currentMediaIndex === fullscreenMedia.length - 1}
                 >
@@ -350,7 +350,7 @@ const ReviewReviews = () => {
               </>
             )}
             
-            <div className="fullscreen-media">
+            <div className="admin-review-fullscreen-media">
               <URLMediaRenderer 
                 src={fullscreenMedia[currentMediaIndex]} 
                 alt={`fullscreen-media-${currentMediaIndex}`} 
@@ -358,16 +358,16 @@ const ReviewReviews = () => {
             </div>
             
             {fullscreenMedia.length > 1 && (
-              <div className="fullscreen-counter">
+              <div className="admin-review-fullscreen-counter">
                 {currentMediaIndex + 1} / {fullscreenMedia.length}
               </div>
             )}
             
-            <div className="fullscreen-thumbnails">
+            <div className="admin-review-fullscreen-thumbnails">
               {fullscreenMedia.map((url, index) => (
                 <div 
                   key={index} 
-                  className={`fullscreen-thumbnail ${index === currentMediaIndex ? 'thumbnail-active' : ''}`}
+                  className={`admin-review-fullscreen-thumbnail ${index === currentMediaIndex ? 'admin-review-thumbnail-active' : ''}`}
                   onClick={() => setCurrentMediaIndex(index)}
                 >
                   <URLMediaRenderer src={url} alt={`thumbnail-${index}`} />
