@@ -1,6 +1,11 @@
 .order-info-wrapper *{
   font-family: "Assistant";
 }
+.order-info-wrapper{
+  width: 99%;
+  max-width: 410px;
+  margin-inline: auto;
+}
 .orderId-container {
     display: flex;
     align-items: center;
@@ -8,6 +13,7 @@
     padding: 10px 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
+    width: calc(100% - 40px);
     max-width: 400px;
    margin-inline: auto;
     background-color: #f9f9f9;

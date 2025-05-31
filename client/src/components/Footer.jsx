@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./footer.css";
 import { HashLink as Link } from "react-router-hash-link";
+import { toast } from "react-toastify";
 //import { UserContext } from "./context/UserContext";
 import axios from "axios";
 
@@ -10,13 +11,18 @@ export default function Footer() {
 const [email, setEmail] = useState(''); 
 const [message, setMessage] = useState(''); 
 const handleEmailChange = (e) => { 
-  setEmail(e.target.value); };
+  setEmail(e.target.value); 
+};
+
    const handleSubscribe = async () => { 
     try { const response = await axios.post(`${process.env.REACT_APP_API_URL}/subscribe`, { email }); 
-    setMessage('Subscription successful!'); 
+    toast.success("Subscription successful!") 
     setEmail('');  }
      catch (error) {
-       setMessage('Subscription failed. Please try again.'); 
+      console.log(error?.response?.data?.error);
+        toast.error(`${error?.response?.data?.error}`, {
+               className: "custom-toast-error",
+             });
       }
     } 
   return (

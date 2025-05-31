@@ -8,7 +8,7 @@ import { renderCartMessages } from "../cartItems/cartUtils";
 import Success from "../cartItems/Success";
 import AddressModal from "../cartItems/AddressModal";
 import axios from "axios";
-const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize }) => {
+const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize,isActive,setIsActive }) => {
   //  const navigate = useNavigate();
   const { selectedAddress } = useAddress();
   const [formData, setFormData] = useState({
@@ -28,7 +28,7 @@ const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize }) => {
   const [walletPoints, setWalletPoints] = useState(null);
   const additionalDiscountRef = useRef(0); // Additional discounts reference
   const [quantity, setQuantity] = useState(1);
-
+const [lushioCashBack,setLushioCashBack] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Address and Checkout States
@@ -39,7 +39,7 @@ const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize }) => {
   const [successOpen, setSuccessOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [showNotification1, setShowNotification1] = useState(false);
-  const [isActive, setIsActive] = useState(false);
+ 
   const [loading, setLoading] = useState(false);
 
   const fetchCartAddress = async () => {
@@ -179,7 +179,7 @@ const normalizedHeight = {
         productName: product.displayName,
       },
     ],
-    lushioCashBack: 0,
+      lushioCashBack: lushioCashBack || 0,
     //   paymentData: paymentData,
   };
 
@@ -308,11 +308,7 @@ const normalizedHeight = {
           </div>
         </div>
       )}
-      {isActive && (
-        <div className="spinner-overlay">
-          <div></div>
-        </div>
-      )}
+     
       <div className="selected-address-container">
         {cartAddress || selectedAddress ? (
           <div className="selected-address">
@@ -380,6 +376,8 @@ const normalizedHeight = {
           getSelectedAmount={getSelectedAmount}
           additionalDiscountRef={additionalDiscountRef}
           getTotalForCOD={getTotalForCOD}
+           setLushioCashBack={setLushioCashBack}
+          lushioCashBack={lushioCashBack}
           getTotalWithWalletAndDiscount={getTotalWithWalletAndDiscount}
           renderCartMessages={renderCartMessages}
           shippingFee={shippingFee}
@@ -402,7 +400,7 @@ const normalizedHeight = {
             paying with PhonePe.
           </p>
         )}
-        <button onClick={handleCreateOrder} className="proceed-to-pay-button">
+        <button onClick={handleCreateOrder} className="proceed-to-pay-button" disabled={isActive}>
           🛒 Place Order – ₹{getTotalWithWalletAndDiscount().total || 0}
         </button>
       </div>

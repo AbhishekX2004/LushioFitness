@@ -345,7 +345,10 @@ function ProductDisplay() {
                 </strong>
                 {/* <SingleStar review="3.7" /> */}
                 <img src="/Images/icons/star.png" alt="icon" />
-                <p>({product?.reviewCount})</p>
+               <p>
+  {product?.reviewCount > 0 ? `(${product.reviewCount})` : null}
+</p>
+
               </span>
             </div>
           </div>

@@ -43,9 +43,9 @@ function EditProfile() {
             ...data,
             dob: formatDateForInput(data.dob),
             doa: formatDateForInput(data.doa),
-            phoneNumber: data.phoneNumber.startsWith("+")
-              ? data.phoneNumber
-              : `+${data.phoneNumber}`,
+            phoneNumber: data?.phoneNumber?.startsWith("+")
+              ? data?.phoneNumber
+              : `+${data?.phoneNumber}`,
           };
 
           setUserData(formattedData);

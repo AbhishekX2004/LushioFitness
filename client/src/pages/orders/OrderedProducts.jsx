@@ -71,15 +71,13 @@ const OrderedProducts = ({ orderedProducts, canReturn, orderId }) => {
       setLoading(false);
     }
   };
-  if (loading)
-    return (
-      <div className="loader-container">
-        {" "}
-        <span className="loader"></span>
-      </div>
-    );
   return (
     <div className="ordered-products-container">
+       {loading && (
+        <div className="spinner-overlay">
+          <div></div>
+        </div>
+      )}
       <h2 className="ordered-products-heading">Ordered Products</h2>
       <div className="ordered-products-list">
         {orderedProducts.map((product, index) => (

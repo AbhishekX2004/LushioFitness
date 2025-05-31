@@ -34,7 +34,7 @@ const [couponApplied, setCouponApplied] = useState("");
 const [useWalletPoints, setUseWalletPoints] = useState(true);
 const [walletPoints, setWalletPoints] = useState(null);
 const additionalDiscountRef = useRef(0); // Additional discounts reference
-
+const [lushioCashBack,setLushioCashBack] = useState(0);
 // Cart and Product States
 const [cartProducts, setCartProducts] = useState([]);
 const [selectedItems, setSelectedItems] = useState({});
@@ -343,7 +343,7 @@ const getTotalForCOD = () => {
     onlinePaymentDiscount: getTotalWithWalletAndDiscount().additionalDiscount || 0,
     address: selectedAddress,
     orderedProducts: selectedProductDetails,
-    lushioCashBack: 0
+    lushioCashBack: lushioCashBack || 0,
  //   paymentData: paymentData,
   
   };
@@ -415,7 +415,7 @@ const getTotalForCOD = () => {
  }
   const createOrder = async () => {
     try {
-      console.log(orderDetails.orderedProducts);
+     // console.log(orderDetails);
       // if(1){
       //   console.log(orderDetails.address.name);
       //   return;
@@ -589,6 +589,8 @@ fetchCartCount();
           additionalDiscountRef={additionalDiscountRef}
           getTotalForCOD={getTotalForCOD}
           getTotalWithWalletAndDiscount={getTotalWithWalletAndDiscount}
+          setLushioCashBack={setLushioCashBack}
+          lushioCashBack={lushioCashBack}
           renderCartMessages={renderCartMessages}
           shippingFee={shippingFee}
           selectedPaymentMethod={selectedPaymentMethod}
