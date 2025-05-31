@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import {  
   MapPin, 
  
 } from 'lucide-react';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { sampleTrackingData } from './sampleData';
 import { getStatusDescription, getOrderStatus } from './statusUtils';
 import { getStatusIcon, getStatusColorClass, formatDate} from './trackingHelpers';
@@ -18,7 +19,21 @@ const DeliveryTrackingUI = () => {
   // Enhanced sample tracking data using your status codes
  
   const currentTrackingData = sampleTrackingData[selectedOrder];
+const [expanded, setExpanded] = useState(false);
+  const [maxHeight, setMaxHeight] = useState('300px'); // default collapsed height
+  const containerRef = useRef(null);
 
+  const toggleExpanded = () => {
+    setExpanded((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (expanded && containerRef.current) {
+      setMaxHeight(`${containerRef.current.scrollHeight}px`);
+    } else {
+      setMaxHeight('300px'); // or any height for collapsed state
+    }
+  }, [expanded, currentTrackingData]);
   
   const getCurrentStatus = () => {
     if (currentTrackingData.shipment_track_activities.length > 0) {
@@ -134,7 +149,16 @@ const DeliveryTrackingUI = () => {
       <div className="tracking-timeline-card">
         <h3 className="tracking-timeline-title">Tracking Timeline</h3>
         
-        <div className="tracking-timeline-container">
+        <div 
+        className="tracking-timeline-container"
+        ref={containerRef}
+  style={{
+    maxHeight,
+    overflow: 'hidden',
+    transition: 'max-height 0.4s ease-in-out',
+    position: 'relative',
+  }}
+        >
           {/* Timeline Line */}
           <div className="tracking-timeline-line"></div>
           
@@ -184,7 +208,51 @@ const DeliveryTrackingUI = () => {
               </div>
             );
           })}
+          {!expanded && (
+  <div
+    className="timeline-fade"
+    style={{
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: '60px',
+      background: 'linear-gradient(to top, #fff, rgba(255, 255, 255, 0))',
+      pointerEvents: 'none',
+    }}
+  />
+)}
+
         </div>
+        {currentTrackingData.shipment_track_activities.length > 3 && (
+  <div style={{ textAlign: 'center', 
+      display: "flex",
+        justifyContent: "center",
+  marginTop: '10px' }}>
+    <button
+      onClick={toggleExpanded}
+      className="see-more-button"
+      style={{
+         background: 'white',
+         width: "110px",
+        textUnderlineOffset: "#000",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems:"center",
+        color: '#000',
+        padding: '8px 16px',
+        border: 'none',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        fontSize: '15px',
+      }}
+    >
+     {expanded ? 'See Less ' : 'See More '}
+      {expanded ? <FaChevronUp /> : <FaChevronDown />}
+    </button>
+  </div>
+)}
+
       </div>
 
       {/* Status Legend */}
