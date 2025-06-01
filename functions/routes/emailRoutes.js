@@ -193,22 +193,35 @@ router.post("/", async (req, res) => {
       `);
       break;
 
-    case "address":
-      subject = "Address Updated";
-      htmlContent = emailWrapper(`
-        <div style="font-family: Arial, sans-serif;">
-          <h2 style="color: #333; margin-bottom: 20px; font-size: 24px;">Address Updated</h2>
-          <p style="font-size: 16px; line-height: 1.5; margin-bottom: 15px;">Hi ${name},</p>
-          <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Your delivery address has been updated to:</p>
-          <div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 4px solid #2196F3; margin-bottom: 20px;">
-            <p style="font-size: 16px; line-height: 1.5; margin: 0; font-weight: bold; color: #1976D2;">${address}</p>
-          </div>
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="font-size: 14px; color: #666; margin: 0;">Thank you for choosing Lushio!</p>
-          </div>
-        </div>
-      `);
-      break;
+   case "address":
+  subject = "Address Updated";
+
+  const landmarkText = address.landmark
+    ? `<p><strong>Landmark:</strong> ${address.landmark}</p>`
+    : "";
+
+  const fullAddress = `
+    <span>${address.flatDetails}, ${address.areaDetails}, ${address.townCity}, ${address.state}</span><br/>
+    ${landmarkText}
+    <span>Pin Code: ${address.pinCode}</span>
+  `;
+
+  htmlContent = emailWrapper(`
+    <div style="font-family: Arial, sans-serif;">
+      <h2 style="color: #333; margin-bottom: 20px; font-size: 24px;">Address Updated</h2>
+      <p style="font-size: 16px; line-height: 1.5; margin-bottom: 15px;">Hi ${name},</p>
+      <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+        Your delivery address for order with orderId <b>${orderId}</b> has been updated to:
+      </p>
+      <div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 4px solid #2196F3; margin-bottom: 20px;">
+        ${fullAddress}
+      </div>
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+        <p style="font-size: 14px; color: #666; margin: 0;">Thank you for choosing Lushio!</p>
+      </div>
+    </div>
+  `);
+  break;
 
     default:
       return res.status(400).json({message: "Invalid email type"});

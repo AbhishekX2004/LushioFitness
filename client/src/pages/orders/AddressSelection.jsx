@@ -54,6 +54,21 @@ const [isUpdating,setIsUpdating] = useState(false);
     setSelectedAddress(defaultAddress);
   }
 }, [addressData]);
+
+ const sendEmail = async (updatedAddress) => {
+    try {
+      const payload = {
+        email: user.email,
+        name: updatedAddress.email || "User",
+        type: "address",
+        orderId: orderId,
+      };
+
+      await axios.post(`${process.env.REACT_APP_API_URL}/sendEmail`, payload);
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
 const handleSelectAddress = async () => {
   try {
     setIsUpdating(true);
@@ -69,6 +84,7 @@ const handleSelectAddress = async () => {
     });
 handleClose();
 toast.success("Address updated successfully");
+ await sendEmail(updatedAddress);
    
   } catch (err) {
     console.error("Error while selecting address:", err);
