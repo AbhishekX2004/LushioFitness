@@ -374,10 +374,15 @@ color: #575bc1;
   padding: 14px;
   }
   .select{
-  padding: 6px 20px 6px 8px;
+  padding: 6px 10px 6px 8px;
+   border-radius: 6px;
+ min-width: 150px;
   }
  
-  
+  .select-icon {
+   
+   right: 25px;
+  }
   .order-header {
     flex-direction: column;
     align-items: flex-start;
