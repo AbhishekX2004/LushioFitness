@@ -13,6 +13,7 @@ const AddressModal = ({orderId})=> {
      <button onClick={handleOpen} className="final-submit-button">
        Update Delivery Address
       </button>
+      <p>⚠️ Address can be updated only if item is not shipped</p>
       <Modal
         open={open}
         onClose={handleClose}

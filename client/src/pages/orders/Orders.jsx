@@ -212,7 +212,7 @@ const timeRangeOptions = getTimeRangeOptions();
                   className="select"
                   value={limit}
                   onChange={(e) => setLimit(parseInt(e.target.value))}
-                  style={{ minWidth: '180px' }}
+                  // style={{ minWidth: '120px' }}
                 >
                   <option value={5}>5 orders</option>
                   <option value={10}>10 orders</option>

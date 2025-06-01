@@ -175,7 +175,7 @@ function App() {
             autoClose={3000}
             hideProgressBar
            // closeOnClick={false}
-            pauseOnHover
+           // pauseOnHover
             draggable
             theme="light"
             transition={Flip}
