@@ -5,9 +5,13 @@ import { UserContext } from "../../components/context/UserContext.jsx";
 import PhoneInput from "react-phone-input-2";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import "react-phone-input-2/lib/style.css";
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import "./EditProfile.css";
+
+import GoogleLinking from "./Linking/GoogleLinking.jsx";
+import PhoneLinking from "./Linking/PhoneLinking.jsx";
+import FacebookLinking from "./Linking/FacebookLinking.jsx";
 
 function EditProfile() {
   const { user } = useContext(UserContext);
@@ -53,7 +57,7 @@ function EditProfile() {
           setUserData(formattedData);
           setInitialData(formattedData);
           console.log("Initial data set:", formattedData);
-          console.log("User data after setting:", userData);
+          
         } catch (error) {
           console.error("Error fetching user data:", error);
         } finally {
@@ -80,12 +84,12 @@ function EditProfile() {
 
     // Phone number validation
     if (userData.phoneNumber && !isValidPhoneNumber(userData.phoneNumber)) {
-       toast.error("Please enter a valid phone number.",{className:"custom-toast-error"})
+      toast.error("Please enter a valid phone number.", { className: "custom-toast-error" })
       return;
     }
 
     if (Object.keys(changedFields).length === 0) {
-     toast.error("No changes Detected!",{className:"custom-toast-error"})
+      toast.error("No changes Detected!", { className: "custom-toast-error" })
       return;
     }
 
@@ -97,7 +101,7 @@ function EditProfile() {
       );
 
       setInitialData(userData);
-       toast.success("Profile Updated successfully!");
+      toast.success("Profile Updated successfully!");
     } catch (error) {
       alert(
         `Error updating profile\n${
@@ -119,7 +123,7 @@ function EditProfile() {
   };
 
   return (
-    <div className="edit-profile-container">
+    <div className="edit-profile-container">      
       {isLoading && (
         <div className="edit-profile-spinner-overlay">
           <div className="edit-profile-spinner"></div>
@@ -222,6 +226,24 @@ function EditProfile() {
             ))}
           </div>
         </div>
+        
+        <GoogleLinking 
+          user={user}
+          userData={userData}
+          setUserData={setUserData}
+          initialData={initialData}
+          setInitialData={setInitialData}
+        />
+        
+        <FacebookLinking 
+          user={user}
+          userData={userData}
+          setUserData={setUserData}
+          initialData={initialData}
+          setInitialData={setInitialData}
+        />
+        
+        <PhoneLinking />
 
         <button 
           type="submit" 
