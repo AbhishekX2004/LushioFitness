@@ -98,17 +98,16 @@ const timeRangeOptions = getTimeRangeOptions();
     fetchOrders(true);
   };
 
-  const formatDate = (date) => {
-    if (!date) return 'N/A';
-    const dateObj = date.toDate ? date.toDate() : new Date(date);
-    return dateObj.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+const formatDate = (timestamp) =>{
+  const milliseconds = timestamp._seconds * 1000 + Math.floor(timestamp._nanoseconds / 1_000_000);
+  const date = new Date(milliseconds);
+
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
 
   const getStatusBadgeClass = (status) => {
     switch (status?.toLowerCase()) {
@@ -280,7 +279,7 @@ const timeRangeOptions = getTimeRangeOptions();
                     <span className="order-id">Order ID: {order.orderId}</span>
                     <div className="order-date">
                       <Clock size={14} />
-                      {formatDate(order.dateOfOrder._seconds)}
+                      {formatDate(order.dateOfOrder)}
                     </div>
                   </div>
 
@@ -310,13 +309,7 @@ const timeRangeOptions = getTimeRangeOptions();
                       </div>
                       <div className="ordered-products-list">
                         {order.orderedProducts.map((product,index) => (
-                        //   <div key={product.opid} className="product-item">
-                        //     <div className="product-name">{product.name || 'Product'}</div>
-                        //     <div className="product-details">
-                        //       Qty: {product.quantity || 1} | ${product.price || 'N/A'}
-                        //     </div>
-                        //   </div>
-                        
+
                                         <div className="product-details" key={index}>
                                           <Link to={`/product/${product?.productId}`}>
                                             <img

@@ -1,13 +1,18 @@
-import React,{useState} from 'react'
-import { useNavigate } from "react-router-dom";
-
+import React,{useState,useEffect} from 'react'
+import { useNavigate, useLocation } from 'react-router-dom';
 function Search({searchRef, closeSearch}) {
   const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
-
+const location = useLocation();
   const handleSearchChange = (e) => {
     setSearchText(e.target.value);
   };
+
+    useEffect(() => {
+    closeSearch();
+    setSearchText(""); 
+  }, [location.pathname]); 
+
 const handleSearch = (e) => {
   if (e.key === "Enter" && searchText.trim()) {
     const trimmedText = searchText.trim().toLowerCase();

@@ -1,7 +1,11 @@
+.review-container *{
+  font-family: "Assistant";
+}
 .review-container {
   display: flex;
   flex-direction: column;
   max-width: 1020px;
+  gap: 10px;
   width: calc(95%);
   margin-inline: auto;
 }
@@ -78,7 +82,7 @@
   
   .review-header h3 {
     margin: 0;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     color: #333;
   }
   .review-details{

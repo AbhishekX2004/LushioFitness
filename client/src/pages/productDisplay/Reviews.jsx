@@ -36,7 +36,10 @@ const ReviewCard = ({
   fit,
   media,
 }) => {
-  const formattedDate = formatDateTime(timestamp);
+ 
+const datePart = timestamp.split(" at ")[0];
+
+
   const [isOpen, setIsOpen] = useState(false);
   const openGallery = () => {
     setIsOpen(true); // Set isOpen to true to open the gallery
@@ -59,9 +62,9 @@ const ReviewCard = ({
       </div>
 
       <div className="review-header">
-        <h3>{displayName || "Anonymous"}</h3>
+        <h3>{displayName==="User not found" ? "Anonymous": displayName}</h3>
         <div className="review-footer">
-          <span className="review-date">{timestamp}</span>
+          <span className="review-date">{datePart}</span>
         </div>
         <Rating value={rating} precision={0.1} readOnly />
       </div>

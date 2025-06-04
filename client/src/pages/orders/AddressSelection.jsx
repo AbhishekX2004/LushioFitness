@@ -59,9 +59,10 @@ const [isUpdating,setIsUpdating] = useState(false);
     try {
       const payload = {
         email: user.email,
-        name: updatedAddress.email || "User",
+        name: updatedAddress.name || "User",
         type: "address",
         orderId: orderId,
+        address: updatedAddress,
       };
 
       await axios.post(`${process.env.REACT_APP_API_URL}/sendEmail`, payload);

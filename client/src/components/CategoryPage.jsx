@@ -70,7 +70,15 @@ function CategoryPage() {
     { label: category, link: `/${category}` },
     ...(subCategory ? [{ label: subCategory, link: `/${category}/${subCategory}` }] : []),
   ];
-
+if(loading){
+   return(
+ <div className="loader-container">
+          <span className="loader"></span>
+        </div>
+   )
+       
+      
+}
   return (
     <div className="category-page">
       <Breadcrumb items={breadcrumbItems} />

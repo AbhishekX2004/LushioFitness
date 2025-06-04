@@ -178,15 +178,7 @@ function ProductDisplay() {
         const data = await response.json();
         setProduct(data);
         console.log(data);
-        // Sort the reviews based on the length of the media array, with safeguards
-        // const sortedReviews = data.reviews.sort((a, b) => {
-        //   const mediaA = Array.isArray(a.media) ? a.media.length : 0;
-        //   const mediaB = Array.isArray(b.media) ? b.media.length : 0;
-        //   return mediaB - mediaA;
-        // });
-        // setReviews(sortedReviews);
 
-        // setReviews(data.reviews);
         setImage(data.allImages[0]);
       } catch (err) {
         setError(err.message);
