@@ -7,17 +7,24 @@ const router = express.Router();
 const axios = require("axios");
 const crypto = require("crypto");
 const logger = require("firebase-functions/logger");
+const { getFirestore } = require("firebase-admin/firestore");
+const db = getFirestore();
 
 // ENVs
 const PHONEPE_SALT_KEY = process.env.PHONEPE_SALT_KEY;
 const PHONEPE_MERCHANT_ID = process.env.PHONEPE_MERCHANT_ID;
 const PHONEPE_URL = process.env.PHONEPE_API_URL;
-const PHONEPE_REFUND_URL = process.env.PHONEPE_REFUND_URL;
 const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL;
 const API_URL = process.env.REACT_APP_API_URL;
 
 // Global variable to store order details
 let globalOrderDetails = null;
+
+function generateXVerifyHeader(payload, endpoint) {
+  const string = payload + endpoint + PHONEPE_SALT_KEY;
+  const sha256 = crypto.createHash("sha256").update(string).digest("hex");
+  return sha256 + "###" + 1;
+}
 
 router.post("/", async (req, res) => {
   try {
@@ -69,19 +76,18 @@ router.post("/", async (req, res) => {
     const payloadMain = Buffer.from(payload).toString("base64");
 
     // Generate X-VERIFY checksum
-    const string = payloadMain + "/pg/v1/pay" + PHONEPE_SALT_KEY;
-    const sha256 = crypto.createHash("sha256").update(string).digest("hex");
+    // const string = payloadMain + "/pg/v1/pay" + PHONEPE_SALT_KEY;
+    // const sha256 = crypto.createHash("sha256").update(string).digest("hex");
 
-    const checksum = sha256 + "###" + KeyIndex;
-
-    // const prod_URL = "http://api.phonepe.com/api/hermes/pg/v1/pay" // if you are live
+    // const checksum = sha256 + "###" + KeyIndex;
+    const checksum = generateXVerifyHeader(payloadMain, "/pg/v1/pay");
     const prod_URL = `${PHONEPE_URL}/pay`;
 
     const option = {
       method: "POST",
       url: prod_URL,
       headers: {
-        "accept": "application/json",
+        accept: "application/json",
         "Content-Type": "application/json",
         "X-VERIFY": checksum,
       },
@@ -90,12 +96,15 @@ router.post("/", async (req, res) => {
       },
     };
 
-    axios.request(option).then((response) => {
-      res.json(response.data);
-    }).catch((error) => {
-      logger.log("Error in / route inner catch", error);
-      res.status(500).json({error: error.message});
-    });
+    axios
+      .request(option)
+      .then((response) => {
+        res.json(response.data);
+      })
+      .catch((error) => {
+        logger.log("Error in / route inner catch", error);
+        res.status(500).json({ error: error.message });
+      });
   } catch (error) {
     logger.log("Error in / route outer catch", error);
   }
@@ -108,7 +117,8 @@ router.post("/status", async (req, res) => {
 
     const keyIndex = 1;
 
-    const string = `/pg/v1/status/${merchantId}/${merchantTransactionId}` + PHONEPE_SALT_KEY;
+    const string =
+      `/pg/v1/status/${merchantId}/${merchantTransactionId}` + PHONEPE_SALT_KEY;
     const sha256 = crypto.createHash("sha256").update(string).digest("hex");
     const checksum = sha256 + "###" + keyIndex;
 
@@ -116,7 +126,7 @@ router.post("/status", async (req, res) => {
       method: "get",
       url: `${PHONEPE_URL}/status/${merchantId}/${merchantTransactionId}`,
       headers: {
-        "accept": "application/json",
+        accept: "application/json",
         "Content-Type": "application/json",
         "X-VERIFY": checksum,
         "X-MERCHANT-ID": merchantId,
@@ -127,10 +137,11 @@ router.post("/status", async (req, res) => {
     const response = await axios(options);
 
     if (response.data.success === true) {
-      const paymentDetails = {
-        message: "Payment successful!",
-        data: response.data,
-      };
+      // const paymentDetails = {
+      //   message: "Payment successful!",
+      //   data: response.data,
+      // };
+      const paymentDetails = response.data;
 
       logger.log("Payment Details:", paymentDetails);
 
@@ -141,24 +152,26 @@ router.post("/status", async (req, res) => {
           paymentData: paymentDetails, // Nest paymentDetails under the key 'paymentData'
         };
 
-        logger.log("Combined Order and Payment Details:", JSON.stringify(combinedDetails, null, 2));
+        logger.log(
+          "Combined Order and Payment Details:",
+          JSON.stringify(combinedDetails, null, 2)
+        );
         // Await order creation API call
         const orderResponse = await axios.post(
-            `${API_URL}/orders/createOrder`,
-            combinedDetails,
+          `${API_URL}/orders/createOrder`,
+          combinedDetails
         );
         logger.log("Order Creation Response:", orderResponse.data);
         // Extracting productIds
-        const selectedProductIds = globalOrderDetails.orderedProducts.map((product) => product.productId);
+        const selectedProductIds = globalOrderDetails.orderedProducts.map(
+          (product) => product.productId
+        );
         console.log(selectedProductIds);
         try {
-          const response = await axios.post(
-              `${API_URL}/cart/batch-delete`,
-              {
-                uid: globalOrderDetails.uid,
-                itemIds: selectedProductIds,
-              },
-          );
+          const response = await axios.post(`${API_URL}/cart/batch-delete`, {
+            uid: globalOrderDetails.uid,
+            itemIds: selectedProductIds,
+          });
         } catch (error) {
           logger.log(error);
         }
@@ -175,58 +188,94 @@ router.post("/status", async (req, res) => {
     }
   } catch (error) {
     logger.error("Error in /status route:", error);
-    res.status(500).json({error: "Internal Server Error"});
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
-router.post("/refund", async ( req, res) =>{
+
+// Route: Refund Transaction
+router.post("/refund", async (req, res) => {
   try {
-    const {transactionId, refundAmount, refundReason} = req.body;
-    if (!transactionId || !refundAmount || !refundReason) {
-      return res.status(400).json({error: "transactionId, refundAmount, and refundReason are required."});
+    const {
+      uid,
+      oid,
+      merchantTransactionId,
+      amount,
+    } = req.body;
+    // merchantTransactionId is R+Date.now()
+    // Validate required fields
+    if (!oid || !uid || !merchantTransactionId || !amount) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Missing required fields: uid, oid, merchantTransactionId, amount",
+      });
+    }
+    const orderRef = db.collection("orders").doc(oid);
+    const orderDoc = await orderRef.get();
+    //const userRef = db.collection("users").doc(uid);
+
+    if (!orderDoc.exists) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found." });
     }
 
-    // Generate a unique refund ID
-    const refundId = `REF${transactionId}-${Date.now()}`;
-    const payloadData = {
+    const orderData = orderDoc.data();
+    if (orderData.uid !== uid) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Unauthorized access." });
+    }
+    // Prepare payload
+    const payload = {
       merchantId: PHONEPE_MERCHANT_ID,
-      transactionId,
-      refundId,
-      amount: refundAmount * 100, // Convert to paisa
-      reason: refundReason,
+      merchantUserId: uid,
+      originalTransactionId: "T7850590068188104",
+      merchantTransactionId,
+      amount: parseInt(amount),
+      callbackUrl: `${FRONTEND_URL}/cart`,
     };
 
-    const KeyIndex = 1;
+    console.log("Refund Payload:", payload);
 
-    // Base64 encode the payload
-    const payload = JSON.stringify(payloadData);
-    const payloadMain = Buffer.from(payload).toString("base64");
+    // Encode payload
+    const encode = Buffer.from(JSON.stringify(payload)).toString("base64");
 
-    // Generate X-VERIFY checksum
-    const string = payloadMain + "/v3/credit/backToSource" + PHONEPE_SALT_KEY;
-    const sha256 = crypto.createHash("sha256").update(string).digest("hex");
+    // Generate X-VERIFY header
+    const xVerifyHeader = generateXVerifyHeader(encode, "/pg/v1/refund");
 
-    const checksum = sha256 + "###" + KeyIndex;
-
-    // Make the refund request to PhonePe
-    const options = {
-      method: "post",
-
-      url: `${PHONEPE_URL}/v3/credit/backToSource`,
-      headers: {
-        "accept": "text/plain",
-        "Content-Type": "application/json",
-        "X-VERIFY": checksum,
-        "X-MERCHANT-ID": PHONEPE_MERCHANT_ID,
+    // Make refund API call
+    const refundResponse = await axios.post(
+      `${PHONEPE_URL}/refund`,
+      {
+        request: encode,
       },
-      data: payloadMain,
-    };
+      {
+        headers: {
+          "Content-Type": "application/json",
+          accept: "application/json",
+          "X-VERIFY": xVerifyHeader,
+        },
+      }
+    );
 
-    const response = await axios.request(options);
-    //  res.status(200).json({message: "Message"});
-    res.status(200).json(response.data);
+    console.log("Refund API Response:", refundResponse.data);
+
+    res.json({
+      //  success: true,
+      // message: 'Refund request processed',
+      data: refundResponse.data,
+      // status: refundResponse.status,
+      // headers: refundResponse.headers,
+      payload: payload,
+    });
   } catch (error) {
-    console.error("Refund Error:", error);
-    res.status(500).json({error: "Refund failed. Please try again later."});
+    console.error("Refund Error:", error.response?.data || error.message);
+    res.status(500).json({
+      success: false,
+      message: "Refund request failed",
+      error: error.response?.data || error.message,
+    });
   }
 });
 module.exports = router;
