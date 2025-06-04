@@ -8,6 +8,7 @@ import { renderCartMessages } from "../cartItems/cartUtils";
 import Success from "../cartItems/Success";
 import AddressModal from "../cartItems/AddressModal";
 import axios from "axios";
+import { toast } from "react-toastify";
 const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize,isActive,setIsActive }) => {
   //  const navigate = useNavigate();
   const { selectedAddress } = useAddress();
@@ -23,7 +24,7 @@ const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize,isActive,
   // Payment and Discount States
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("phonepe");
   const [discountPercentage, setDiscountPercentage] = useState(0);
-  const [couponApplied, setCouponApplied] = useState("");
+  const [couponApplied, setCouponApplied] = useState(null);
   const [useWalletPoints, setUseWalletPoints] = useState(true);
   const [walletPoints, setWalletPoints] = useState(null);
   const additionalDiscountRef = useRef(0); // Additional discounts reference
@@ -137,10 +138,7 @@ const [lushioCashBack,setLushioCashBack] = useState(0);
   const handleWalletCheckboxChange = () => {
     setUseWalletPoints(!useWalletPoints);
   };
- // const [selectedProductDetails, setSelectedProductDetails] = useState([]);
-  //const [selectedProductIds, setSelectedProductIds] = useState([]);
 
-  // Call this function whenever the selected items or cart products change
 
   const getSelectedTotalAmount = () => {
     return product.discountedPrice * quantity;
@@ -163,7 +161,7 @@ const normalizedHeight = {
     payableAmount: getTotalWithWalletAndDiscount().total,
     discount: getSelectedTotalAmount() - getTotalWithWalletAndDiscount().total,
     lushioCurrencyUsed: useWalletPoints && walletPoints,
-    couponCode: couponApplied,
+    couponCode: couponApplied?.couponCode,
     couponDiscount: getTotalWithWalletAndDiscount().couponDiscountAmount || 0,
     onlinePaymentDiscount:
       getTotalWithWalletAndDiscount().additionalDiscount || 0,
@@ -270,7 +268,12 @@ const normalizedHeight = {
       setTimeout(() => setShowNotification1(false), 3000);
       return;
     }
-    
+     if(getTotalWithWalletAndDiscount().total < couponApplied?.minPurchaseOf){
+             toast.error(`Min purchase amount is ₹${couponApplied?.minPurchaseOf} for this coupon`, {
+                  className: "custom-toast-error",
+                });
+                return;
+        }
     if (selectedPaymentMethod === "phonepe") {
       await handlePayment();
       // await createOrder();

@@ -86,7 +86,7 @@ function Coupon({ setDiscountPercentage, cartAmount, setCouponApplied }) {
       );
       const discountValue = Math.ceil(response?.data?.discount);
       setDiscountPercentage(discountValue); // Update discount in parent component
-      setCouponApplied(couponCode); // Set applied coupon code
+      setCouponApplied(response?.data); // Set applied coupon code
       setSuccessMessage(
         `Coupon applied successfully! Discount: ₹${discountValue}`
       );

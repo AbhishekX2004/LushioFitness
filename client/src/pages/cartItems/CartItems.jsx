@@ -5,6 +5,7 @@ import CartRow from "./CartRow";
 import EmptyCart from "./EmptyCart";
 //import PaymentMethod from "./PaymentMethod";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { UserContext } from "../../components/context/UserContext";
 import { useWishlist } from "../../components/context/WishlistContext";
 import { useCart } from "../../components/context/CartContext";
@@ -30,7 +31,7 @@ const { toggleWishlist } = useWishlist();
 // Payment and Discount States
 const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("phonepe");
 const [discountPercentage, setDiscountPercentage] = useState(0);
-const [couponApplied, setCouponApplied] = useState("");
+const [couponApplied, setCouponApplied] = useState(null);
 const [useWalletPoints, setUseWalletPoints] = useState(true);
 const [walletPoints, setWalletPoints] = useState(null);
 const additionalDiscountRef = useRef(0); // Additional discounts reference
@@ -338,7 +339,7 @@ const getTotalForCOD = () => {
     payableAmount: getTotalWithWalletAndDiscount().total,
     discount: getSelectedTotalAmount() - getTotalWithWalletAndDiscount().total,
     lushioCurrencyUsed: useWalletPoints && walletPoints,
-    couponCode: couponApplied,
+    couponCode: couponApplied?.couponCode,
     couponDiscount: getTotalWithWalletAndDiscount().couponDiscountAmount || 0,
     onlinePaymentDiscount: getTotalWithWalletAndDiscount().additionalDiscount || 0,
     address: selectedAddress,
@@ -364,8 +365,6 @@ const getTotalForCOD = () => {
     ...orderDetails, // Include all the properties of orderDetails
     ...data,  // Override or add properties from paymentData
   };
-
-  
 
     await axios
       .post(
@@ -401,9 +400,7 @@ const getTotalForCOD = () => {
       name : orderDetails.address.name || "User",
       type: "order",
       orderId: oid,
-    //  address: orderDetails.email,
       items: orderDetails.orderedProducts,
-     // item: items[0]?.name || '', // fallback for 'cancel' single item
     };
 
     await axios.post(`${process.env.REACT_APP_API_URL}/sendEmail`, payload);
@@ -425,12 +422,8 @@ const getTotalForCOD = () => {
         `${process.env.REACT_APP_API_URL}/orders/createOrder`,
         orderDetails
       );
-     
-   //   await deleteCartItems(selectedProductIds);
       setIsActive(false);
       setSuccessOpen(true);
-     // setTimeout(() => setSuccessOpen(false), 4000);
-      // Wait for 4 seconds before closing the success state
       await deleteCartItems();
   await new Promise((resolve) => setTimeout(resolve, 2000));
   if(response.status===200 && user.email){
@@ -455,6 +448,12 @@ await sendEmail(response.data.orderId);
       setShowNotification1(true);
       setTimeout(() => setShowNotification1(false), 3000);
       return;
+    }
+    if(getTotalWithWalletAndDiscount().total < couponApplied?.minPurchaseOf){
+         toast.error(`Min purchase amount is ₹${couponApplied?.minPurchaseOf} for this coupon`, {
+              className: "custom-toast-error",
+            });
+            return;
     }
     if (selectedPaymentMethod === "phonepe") {
       await handlePayment();

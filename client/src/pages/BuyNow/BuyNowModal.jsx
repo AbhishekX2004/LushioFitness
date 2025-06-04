@@ -47,7 +47,7 @@ const BuyNowModal = ({
               p: 4,
             }}
           >
-             {!isActive && (
+             {isActive && (
         <div className="spinner-overlay">
           <div></div>
         </div>

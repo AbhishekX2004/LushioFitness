@@ -68,12 +68,12 @@ const getDiscountedAmount = (totalAmount, discountTiers) => {
 
   const discountAmount = (totalAmount * applicableDiscount) / 100;
  // console.log(discountAmount);
- setLushioCashBack(discountAmount);
+ setLushioCashBack( Math.ceil(discountAmount));
   return Math.ceil(discountAmount);
 };
 const lushioCashBack1 = getDiscountedAmount(getSelectedTotalAmount(), discountedTiers);
    const handleRemoveCoupon = () => {
-    setCouponApplied(""); 
+    setCouponApplied(null); 
     setDiscountPercentage(0);
    
   };
@@ -96,7 +96,7 @@ const lushioCashBack1 = getDiscountedAmount(getSelectedTotalAmount(), discounted
       </div>
       {
         couponApplied && <div className="coupon-applied-container">
-  <div className="coupon-applied-left">✅<p> Coupon Applied {couponApplied}</p></div>
+  <div className="coupon-applied-left">✅<p> Coupon Applied {couponApplied.couponCode}</p></div>
 
   <div className="coupon-applied-right" onClick={handleRemoveCoupon}>REMOVE ❌</div>
 </div>
