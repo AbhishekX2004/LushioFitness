@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable require-jsdoc */
 /* eslint-disable new-cap */
 /* eslint-disable max-len */
@@ -193,20 +194,20 @@ router.post("/", async (req, res) => {
       `);
       break;
 
-   case "address":
-  subject = "Address Updated";
+    case "address":
+      subject = "Address Updated";
 
-  const landmarkText = address.landmark
-    ? `<p><strong>Landmark:</strong> ${address.landmark}</p>`
-    : "";
+      const landmarkText = address.landmark ?
+    `<p><strong>Landmark:</strong> ${address.landmark}</p>` :
+    "";
 
-  const fullAddress = `
+      const fullAddress = `
     <span>${address.flatDetails}, ${address.areaDetails}, ${address.townCity}, ${address.state}</span><br/>
     ${landmarkText}
     <span>Pin Code: ${address.pinCode}</span>
   `;
 
-  htmlContent = emailWrapper(`
+      htmlContent = emailWrapper(`
     <div style="font-family: Arial, sans-serif;">
       <h2 style="color: #333; margin-bottom: 20px; font-size: 24px;">Address Updated</h2>
       <p style="font-size: 16px; line-height: 1.5; margin-bottom: 15px;">Hi ${name},</p>
@@ -221,7 +222,7 @@ router.post("/", async (req, res) => {
       </div>
     </div>
   `);
-  break;
+      break;
 
     default:
       return res.status(400).json({message: "Invalid email type"});
