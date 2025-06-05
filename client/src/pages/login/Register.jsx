@@ -23,7 +23,7 @@ const Register = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [isPhone, setIsPhone] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [otpTimer, setOtpTimer] = useState(0);
   const [passwordError, setPasswordError] = useState("");

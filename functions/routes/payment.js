@@ -41,6 +41,9 @@ router.post("/", async (req, res) => {
       couponCode,
       address,
       orderedProducts,
+      onlinePaymentDiscount,
+      couponDiscount,
+      lushioCashBack,
     } = req.body;
 
     // Separate global order details
@@ -54,6 +57,9 @@ router.post("/", async (req, res) => {
       couponCode,
       address,
       orderedProducts,
+      onlinePaymentDiscount,
+      couponDiscount,
+      lushioCashBack,
     };
     const data = {
       merchantId: PHONEPE_MERCHANT_ID,

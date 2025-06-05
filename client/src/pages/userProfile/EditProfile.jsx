@@ -1,18 +1,21 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import moment from "moment";
 import { UserContext } from "../../components/context/UserContext.jsx";
-import PhoneInput from "react-phone-input-2";
-import { isValidPhoneNumber } from "libphonenumber-js";
-import "react-phone-input-2/lib/style.css";
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import "./EditProfile.css";
+
+import GoogleLinking from "./Linking/GoogleLinking.jsx";
+import PhoneLinking from "./Linking/PhoneLinking.jsx";
+import FacebookLinking from "./Linking/FacebookLinking.jsx";
+import EmailLinking from "./Linking/EmailLinking.jsx";
+
 function EditProfile() {
   const { user } = useContext(UserContext);
   const [userData, setUserData] = useState({
     displayName: "",
     email: "",
-    phoneNumber: "",
     dob: "",
     doa: "",
     gender: "",
@@ -20,8 +23,6 @@ function EditProfile() {
 
   const [initialData, setInitialData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-
-  const phoneInputRef = useRef(null);
 
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
@@ -43,15 +44,12 @@ function EditProfile() {
             ...data,
             dob: formatDateForInput(data.dob),
             doa: formatDateForInput(data.doa),
-            phoneNumber: data?.phoneNumber?.startsWith("+")
-              ? data?.phoneNumber
-              : `+${data?.phoneNumber}`,
           };
 
           setUserData(formattedData);
           setInitialData(formattedData);
           console.log("Initial data set:", formattedData);
-          console.log("User data after setting:", userData);
+          
         } catch (error) {
           console.error("Error fetching user data:", error);
         } finally {
@@ -75,15 +73,8 @@ function EditProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const changedFields = getChangedFields();
-
-    // Phone number validation
-    if (userData.phoneNumber && !isValidPhoneNumber(userData.phoneNumber)) {
-       toast.error("Please enter a valid phone number.",{className:"custom-toast-error"})
-      return;
-    }
-
     if (Object.keys(changedFields).length === 0) {
-     toast.error("No changes Detected!",{className:"custom-toast-error"})
+      toast.error("No changes Detected!", { className: "custom-toast-error" })
       return;
     }
 
@@ -95,7 +86,7 @@ function EditProfile() {
       );
 
       setInitialData(userData);
-       toast.success("Profile Updated successfully!");
+      toast.success("Profile Updated successfully!");
     } catch (error) {
       alert(
         `Error updating profile\n${
@@ -117,88 +108,121 @@ function EditProfile() {
   };
 
   return (
-    <div className="edit-profile-container">
+    <div className="edit-profile-container">      
       {isLoading && (
-        <div className="spinner-overlay">
-          <div></div>
+        <div className="edit-profile-spinner-overlay">
+          <div className="edit-profile-spinner"></div>
         </div>
       )}
-      <p className="user-question">Edit Your Profile</p>
-      <form onSubmit={handleSubmit} className="edit-profile">
-        <label>Name</label>
-        <input
-          type="text"
-          name="displayName"
-          placeholder="Enter your Name"
-          value={userData.displayName}
-          onChange={handleChange}
-          required
+      <h2 className="edit-profile-title">Edit Your Profile</h2>
+      <form onSubmit={handleSubmit} className="edit-profile-form">
+        <div className="edit-profile-field">
+          <label className="edit-profile-label">Name</label>
+          <input
+            type="text"
+            name="displayName"
+            placeholder="Enter your Name"
+            value={userData.displayName}
+            onChange={handleChange}
+            className="edit-profile-input"
+            required
+          />
+        </div>
+
+        <PhoneLinking />
+
+        <EmailLinking 
+          user={user}
+          userData={userData}
+          setUserData={setUserData}
+          initialData={initialData}
+          setInitialData={setInitialData}
+        />
+        
+        <GoogleLinking 
+          user={user}
+          userData={userData}
+          setUserData={setUserData}
+          initialData={initialData}
+          setInitialData={setInitialData}
+        />
+        
+        <FacebookLinking 
+          user={user}
+          userData={userData}
+          setUserData={setUserData}
+          initialData={initialData}
+          setInitialData={setInitialData}
         />
 
-        <label>Email</label>
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          value={userData.email}
-          onChange={handleChange}
-          required
-        />
+        {/* <div className="edit-profile-field">
+          <label className="edit-profile-label">Email</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            value={userData.email}
+            onChange={handleChange}
+            className="edit-profile-input"
+            required
+          />
+        </div> */}
 
-        <label>Phone no.</label>
-        <PhoneInput
-          country={"in"}
-          value={userData.phoneNumber}
-          onChange={(phone) =>
-            setUserData((prevData) => ({
-              ...prevData,
-              phoneNumber: phone.startsWith("+") ? phone : `+${phone}`,
-            }))
-          }
-          inputProps={{
-            name: "phoneNumber",
-            required: true,
-            ref: phoneInputRef,
-          }}
-          enableSearch
-        />
+        <div className="edit-profile-field">
+          <label className="edit-profile-label">
+            Birthday Date 
+            <span className="edit-profile-note">(modifiable up to two times only)</span>
+          </label>
+          <input
+            type="date"
+            name="dob"
+            value={userData.dob || ""}
+            onChange={handleChange}
+            className="edit-profile-input edit-profile-date-input"
+          />
+        </div>
 
-        <label>Birthday Date (modifiable up to two times only)</label>
-        <input
-          type="date"
-          name="dob"
-          value={userData.dob || ""}
-          onChange={handleChange}
-        />
+        <div className="edit-profile-field">
+          <label className="edit-profile-label">
+            Anniversary Date 
+            <span className="edit-profile-note">(modifiable up to two times only)</span>
+          </label>
+          <input
+            type="date"
+            name="doa"
+            value={userData.doa || ""}
+            onChange={handleChange}
+            className="edit-profile-input edit-profile-date-input"
+          />
+        </div>
 
-        <label>Anniversary Date (modifiable up to two times only)</label>
-        <input
-          type="date"
-          name="doa"
-          value={userData.doa || ""}
-          onChange={handleChange}
-        />
-
-        <div className="radio-input">
-          <label>Gender</label>
-          <div>
+        <div className="edit-profile-radio-field">
+          <label className="edit-profile-label">Gender</label>
+          <div className="edit-profile-radio-group">
             {["Male", "Female", "Other"].map((gender) => (
-              <label key={gender}>
+              <label key={gender} className="edit-profile-radio-label">
                 <input
                   type="radio"
                   name="gender"
                   value={gender}
                   checked={userData.gender === gender}
                   onChange={handleChange}
+                  className="edit-profile-radio-input"
                   required
-                />{" "}
-                {gender}
+                />
+                <span className="edit-profile-radio-text">{gender}</span>
               </label>
             ))}
           </div>
         </div>
 
-        <button type="submit">Save</button>
+        <button 
+          type="submit" 
+          className="edit-profile-submit-btn"
+          disabled={isLoading}
+        >
+          {isLoading ? "Saving..." : "Save"}
+        </button>
       </form>
     </div>
   );
