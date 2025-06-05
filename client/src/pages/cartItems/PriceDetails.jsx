@@ -14,6 +14,8 @@ const PriceDetails = ({
   getSelectedTotalAmount,
   getSelectedAmount,
   getTotalWithWalletAndDiscount,
+  lushioCashBack,
+  setLushioCashBack,
   additionalDiscountRef,
   getTotalForCOD,
   renderCartMessages,
@@ -33,7 +35,6 @@ const PriceDetails = ({
         
         if (docSnap.exists()) {
           const data = docSnap.data();
-        
          setDiscountTiers(data.orderDiscounts);
         }
       } catch (error) {
@@ -44,9 +45,35 @@ const PriceDetails = ({
 
     fetchAdminControls();
   }, []);
+const getDiscountedAmount = (totalAmount, discountTiers) => {
+  if (typeof totalAmount !== "number" || !discountTiers || typeof discountTiers !== "object") {
+    return totalAmount; // fallback: no discount
+  }
 
+  const sortedThresholds = Object.keys(discountTiers)
+    .map(Number)
+    .filter(n => !isNaN(n) && n > 0)
+    .sort((a, b) => a - b);
+
+  let applicableDiscount = 0;
+
+  for (let i = 0; i < sortedThresholds.length; i++) {
+    const threshold = sortedThresholds[i];
+    if (totalAmount >= threshold) {
+      applicableDiscount = discountTiers[threshold];
+    } else {
+      break;
+    }
+  }
+
+  const discountAmount = (totalAmount * applicableDiscount) / 100;
+ // console.log(discountAmount);
+ setLushioCashBack( Math.ceil(discountAmount));
+  return Math.ceil(discountAmount);
+};
+const lushioCashBack1 = getDiscountedAmount(getSelectedTotalAmount(), discountedTiers);
    const handleRemoveCoupon = () => {
-    setCouponApplied(""); 
+    setCouponApplied(null); 
     setDiscountPercentage(0);
    
   };
@@ -69,13 +96,13 @@ const PriceDetails = ({
       </div>
       {
         couponApplied && <div className="coupon-applied-container">
-  <div className="coupon-applied-left">✅<p> Coupon Applied {couponApplied}</p></div>
+  <div className="coupon-applied-left">✅<p> Coupon Applied {couponApplied.couponCode}</p></div>
 
   <div className="coupon-applied-right" onClick={handleRemoveCoupon}>REMOVE ❌</div>
 </div>
       }
 
-      <div className="priceBlock-base-priceHeader">PRICE DETAILS (1 Item)</div>
+      <div className="priceBlock-base-priceHeader">PRICE DETAILS </div>
       <div className="priceBreakUp-base-orderSummary" id="priceBlock">
       <div className="priceDetail-base-row priceDetail-totalMRP">
           <span>Total MRP</span>
@@ -84,7 +111,7 @@ const PriceDetails = ({
           </span>
         </div>
         <div className="priceDetail-base-row">
-          <span>Payable Amount</span>
+          <span>Discounted Price</span>
           <span className="priceDetail-base-value">
             ₹{getSelectedTotalAmount()}
           </span>
@@ -149,7 +176,7 @@ const PriceDetails = ({
           </div>
         </div>
         <div className="priceDetail-base-total">
-          <span>Total Amount</span>
+          <span>Net Payable Amount</span>
           <span className="priceDetail-base-value">
             ₹ {getTotalWithWalletAndDiscount().total}
           </span>

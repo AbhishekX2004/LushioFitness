@@ -35,6 +35,7 @@ export const AddressProvider = ({ children }) => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/user/addresses/${user.uid}`, { newAddress });
       setAddressData(response.data.addresses.sort((a, b) => b.isDefault - a.isDefault));
+      toast.success("Address added successfully!")
     } catch (error) {
       console.error('Error adding address:', error);
     } finally {
@@ -49,6 +50,7 @@ export const AddressProvider = ({ children }) => {
       const updatedData = [...addressData];
       updatedData[index] = updatedAddress;
       setAddressData(updatedData.sort((a, b) => b.isDefault - a.isDefault));
+      toast.success("Address Edited successfully!");
     } catch (error) {
       console.error('Error updating address:', error);
     } finally {
@@ -70,6 +72,7 @@ export const AddressProvider = ({ children }) => {
         setISChangingDefault(true);
         await axios.delete(`${process.env.REACT_APP_API_URL}/user/addresses/delete/${user.uid}/${id}`);
         setAddressData(addressData.filter((address) => address.id !== id));
+        toast.success("Address removed successfully!")
       } catch (error) {
         console.error('Error deleting address:', error);
       }

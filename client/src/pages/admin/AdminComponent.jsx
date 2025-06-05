@@ -21,15 +21,16 @@ const AdminComponent = () => {
   const adminMenuItems = [
     { key: "AddProducts", label: "Add Products", icon: "+" },
     { key: "EditProducts", label: "Edit Products", icon: "✎" },
+     { key: "OrderLogistics", label: "Order Logistics", icon: "📦" },
+    { key: "OrderManagement", label: "Order Management", icon: "📋" },
     { key: "ReviewReviews", label: "Review Reviews", icon: "★" },
     { key: "Coupons", label: "Coupons", icon: "%" },
     { key: "ChangeBanners", label: "Change Banners", icon: "⬛" },
     { key: "SendTokens", label: "Send Tokens", icon: "◆" },
     { key: "ViewComplaints", label: "View Complaints", icon: "!" },
     { key: "MaintenanceManager", label: "Maintenance", icon: "⚙" },
-    { key: "AdminControls", label: "Admin Controls", icon: "⚡" },
-    { key: "OrderLogistics", label: "Order Logistics", icon: "📦" },
-    { key: "OrderManagement", label: "Order Management", icon: "📋" }
+    { key: "AdminControls", label: "Admin Controls", icon: "⚡" }
+   
   ];
 
   const handleLogout = async () => {

@@ -25,9 +25,9 @@
     max-width: 100px;
     background: #fdd835;
 }
-.order{
+/* .order{
     margin-bottom: 40px;
-}
+} */
 .orderID{
     margin-bottom: 10px;
 }
@@ -222,7 +222,7 @@
         cursor: not-allowed;
       }
       .final-submit-button {
-        background-color: black;
+        background-color: #1c1b1b;
         color: white;
         font-size: 16px;
         padding: 12px 20px;

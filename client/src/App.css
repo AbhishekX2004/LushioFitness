@@ -111,12 +111,13 @@ height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(to right, #38b000, #70e000); /* green gradient */
    background: linear-gradient(to right, #10b981, #14b8a6);
+    background: linear-gradient(135deg, #4ade80, #16a34a);
   color: white;
-  min-width: 240px;
+  font-family: "Assistant";
+  /* min-width: fit-content; */
   /* max-width: 90vw; */
-  max-width: fit-content;
+  max-width: 90vw;
   padding: 17px;
   margin: 20px auto;
   border-radius: 10px;
@@ -133,7 +134,9 @@ height: 50px;
   font-weight: 500;
   font-size: 0.95rem;
 }
-
+.custom-toast-body *{
+  font-family: "Assistant";
+}
 /* Fix icon color visibility */
  .custom-toast-success  .Toastify__toast-icon {
   svg {

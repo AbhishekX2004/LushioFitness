@@ -8,7 +8,8 @@ import { renderCartMessages } from "../cartItems/cartUtils";
 import Success from "../cartItems/Success";
 import AddressModal from "../cartItems/AddressModal";
 import axios from "axios";
-const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize }) => {
+import { toast } from "react-toastify";
+const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize,isActive,setIsActive }) => {
   //  const navigate = useNavigate();
   const { selectedAddress } = useAddress();
   const [formData, setFormData] = useState({
@@ -23,12 +24,12 @@ const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize }) => {
   // Payment and Discount States
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("phonepe");
   const [discountPercentage, setDiscountPercentage] = useState(0);
-  const [couponApplied, setCouponApplied] = useState("");
+  const [couponApplied, setCouponApplied] = useState(null);
   const [useWalletPoints, setUseWalletPoints] = useState(true);
   const [walletPoints, setWalletPoints] = useState(null);
   const additionalDiscountRef = useRef(0); // Additional discounts reference
   const [quantity, setQuantity] = useState(1);
-
+const [lushioCashBack,setLushioCashBack] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Address and Checkout States
@@ -39,7 +40,7 @@ const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize }) => {
   const [successOpen, setSuccessOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [showNotification1, setShowNotification1] = useState(false);
-  const [isActive, setIsActive] = useState(false);
+ 
   const [loading, setLoading] = useState(false);
 
   const fetchCartAddress = async () => {
@@ -137,10 +138,7 @@ const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize }) => {
   const handleWalletCheckboxChange = () => {
     setUseWalletPoints(!useWalletPoints);
   };
- // const [selectedProductDetails, setSelectedProductDetails] = useState([]);
-  //const [selectedProductIds, setSelectedProductIds] = useState([]);
 
-  // Call this function whenever the selected items or cart products change
 
   const getSelectedTotalAmount = () => {
     return product.discountedPrice * quantity;
@@ -163,7 +161,7 @@ const normalizedHeight = {
     payableAmount: getTotalWithWalletAndDiscount().total,
     discount: getSelectedTotalAmount() - getTotalWithWalletAndDiscount().total,
     lushioCurrencyUsed: useWalletPoints && walletPoints,
-    couponCode: couponApplied,
+    couponCode: couponApplied?.couponCode,
     couponDiscount: getTotalWithWalletAndDiscount().couponDiscountAmount || 0,
     onlinePaymentDiscount:
       getTotalWithWalletAndDiscount().additionalDiscount || 0,
@@ -179,7 +177,7 @@ const normalizedHeight = {
         productName: product.displayName,
       },
     ],
-    lushioCashBack: 0,
+      lushioCashBack: lushioCashBack || 0,
     //   paymentData: paymentData,
   };
 
@@ -270,7 +268,12 @@ const normalizedHeight = {
       setTimeout(() => setShowNotification1(false), 3000);
       return;
     }
-    
+     if(getTotalWithWalletAndDiscount().total < couponApplied?.minPurchaseOf){
+             toast.error(`Min purchase amount is ₹${couponApplied?.minPurchaseOf} for this coupon`, {
+                  className: "custom-toast-error",
+                });
+                return;
+        }
     if (selectedPaymentMethod === "phonepe") {
       await handlePayment();
       // await createOrder();
@@ -308,11 +311,7 @@ const normalizedHeight = {
           </div>
         </div>
       )}
-      {isActive && (
-        <div className="spinner-overlay">
-          <div></div>
-        </div>
-      )}
+     
       <div className="selected-address-container">
         {cartAddress || selectedAddress ? (
           <div className="selected-address">
@@ -380,6 +379,8 @@ const normalizedHeight = {
           getSelectedAmount={getSelectedAmount}
           additionalDiscountRef={additionalDiscountRef}
           getTotalForCOD={getTotalForCOD}
+           setLushioCashBack={setLushioCashBack}
+          lushioCashBack={lushioCashBack}
           getTotalWithWalletAndDiscount={getTotalWithWalletAndDiscount}
           renderCartMessages={renderCartMessages}
           shippingFee={shippingFee}
@@ -402,7 +403,7 @@ const normalizedHeight = {
             paying with PhonePe.
           </p>
         )}
-        <button onClick={handleCreateOrder} className="proceed-to-pay-button">
+        <button onClick={handleCreateOrder} className="proceed-to-pay-button" disabled={isActive}>
           🛒 Place Order – ₹{getTotalWithWalletAndDiscount().total || 0}
         </button>
       </div>

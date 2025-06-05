@@ -67,6 +67,9 @@ function Coupon({ setDiscountPercentage, cartAmount, setCouponApplied }) {
 
   // Generic function to handle coupon application
   const applyCoupon = async (couponCode) => {
+     setSuccessMessage("");
+    setErrorMessage("");
+    setValidationMessage("");
     if (!couponCode) {
       setValidationMessage("Please provide a valid coupon.");
       return;
@@ -81,9 +84,9 @@ function Coupon({ setDiscountPercentage, cartAmount, setCouponApplied }) {
           purchaseOf: parseFloat(cartAmount),
         }
       );
-      const discountValue = response.data.discount;
+      const discountValue = Math.ceil(response?.data?.discount);
       setDiscountPercentage(discountValue); // Update discount in parent component
-      setCouponApplied(couponCode); // Set applied coupon code
+      setCouponApplied(response?.data); // Set applied coupon code
       setSuccessMessage(
         `Coupon applied successfully! Discount: ₹${discountValue}`
       );

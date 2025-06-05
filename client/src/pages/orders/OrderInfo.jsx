@@ -132,33 +132,6 @@ function OrderInfo() {
 
       <ReturnExchangeNotice/>
       <OrderedProducts orderedProducts={orderDetails?.orderedProducts || []} canReturn={canReturn} orderId={orderId}/>
-
-      {/* <div className="order-tracking-vertical-container">
-        <h2 className="order-tracking-vertical-heading">Delivery Status</h2>
-        <div className="order-tracking-progress-bar">
-          <div
-            className="order-tracking-progress"
-            style={{ height: `${(currentStep / steps.length) * 100}%` }}
-          ></div>
-        </div>
-        <div className="order-tracking-vertical-steps">
-          {steps.map((step, index) => (
-            <div
-              className={`order-tracking-vertical-step ${
-                index + 1 <= currentStep ? "active" : ""
-              }`}
-              key={index}
-            >
-              <div className="order-tracking-vertical-icon">
-                {index < currentStep && (
-                  <AiOutlineCheck className="order-tracking-check-icon" />
-                )}
-              </div>
-              <p className="order-tracking-vertical-label">{step}</p>
-            </div>
-          ))}
-        </div>
-      </div> */}
      
       <div className="orderId-container downloadInvoicePdf" onClick={()=>handledownloadInvoice(orderDetails)}>
         <div className="orderId-left" >
@@ -169,11 +142,8 @@ function OrderInfo() {
         </div>
       </div>
       <DeliveryTrackingUI/>
-      {/* <OrderTrackingTimeline trackingData={trackingData} /> */}
-  
-        {/*  <ReturnExchange/> */}
       <div className="order-price-details-container">
-        <h2 className="order-price-details-heading">Order Details</h2>
+        {/* <h2 className="order-price-details-heading">Order Details</h2> */}
         <h4 className="order-price-details-heading">Price Details ({orderDetails?.orderedProducts.length || 0} Items)</h4>
         <div className="order-price-row">
           <span className="order-price-label">Total MRP</span>
@@ -228,7 +198,7 @@ function OrderInfo() {
         {orderDetails?.address.landmark &&  <p><strong>Landmamrk: </strong>{orderDetails?.address.landmark}</p>} 
           <p className="order-delivery-contact">+{orderDetails?.address.contactNo}</p>
         </div>
-        {/* <button className="final-submit-button">Update Delivery Address</button> */}
+      
         <AddressModal orderId={orderId}/>
       </div>
     </div>

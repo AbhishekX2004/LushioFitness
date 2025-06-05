@@ -11,7 +11,7 @@ import {
 } from 'react-share';
 
 const ShareComponent = ({referralCode}) => {
-  const shareUrl = `${process.env.REACT_APP_FRONTEND_URL}/login?${referralCode}`;  // URL to share
+  const shareUrl = `${process.env.REACT_APP_FRONTEND_URL}/register?${referralCode}`;  // URL to share
  
   const text = "Hey, check this out! Sign up using my referral codeand earn ₹100 rewards. Don't miss this amazing opportunity!"; // Refer and earn text
 

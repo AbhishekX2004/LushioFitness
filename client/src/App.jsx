@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { doc, onSnapshot } from "firebase/firestore";
 import axios from "axios";
 import { db } from "./firebaseConfig";
-import { ToastContainer, Zoom } from "react-toastify";
+import { ToastContainer, Zoom,Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // Components
@@ -174,11 +174,11 @@ function App() {
             position="top-center"
             autoClose={3000}
             hideProgressBar
-            closeOnClick={false}
-            pauseOnHover
+           // closeOnClick={false}
+           // pauseOnHover
             draggable
             theme="light"
-            transition={Zoom}
+            transition={Flip}
             toastClassName="custom-toast-success"
             bodyClassName="custom-toast-body"
             closeButton={false}

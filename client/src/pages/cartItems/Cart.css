@@ -298,9 +298,9 @@ line-height: 16px
 }
 
 .priceBlock-base-priceHeader {
-    font-size: 12px;
+    font-size: 17px;
     font-weight: 700;
-    margin: 14px 0 16px;
+    margin: 12px 0 8px;
     color: #535766
 }
 .priceDetail-base-value {

@@ -12,9 +12,10 @@ const BuyNowModal = ({
   selectedSize,
 }) => {
   const handleClose = () => setOpen(false);
-
+ const [isActive, setIsActive] = useState(false);
   return (
     <>
+     
       <button onClick={handleOpen} className={className}>
         Buy Now
       </button>
@@ -27,7 +28,9 @@ const BuyNowModal = ({
           timeout: 500,
         }}
       >
+        
         <Fade in={open}>
+         
           <Box
             className="address-modal"
             sx={{
@@ -44,6 +47,11 @@ const BuyNowModal = ({
               p: 4,
             }}
           >
+             {isActive && (
+        <div className="spinner-overlay">
+          <div></div>
+        </div>
+      )}
             <img
               src="/Images/icons/cross.png"
               alt=""
@@ -55,6 +63,8 @@ const BuyNowModal = ({
               selectedHeight={selectedHeight}
               selectedColor={selectedColor}
               selectedSize={selectedSize}
+              isActive={isActive}
+              setIsActive={setIsActive}
             />
           </Box>
         </Fade>
