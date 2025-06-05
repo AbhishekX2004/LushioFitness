@@ -2,6 +2,17 @@
 
 import { auth, db } from "../../../../firebaseConfig"; // Adjust path as needed
 import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { 
+  updateEmail, 
+  sendEmailVerification, 
+  verifyBeforeUpdateEmail,
+  applyActionCode,
+  checkActionCode,
+  EmailAuthProvider, 
+  linkWithCredential,
+  updatePassword,
+  reauthenticateWithCredential
+} from "firebase/auth";
 import { toast } from 'react-toastify';
 
 /**
@@ -46,6 +57,14 @@ export const isProviderLinked = (providerId) => {
 };
 
 /**
+ * Check if user has email/password authentication method
+ * @returns {boolean}
+ */
+export const hasEmailPasswordAuth = () => {
+  return isProviderLinked('password');
+};
+
+/**
  * Check if user's primary email is from Google
  * @returns {boolean}
  */
@@ -75,6 +94,230 @@ export const isEmailFromFacebook = () => {
   
   // If Facebook is linked and the current email matches Facebook email
   return facebookProvider && currentUser.email === facebookProvider.email;
+};
+
+/**
+ * Check if user's email can be changed (not from OAuth providers)
+ * @returns {boolean}
+ */
+export const canChangeEmail = () => {
+  return !isEmailFromGoogle() && !isEmailFromFacebook();
+};
+
+// Updated function to initiate email change process
+export const initiateEmailChange = async (newEmail, currentPassword) => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error("No authenticated user found");
+  }
+
+  try {
+    // If user has email/password auth, reauthenticate first
+    if (hasEmailPasswordAuth() && currentPassword) {
+      const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+      await reauthenticateWithCredential(currentUser, credential);
+    }
+
+    // Use verifyBeforeUpdateEmail instead of updateEmail
+    await verifyBeforeUpdateEmail(currentUser, newEmail);
+    
+    return {
+      success: true,
+      requiresVerification: true,
+      message: "Verification email sent to your new email address. Please check your inbox and click the verification link to complete the email change."
+    };
+    
+  } catch (error) {
+    console.error("Error initiating email change:", error);
+    throw error;
+  }
+};
+
+// Function to check if email verification is complete and sync with database
+export const checkAndSyncEmailChange = async (updateUserData, updateInitialData) => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    return { changed: false, email: null };
+  }
+
+  try {
+    // Force reload to get the latest user info
+    await currentUser.reload();
+    const refreshedUser = auth.currentUser;
+    
+    // Check if this is a different email than what we had before
+    const hasEmailChanged = refreshedUser.email !== currentUser.email;
+    
+    if (hasEmailChanged || (refreshedUser.emailVerified && refreshedUser.email)) {
+      // Update Firestore with the new email
+      await updateUserFirestore(refreshedUser.uid, {
+        email: refreshedUser.email,
+        linkedAccounts: {
+          email: {
+            email: refreshedUser.email,
+            linked: true,
+            linkedAt: new Date().toISOString(),
+            verified: refreshedUser.emailVerified
+          }
+        }
+      });
+
+      // Update local state if callbacks are provided
+      if (updateUserData) {
+        updateUserData(prev => ({ ...prev, email: refreshedUser.email }));
+      }
+      if (updateInitialData) {
+        updateInitialData(prev => ({ ...prev, email: refreshedUser.email }));
+      }
+
+      return {
+        changed: true,
+        email: refreshedUser.email,
+        verified: refreshedUser.emailVerified
+      };
+    }
+
+    return {
+      changed: false,
+      email: refreshedUser.email,
+      verified: refreshedUser.emailVerified
+    };
+    
+  } catch (error) {
+    console.error("Error checking and syncing email change:", error);
+    throw error;
+  }
+};
+
+// Enhanced function to handle email verification completion with database sync
+export const handleEmailVerificationComplete = async (userId, updateUserData, updateInitialData) => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error("No authenticated user found");
+  }
+
+  try {
+    // Force reload the user to get updated email info
+    await currentUser.reload();
+    const refreshedUser = auth.currentUser;
+    
+    // Always update the database with the current email from Firebase Auth
+    // This ensures the database stays in sync with Firebase Auth
+    await updateUserFirestore(refreshedUser.uid, {
+      email: refreshedUser.email,
+      linkedAccounts: {
+        email: {
+          email: refreshedUser.email,
+          linked: true,
+          linkedAt: new Date().toISOString(),
+          verified: refreshedUser.emailVerified
+        }
+      }
+    });
+
+    // Update local state if callbacks are provided
+    if (updateUserData) {
+      updateUserData(prev => ({ ...prev, email: refreshedUser.email }));
+    }
+    if (updateInitialData) {
+      updateInitialData(prev => ({ ...prev, email: refreshedUser.email }));
+    }
+    
+    return {
+      success: true,
+      email: refreshedUser.email,
+      verified: refreshedUser.emailVerified,
+      message: refreshedUser.emailVerified ? 
+        "Email verification completed successfully! You can now login with your new email." : 
+        "Email updated but verification is still pending."
+    };
+    
+  } catch (error) {
+    console.error("Error handling email verification:", error);
+    throw error;
+  }
+};
+
+// Keep the original function for backward compatibility but mark as deprecated
+export const updateUserEmail = async (newEmail, currentPassword) => {
+  console.warn("updateUserEmail is deprecated. Use initiateEmailChange instead.");
+  return await initiateEmailChange(newEmail, currentPassword);
+};
+
+/**
+ * Link email/password authentication to user account
+ * @param {string} email - Email address
+ * @param {string} password - Password
+ * @returns {Promise<Object>} { success: boolean, requiresVerification: boolean, message: string }
+ */
+export const linkEmailPassword = async (email, password) => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error("No authenticated user found");
+  }
+
+  try {
+    const credential = EmailAuthProvider.credential(email, password);
+    await linkWithCredential(currentUser, credential);
+    
+    // Send verification email
+    await sendEmailVerification(currentUser);
+    
+    return {
+      success: true,
+      requiresVerification: true,
+      message: "Email/password authentication linked successfully. Please check your email for verification."
+    };
+    
+  } catch (error) {
+    console.error("Error linking email/password:", error);
+    throw error;
+  }
+};
+
+/**
+ * Update user password
+ * @param {string} newPassword - New password
+ * @param {string} currentPassword - Current password (for reauthentication)
+ * @returns {Promise<void>}
+ */
+export const updateUserPassword = async (newPassword, currentPassword) => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error("No authenticated user found");
+  }
+
+  try {
+    // Reauthenticate first
+    if (currentPassword) {
+      const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+      await reauthenticateWithCredential(currentUser, credential);
+    }
+
+    await updatePassword(currentUser, newPassword);
+    
+  } catch (error) {
+    console.error("Error updating password:", error);
+    throw error;
+  }
+};
+
+/**
+ * Send email verification to current user
+ * @returns {Promise<void>}
+ */
+export const sendVerificationEmail = async () => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error("No authenticated user found");
+  }
+
+  try {
+    await sendEmailVerification(currentUser);
+  } catch (error) {
+    console.error("Error sending verification email:", error);
+    throw error;
+  }
 };
 
 /**
@@ -184,7 +427,11 @@ export const handleAuthError = (error, operation, providerName) => {
     'auth/code-expired': 'Verification code expired. Please request a new one.',
     'auth/popup-closed-by-user': 'Authentication popup was closed before completion',
     'auth/popup-blocked': 'Authentication popup was blocked by the browser',
-    'auth/cancelled-popup-request': 'Authentication popup request was cancelled'
+    'auth/cancelled-popup-request': 'Authentication popup request was cancelled',
+    'auth/wrong-password': 'Incorrect password. Please try again.',
+    'auth/weak-password': 'Password is too weak. Please use at least 6 characters.',
+    'auth/invalid-email': 'Invalid email address format.',
+    'auth/requires-recent-login': 'This operation requires recent authentication. Please sign out and sign in again.'
   };
   
   const message = errorMessages[error.code] || `Failed to ${operation} ${providerName}: ${error.message}`;

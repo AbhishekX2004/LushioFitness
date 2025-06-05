@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import moment from "moment";
 import { UserContext } from "../../components/context/UserContext.jsx";
-import PhoneInput from "react-phone-input-2";
-import { isValidPhoneNumber } from "libphonenumber-js";
-import "react-phone-input-2/lib/style.css";
 import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import "./EditProfile.css";
@@ -12,13 +9,13 @@ import "./EditProfile.css";
 import GoogleLinking from "./Linking/GoogleLinking.jsx";
 import PhoneLinking from "./Linking/PhoneLinking.jsx";
 import FacebookLinking from "./Linking/FacebookLinking.jsx";
+import EmailLinking from "./Linking/EmailLinking.jsx";
 
 function EditProfile() {
   const { user } = useContext(UserContext);
   const [userData, setUserData] = useState({
     displayName: "",
     email: "",
-    phoneNumber: "",
     dob: "",
     doa: "",
     gender: "",
@@ -26,8 +23,6 @@ function EditProfile() {
 
   const [initialData, setInitialData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-
-  const phoneInputRef = useRef(null);
 
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
@@ -49,9 +44,6 @@ function EditProfile() {
             ...data,
             dob: formatDateForInput(data.dob),
             doa: formatDateForInput(data.doa),
-            phoneNumber: data.phoneNumber.startsWith("+")
-              ? data.phoneNumber
-              : `+${data.phoneNumber}`,
           };
 
           setUserData(formattedData);
@@ -81,13 +73,6 @@ function EditProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const changedFields = getChangedFields();
-
-    // Phone number validation
-    if (userData.phoneNumber && !isValidPhoneNumber(userData.phoneNumber)) {
-      toast.error("Please enter a valid phone number.", { className: "custom-toast-error" })
-      return;
-    }
-
     if (Object.keys(changedFields).length === 0) {
       toast.error("No changes Detected!", { className: "custom-toast-error" })
       return;
@@ -144,7 +129,33 @@ function EditProfile() {
           />
         </div>
 
-        <div className="edit-profile-field">
+        <PhoneLinking />
+
+        <EmailLinking 
+          user={user}
+          userData={userData}
+          setUserData={setUserData}
+          initialData={initialData}
+          setInitialData={setInitialData}
+        />
+        
+        <GoogleLinking 
+          user={user}
+          userData={userData}
+          setUserData={setUserData}
+          initialData={initialData}
+          setInitialData={setInitialData}
+        />
+        
+        <FacebookLinking 
+          user={user}
+          userData={userData}
+          setUserData={setUserData}
+          initialData={initialData}
+          setInitialData={setInitialData}
+        />
+
+        {/* <div className="edit-profile-field">
           <label className="edit-profile-label">Email</label>
           <input
             type="email"
@@ -155,29 +166,7 @@ function EditProfile() {
             className="edit-profile-input"
             required
           />
-        </div>
-
-        <div className="edit-profile-field">
-          <label className="edit-profile-label">Phone no.</label>
-          <div className="edit-profile-phone-container">
-            <PhoneInput
-              country={"in"}
-              value={userData.phoneNumber}
-              onChange={(phone) =>
-                setUserData((prevData) => ({
-                  ...prevData,
-                  phoneNumber: phone.startsWith("+") ? phone : `+${phone}`,
-                }))
-              }
-              inputProps={{
-                name: "phoneNumber",
-                required: true,
-                ref: phoneInputRef,
-              }}
-              enableSearch
-            />
-          </div>
-        </div>
+        </div> */}
 
         <div className="edit-profile-field">
           <label className="edit-profile-label">
@@ -226,24 +215,6 @@ function EditProfile() {
             ))}
           </div>
         </div>
-        
-        <GoogleLinking 
-          user={user}
-          userData={userData}
-          setUserData={setUserData}
-          initialData={initialData}
-          setInitialData={setInitialData}
-        />
-        
-        <FacebookLinking 
-          user={user}
-          userData={userData}
-          setUserData={setUserData}
-          initialData={initialData}
-          setInitialData={setInitialData}
-        />
-        
-        <PhoneLinking />
 
         <button 
           type="submit" 

@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { toast } from 'react-toastify';
-import { auth, db } from "../../../firebaseConfig";
+import { auth } from "../../../firebaseConfig";
 import {
     GoogleAuthProvider,
     linkWithPopup,
     unlink,
     onAuthStateChanged
 } from "firebase/auth";
-// import { doc, updateDoc } from "firebase/firestore";
+import "./GoogleLinking.css";
 import axios from "axios";
 import {
-    getAuthMethodsInfo,
-    isEmailFromGoogle,
     updateUserFirestore,
     validateUnlinking,
     handleAuthError,
@@ -25,63 +23,8 @@ function GoogleLinking({ user, userData, setUserData, initialData, setInitialDat
 
     const googleProvider = new GoogleAuthProvider();
 
-    // Get authentication methods info for display
-    //   const getAuthMethodsInfo = () => {
-    //     const currentUser = auth.currentUser;
-    //     if (!currentUser) return { canUnlink: false, methods: [] };
-
-    //     const methods = currentUser.providerData.map(provider => {
-    //       switch(provider.providerId) {
-    //         case 'google.com':
-    //           return 'Google';
-    //         case 'password':
-    //           return 'Email/Password';
-    //         case 'phone':
-    //           return 'Phone';
-    //         case 'facebook.com':
-    //           return 'Facebook';
-    //         default:
-    //           return provider.providerId;
-    //       }
-    //     });
-
-    //     const canUnlink = currentUser.providerData.length > 1;
-    //     return { canUnlink, methods };
-    //   };
-
-    // Check if user's primary email is from Google
-    //   const isEmailFromGoogle = () => {
-    //     const currentUser = auth.currentUser;
-    //     if (!currentUser) return false;
-
-    //     const googleProvider = currentUser.providerData.find(
-    //       provider => provider.providerId === 'google.com'
-    //     );
-
-    //     // If Google is linked and the current email matches Google email
-    //     return googleProvider && currentUser.email === googleProvider.email;
-    //   };
-
     // Check if Google is linked
     const checkGoogleLinkStatus = async () => {
-        // const currentUser = auth.currentUser;
-        // if (currentUser) {
-        //   try {
-        //     await currentUser.reload();
-        //     const googleProvider = currentUser.providerData.find(
-        //       provider => provider.providerId === 'google.com'
-        //     );
-        //     setGoogleLinked(!!googleProvider);
-        //     console.log("Google link status:", !!googleProvider);
-        //     console.log("Provider data:", currentUser.providerData);
-        //   } catch (error) {
-        //     console.error("Error checking Google link status:", error);
-        //     const googleProvider = currentUser.providerData.find(
-        //       provider => provider.providerId === 'google.com'
-        //     );
-        //     setGoogleLinked(!!googleProvider);
-        //   }
-        // }
         const isLinked = await reloadAndCheckProvider('google.com');
         setGoogleLinked(isLinked);
         console.log("Google link status:", isLinked);
@@ -144,32 +87,13 @@ function GoogleLinking({ user, userData, setUserData, initialData, setInitialDat
                     console.error("Error updating email in profile:", emailUpdateError);
                 }
             }
-
-            //   Update Firestore with linked account info
-            //   try {
-            //     const userDocRef = doc(db, "users", currentUser.uid);
-            //     await updateDoc(userDocRef, {
-            //       googleLinked: true,
-            //       linkedAccounts: {
-            //         google: {
-            //           email: result.user.email,
-            //           linkedAt: new Date().toISOString(),
-            //           becamePrimaryEmail: !hadEmailBefore
-            //         }
-            //       }
-            //     });
-            //   } catch (firestoreError) {
-            //     console.log("Firestore update error (non-critical):", firestoreError);
-            //   }
             await updateUserFirestore(currentUser.uid, {
                 googleLinked: true,
-                linkedAccounts: {
-                    [`linkedAccounts.google`]: {
-                        email: result.user.email,
-                        linkedAt: new Date().toISOString(),
-                        becamePrimaryEmail: !hadEmailBefore
-                    }
-                }
+                [`linkedAccounts.google`]: {
+                    email: result.user.email,
+                    linkedAt: new Date().toISOString(),
+                    becamePrimaryEmail: !hadEmailBefore
+                }                
             });
 
             setGoogleLinked(true);
@@ -272,20 +196,6 @@ function GoogleLinking({ user, userData, setUserData, initialData, setInitialDat
 
             await currentUser.reload();
 
-            // Update Firestore
-            // try {
-            //     const userDocRef = doc(db, "users", currentUser.uid);
-            //     await updateDoc(userDocRef, {
-            //         googleLinked: false,
-            //         linkedAccounts: {
-            //             google: null
-            //         },
-            //         unlinkedAt: new Date().toISOString()
-            //     });
-            // } catch (firestoreError) {
-            //     console.log("Firestore update error (non-critical):", firestoreError);
-            // }
-
             await updateUserFirestore(currentUser.uid, {
                 googleLinked: false,
                 [`linkedAccounts.google`]: {
@@ -317,41 +227,14 @@ function GoogleLinking({ user, userData, setUserData, initialData, setInitialDat
         }
     };
 
-    // // Check if unlinking should be disabled
-    // const shouldDisableUnlink = () => {
-    //     const authInfo = getAuthMethodsInfo();
-    //     const emailFromGoogle = isEmailFromGoogle();
-
-    //     // Disable if:
-    //     // 1. Can't unlink (only auth method), OR
-    //     // 2. Google provides the primary email
-    //     return !authInfo.canUnlink || emailFromGoogle;
-    // };
-
-    // // Get the reason why unlinking is disabled
-    // const getUnlinkDisabledReason = () => {
-    //     const authInfo = getAuthMethodsInfo();
-    //     const emailFromGoogle = isEmailFromGoogle();
-
-    //     if (!authInfo.canUnlink) {
-    //         return "Cannot unlink: Google is your only sign-in method. Add another authentication method to unlink Google.";
-    //     }
-
-    //     if (emailFromGoogle) {
-    //         return "Cannot unlink: Google provides your primary email address. Unlinking would prevent account access.";
-    //     }
-
-    //     return "";
-    // };
-
     const getUnlinkValidation = () => {
         return validateUnlinking('google.com');
     };
 
     return (
-        <div className="edit-profile-field">
-            <label className="edit-profile-label">Google Account</label>
-            <div className="google-link-container">
+        <div className="google-linking-edit-profile-field">
+            <label className="google-linking-edit-profile-label">Google Account</label>
+            <div className="google-linking-google-link-container">
                 <AuthStatusDisplay
                     isLinked={googleLinked}
                     providerName="Google account"
@@ -362,7 +245,7 @@ function GoogleLinking({ user, userData, setUserData, initialData, setInitialDat
                     type="button"
                     onClick={googleLinked ? handleUnlinkGoogle : handleLinkGoogle}
                     disabled={isLinkingGoogle || (googleLinked && !getUnlinkValidation().allowed)}
-                    className={`google-link-btn ${googleLinked ? 'unlink' : 'link'} ${googleLinked && getUnlinkValidation() ? 'disabled' : ''
+                    className={`google-linking-google-link-btn ${googleLinked ? 'google-linking-unlink' : 'google-linking-link'} ${googleLinked && getUnlinkValidation() ? 'google-linking-disabled' : ''
                         }`}
                 >
                     {isLinkingGoogle

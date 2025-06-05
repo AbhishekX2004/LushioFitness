@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from 'react-toastify';
-import { auth, db } from "../../../firebaseConfig";
+import { auth } from "../../../firebaseConfig";
 import {
     FacebookAuthProvider,
     linkWithPopup,
@@ -9,13 +9,13 @@ import {
 } from "firebase/auth";
 import axios from "axios";
 import {
-    getAuthMethodsInfo,
     updateUserFirestore,
     validateUnlinking,
     handleAuthError,
     reloadAndCheckProvider
 } from './utils/authUtils';
 import AuthStatusDisplay from './utils/AuthStatusDisplay';
+import "./FacebookLinking.css";
 
 function FacebookLinking({ user, userData, setUserData, initialData, setInitialData }) {
     const [isLinkingFacebook, setIsLinkingFacebook] = useState(false);
@@ -61,12 +61,6 @@ function FacebookLinking({ user, userData, setUserData, initialData, setInitialD
 
             const result = await linkWithPopup(currentUser, freshFacebookProvider);
 
-            // // Console log the result for debugging
-            // console.log("Facebook linking result:", result);
-            // console.log("Facebook user data:", result.user);
-            // console.log("Facebook additional user info:", result.additionalUserInfo);
-            // console.log("Facebook credential:", result.credential);
-
             // If user didn't have an email before, update the profile email field
             if (!hadEmailBefore && result.user.email) {
                 try {
@@ -98,12 +92,8 @@ function FacebookLinking({ user, userData, setUserData, initialData, setInitialD
             await updateUserFirestore(currentUser.uid, {
                 facebookLinked: true,
                 [`linkedAccounts.facebook`]: {
-                    // email: result.user.email,
-                    // name: result.user.displayName,
                     linkedAt: new Date().toISOString(),
                     becamePrimaryEmail: !hadEmailBefore,
-                    // facebookId: result.additionalUserInfo?.profile?.id || null,
-                    // profilePicture: result.user.photoURL
                 }
             });
 
@@ -121,7 +111,6 @@ function FacebookLinking({ user, userData, setUserData, initialData, setInitialD
 
         } catch (error) {
             handleAuthError(error, 'link', 'Facebook account');
-            // Keep the special handling for provider-already-linked
             if (error.code === 'auth/provider-already-linked') {
                 setTimeout(() => {
                     checkFacebookLinkStatus();
@@ -223,9 +212,9 @@ function FacebookLinking({ user, userData, setUserData, initialData, setInitialD
     };
 
     return (
-        <div className="edit-profile-field">
-            <label className="edit-profile-label">Facebook Account</label>
-            <div className="facebook-link-container">
+        <div className="Facebook-Linking-edit-profile-field">
+            <label className="Facebook-Linking-edit-profile-label">Facebook Account</label>
+            <div className="Facebook-Linking-facebook-link-container">
                 <AuthStatusDisplay
                     isLinked={facebookLinked}
                     providerName="Facebook account"
@@ -236,7 +225,7 @@ function FacebookLinking({ user, userData, setUserData, initialData, setInitialD
                     type="button"
                     onClick={facebookLinked ? handleUnlinkFacebook : handleLinkFacebook}
                     disabled={isLinkingFacebook || (facebookLinked && !getUnlinkValidation().allowed)}
-                    className={`facebook-link-btn ${facebookLinked ? 'unlink' : 'link'} ${facebookLinked && !getUnlinkValidation().allowed ? 'disabled' : ''
+                    className={`Facebook-Linking-facebook-link-btn ${facebookLinked ? 'Facebook-Linking-unlink' : 'Facebook-Linking-link'} ${facebookLinked && !getUnlinkValidation().allowed ? 'Facebook-Linking-disabled' : ''
                         }`}
                 >
                     {isLinkingFacebook

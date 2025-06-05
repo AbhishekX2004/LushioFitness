@@ -1,0 +1,261 @@
+/* EmailLinking.css */
+
+.email-linking-container {
+ background: #ffffff;
+ border: 1px solid #e1e5e9;
+ border-radius: 8px;
+ padding: 20px;
+ margin: 15px 0;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.email-linking-header {
+ margin-bottom: 20px;
+}
+
+.email-linking-header h3 {
+ margin: 0 0 8px 0;
+ color: #333;
+ font-size: 18px;
+ font-weight: 600;
+}
+
+.email-linking-description {
+ margin: 0;
+ color: #666;
+ font-size: 14px;
+ line-height: 1.4;
+}
+
+.email-linking-display {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ flex-wrap: wrap;
+ gap: 15px;
+}
+
+.email-linking-info {
+ display: flex;
+ flex-direction: column;
+ gap: 5px;
+}
+
+.email-linking-email {
+ font-weight: 500;
+ color: #333;
+ font-size: 16px;
+}
+
+.email-linking-status {
+ font-size: 12px;
+ font-weight: 500;
+ padding: 2px 8px;
+ border-radius: 12px;
+ display: inline-block;
+ width: fit-content;
+}
+
+.email-linking-status.verified {
+ background-color: #d4edda;
+ color: #155724;
+}
+
+.email-linking-status.unverified {
+ background-color: #fff3cd;
+ color: #856404;
+}
+
+.email-linking-pending {
+ background-color: #cce7ff;
+ border: 1px solid #99d3ff;
+ border-radius: 6px;
+ padding: 12px;
+ margin: 10px 0;
+}
+
+.email-linking-pending p {
+ margin: 0 0 5px 0;
+ color: #0066cc;
+ font-size: 14px;
+}
+
+.email-linking-pending p:last-child {
+ margin-bottom: 0;
+}
+
+.email-linking-pending small {
+ font-size: 12px;
+ color: #4d94d6;
+}
+
+.email-linking-actions {
+ display: flex;
+ gap: 10px;
+ flex-wrap: wrap;
+}
+
+.email-linking-form {
+ display: flex;
+ flex-direction: column;
+ gap: 15px;
+}
+
+.email-linking-form h4 {
+ margin: 0 0 10px 0;
+ color: #333;
+ font-size: 16px;
+ font-weight: 600;
+}
+
+.email-linking-info-box {
+ background-color: #fff3cd;
+ border: 1px solid #ffeaa7;
+ border-radius: 6px;
+ padding: 12px;
+ margin-bottom: 10px;
+}
+
+.email-linking-info-box p {
+ margin: 0;
+ color: #856404;
+ font-size: 14px;
+ line-height: 1.4;
+}
+
+.email-linking-field {
+ display: flex;
+ flex-direction: column;
+ gap: 5px;
+}
+
+.email-linking-field label {
+ font-weight: 500;
+ color: #333;
+ font-size: 14px;
+}
+
+.email-linking-input {
+ padding: 10px 12px;
+ border: 1px solid #ddd;
+ border-radius: 6px;
+ font-size: 14px;
+ transition: border-color 0.2s ease;
+ background-color: #fff;
+ font-family: inherit;
+}
+
+.email-linking-input:focus {
+ outline: none;
+ border-color: #007bff;
+ box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.email-linking-input.disabled {
+ background-color: #f8f9fa;
+ color: #6c757d;
+ cursor: not-allowed;
+}
+
+.email-linking-input::placeholder {
+ color: #999;
+}
+
+.email-linking-btn {
+ padding: 8px 16px;
+ border-radius: 6px;
+ font-size: 14px;
+ font-weight: 500;
+ cursor: pointer;
+ transition: all 0.2s ease;
+ border: 1px solid transparent;
+ text-decoration: none;
+ display: inline-block;
+ text-align: center;
+ min-width: 80px;
+}
+
+.email-linking-btn:disabled {
+ cursor: not-allowed;
+ opacity: 0.6;
+}
+
+.email-linking-btn.primary {
+ background-color: #007bff;
+ color: white;
+ border-color: #007bff;
+}
+
+.email-linking-btn.primary:hover:not(:disabled) {
+ background-color: #0056b3;
+ border-color: #0056b3;
+}
+
+.email-linking-btn.secondary {
+ background-color: #6c757d;
+ color: white;
+ border-color: #6c757d;
+}
+
+.email-linking-btn.secondary:hover:not(:disabled) {
+ background-color: #545b62;
+ border-color: #545b62;
+}
+
+.email-linking-btn.tertiary {
+ background-color: transparent;
+ color: #007bff;
+ border-color: #007bff;
+}
+
+.email-linking-btn.tertiary:hover:not(:disabled) {
+ background-color: #007bff;
+ color: white;
+}
+
+.email-linking-warning {
+ background-color: #fff3cd;
+ border: 1px solid #ffeaa7;
+ border-radius: 6px;
+ padding: 12px;
+ margin-top: 15px;
+}
+
+.email-linking-warning p {
+ margin: 0;
+ color: #856404;
+ font-size: 14px;
+ line-height: 1.4;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+ .email-linking-display {
+   flex-direction: column;
+   align-items: stretch;
+ }
+ 
+ .email-linking-actions {
+   justify-content: flex-start;
+ }
+ 
+ .email-linking-btn {
+   flex: 1;
+   min-width: 120px;
+ }
+}
+
+@media (max-width: 480px) {
+ .email-linking-container {
+   padding: 15px;
+   margin: 10px 0;
+ }
+ 
+ .email-linking-actions {
+   flex-direction: column;
+ }
+ 
+ .email-linking-btn {
+   width: 100%;
+ }
+}

@@ -1,24 +1,20 @@
 import React, { useState, useEffect } from "react";
 import PhoneInput from "react-phone-input-2";
-// import { isValidPhoneNumber } from "libphonenumber-js";
 import "react-phone-input-2/lib/style.css";
 import { toast } from 'react-toastify';
-import { auth, db } from "../../../firebaseConfig"; // Adjust path as needed
+import { auth } from "../../../firebaseConfig";
+import "./PhoneLinking.css";
 import {
     PhoneAuthProvider,
     linkWithCredential,
-    // RecaptchaVerifier,
-    // signInWithPhoneNumber,
     updatePhoneNumber,
     unlink,
     onAuthStateChanged
 } from "firebase/auth";
-// import { doc, updateDoc } from "firebase/firestore";
 
 import {
     getAuthMethodsInfo,
     updateUserFirestore,
-    validateUnlinking,
     handleAuthError,
     reloadAndCheckProvider
 } from './utils/authUtils';
@@ -33,6 +29,7 @@ import AuthStatusDisplay from './utils/AuthStatusDisplay';
 
 function PhoneLinking() {
     // Phone linking states
+    const [currentPhoneNumber, setCurrentPhoneNumber] = useState("");
     const [phoneLinked, setPhoneLinked] = useState(false);
     const [isLinkingPhone, setIsLinkingPhone] = useState(false);
     const [showPhoneVerification, setShowPhoneVerification] = useState(false);
@@ -43,68 +40,19 @@ function PhoneLinking() {
     const [showPhoneChangeForm, setShowPhoneChangeForm] = useState(false);
     const [newPhoneNumber, setNewPhoneNumber] = useState("");
 
-    // Get authentication methods info for display
-    //   const getAuthMethodsInfo = () => {
-    //     const currentUser = auth.currentUser;
-    //     if (!currentUser) return { canUnlink: false, methods: [] };
-
-    //     const methods = currentUser.providerData.map(provider => {
-    //       switch(provider.providerId) {
-    //         case 'google.com':
-    //           return 'Google';
-    //         case 'password':
-    //           return 'Email/Password';
-    //         case 'phone':
-    //           return 'Phone';
-    //         case 'facebook.com':
-    //           return 'Facebook';
-    //         default:
-    //           return provider.providerId;
-    //       }
-    //     });
-
-    //     const canUnlink = currentUser.providerData.length > 1;
-    //     return { canUnlink, methods };
-    //   };
-
     // Check if Phone is linked
     const checkPhoneLinkStatus = async () => {
-        // const currentUser = auth.currentUser;
-        // if (currentUser) {
-        //   try {
-        //     await currentUser.reload();
-        //     const phoneProvider = currentUser.providerData.find(
-        //       provider => provider.providerId === 'phone'
-        //     );
-        //     setPhoneLinked(!!phoneProvider);
-        //     console.log("Phone link status:", !!phoneProvider);
-        //   } catch (error) {
-        //     console.error("Error checking phone link status:", error);
-        //     const phoneProvider = currentUser.providerData.find(
-        //       provider => provider.providerId === 'phone'
-        //     );
-        //     setPhoneLinked(!!phoneProvider);
-        //   }
-        // }
         const isLinked = await reloadAndCheckProvider('phone');
         setPhoneLinked(isLinked);
+
+        if (isLinked && auth.currentUser) {
+            setCurrentPhoneNumber(auth.currentUser.phoneNumber || "");
+        } else {
+            setCurrentPhoneNumber("");
+        }
+
         console.log("Phone link status:", isLinked);
     };
-
-    // Initialize recaptcha verifier
-    // const initializeRecaptcha = () => {
-    //     if (!recaptchaVerifier) {
-    //         const verifier = new RecaptchaVerifier(auth, 'recaptcha-container-phone', {
-    //             size: 'invisible',
-    //             callback: (response) => {
-    //                 console.log("Recaptcha resolved");
-    //             }
-    //         });
-    //         setRecaptchaVerifier(verifier);
-    //         return verifier;
-    //     }
-    //     return recaptchaVerifier;
-    // };
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -121,7 +69,6 @@ function PhoneLinking() {
 
     // Handle phone number linking
     const handleLinkPhone = async () => {
-        // let phone = `+${phoneForLinking}`
         if (!validatePhoneNumber(phoneForLinking)) {
             toast.error("Please enter a valid phone number", { className: "custom-toast-error" });
             return;
@@ -186,22 +133,6 @@ function PhoneLinking() {
 
             // Link the credential to the current user
             await linkWithCredential(currentUser, credential);
-
-            // Update Firestore
-            // try {
-            //     const userDocRef = doc(db, "users", currentUser.uid);
-            //     await updateDoc(userDocRef, {
-            //         phoneLinked: true,
-            //         linkedAccounts: {
-            //             phone: {
-            //                 phoneNumber: `+${phoneForLinking}`,
-            //                 linkedAt: new Date().toISOString()
-            //             }
-            //         }
-            //     });
-            // } catch (firestoreError) {
-            //     console.log("Firestore update error (non-critical):", firestoreError);
-            // }
             await updateUserFirestore(currentUser.uid, {
                 phoneLinked: true,
                 phoneNumber: formatPhoneNumber(phoneForLinking),
@@ -222,22 +153,11 @@ function PhoneLinking() {
             }, 1000);
 
             toast.success("Phone number linked successfully!");
+            setTimeout(() => {
+                checkPhoneLinkStatus();
+            }, 1000);
 
         } catch (error) {
-            // console.error("Error verifying phone number:", error);
-
-            // if (error.code === 'auth/invalid-verification-code') {
-            //     toast.error("Invalid verification code. Please try again.", { className: "custom-toast-error" });
-            // } else if (error.code === 'auth/code-expired') {
-            //     toast.error("Verification code expired. Please request a new one.", { className: "custom-toast-error" });
-            //     setShowPhoneVerification(false);
-            // } else if (error.code === 'auth/credential-already-in-use') {
-            //     toast.error("This phone number is already linked to another account",
-            //         { className: "custom-toast-error" });
-            // } else {
-            //     toast.error(`Failed to verify phone number: ${error.message}`,
-            //         { className: "custom-toast-error" });
-            // }
             handleAuthError(error, 'verify', 'phone number');
             if (error.code === 'auth/code-expired') {
                 setShowPhoneVerification(false);
@@ -268,21 +188,6 @@ function PhoneLinking() {
 
             await unlink(currentUser, PhoneAuthProvider.PROVIDER_ID);
             await currentUser.reload();
-
-            // Update Firestore
-            // try {
-            //     const userDocRef = doc(db, "users", currentUser.uid);
-            //     await updateDoc(userDocRef, {
-            //         phoneLinked: false,
-            //         linkedAccounts: {
-            //             phone: null
-            //         },
-            //         phoneUnlinkedAt: new Date().toISOString()
-            //     });
-            // } catch (firestoreError) {
-            //     console.log("Firestore update error (non-critical):", firestoreError);
-            // }
-
             await updateUserFirestore(currentUser.uid, {
                 phoneLinked: false,
                 phoneNumber: "",
@@ -298,6 +203,9 @@ function PhoneLinking() {
             }, 1000);
 
             toast.success("Phone number unlinked successfully!");
+            setTimeout(() => {
+                checkPhoneLinkStatus();
+            }, 1000);
 
         } catch (error) {
             console.error("Error unlinking phone number:", error);
@@ -316,12 +224,7 @@ function PhoneLinking() {
 
     // Handle changing linked phone number
     const handleChangePhone = async () => {
-        // let phone = `+${newPhoneNumber}`;
-        // if (!newPhoneNumber || !isValidPhoneNumber(phone)) {
-        //     toast.error("Please enter a valid phone number", { className: "custom-toast-error" });
-        //     return;
-        // }
-        if (!validatePhoneNumber(phoneForLinking)) {
+        if (!validatePhoneNumber(newPhoneNumber)) {
             toast.error("Please enter a valid phone number", { className: "custom-toast-error" });
             return;
         }   
@@ -370,26 +273,11 @@ function PhoneLinking() {
 
             // Update phone number
             await updatePhoneNumber(currentUser, credential);
-
-            // Update Firestore
-            // try {
-            //     const userDocRef = doc(db, "users", currentUser.uid);
-            //     await updateDoc(userDocRef, {
-            //         linkedAccounts: {
-            //             phone: {
-            //                 phoneNumber: `+${newPhoneNumber}`,
-            //                 updatedAt: new Date().toISOString()
-            //             }
-            //         }
-            //     });
-            // } catch (firestoreError) {
-            //     console.log("Firestore update error (non-critical):", firestoreError);
-            // }
             await updateUserFirestore(currentUser.uid, {
                 phoneLinked: true,
-                phoneNumber: formatPhoneNumber(phoneForLinking),
+                phoneNumber: formatPhoneNumber(newPhoneNumber),
                 ['linkedAccounts.phone']: {
-                    phoneNumber: formatPhoneNumber(phoneForLinking),
+                    phoneNumber: formatPhoneNumber(newPhoneNumber),
                     linkedAt: new Date().toISOString()
                 },
             });
@@ -407,17 +295,6 @@ function PhoneLinking() {
             toast.success("Phone number updated successfully!");
 
         } catch (error) {
-            // console.error("Error updating phone number:", error);
-
-            // if (error.code === 'auth/invalid-verification-code') {
-            //     toast.error("Invalid verification code. Please try again.", { className: "custom-toast-error" });
-            // } else if (error.code === 'auth/code-expired') {
-            //     toast.error("Verification code expired. Please request a new one.", { className: "custom-toast-error" });
-            //     setShowPhoneVerification(false);
-            // } else {
-            //     toast.error(`Failed to update phone number: ${error.message}`,
-            //         { className: "custom-toast-error" });
-            // }
             handleAuthError(error, 'verify', 'phone number');
             if (error.code === 'auth/code-expired') {
                 setShowPhoneVerification(false);
@@ -428,49 +305,12 @@ function PhoneLinking() {
     };
 
     return (
-        <div className="edit-profile-field">
+        <div className="phone-linking-edit-profile-field">
             {/* Recaptcha container for phone verification */}
             <div id="recaptcha-container-phone"></div>
 
-            <label className="edit-profile-label">Phone Authentication</label>
-            <div className="phone-auth-container">
-                {/* <div className="phone-auth-status">
-                    <span className={`phone-status ${phoneLinked ? 'linked' : 'not-linked'}`}>
-                        {phoneLinked ? '✓ Phone authentication enabled' : '✗ Phone authentication not enabled'}
-                    </span>
-                    {phoneLinked && (
-                        <div className="phone-auth-actions" style={{ marginTop: '8px' }}>
-                            <button
-                                type="button"
-                                onClick={() => setShowPhoneChangeForm(!showPhoneChangeForm)}
-                                disabled={isLinkingPhone}
-                                style={{
-                                    padding: '4px 8px',
-                                    fontSize: '12px',
-                                    marginRight: '8px',
-                                    backgroundColor: '#007bff',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                Change Phone Number
-                            </button>
-                        </div>
-                    )}
-                    {!phoneLinked && getAuthMethodsInfo().canUnlink && (
-                        <small style={{ color: '#28a745', fontSize: '12px', display: 'block', marginTop: '4px' }}>
-                            Add phone authentication for additional security
-                        </small>
-                    )}
-                    {phoneLinked && !getAuthMethodsInfo().canUnlink && (
-                        <small style={{ color: '#ff9800', fontSize: '12px', display: 'block', marginTop: '4px' }}>
-                            Cannot disable: Phone is your only authentication method
-                        </small>
-                    )}
-                </div> */}
-
+            <label className="phone-linking-edit-profile-label">Phone Authentication</label>
+            <div className="phone-linking-phone-auth-container">
                 <AuthStatusDisplay
                     isLinked={phoneLinked}
                     providerName="Phone authentication"
@@ -479,9 +319,29 @@ function PhoneLinking() {
                     showWarning={phoneLinked && !getAuthMethodsInfo().canUnlink}
                 />
 
+                {phoneLinked && currentPhoneNumber && (
+                    <div className="phone-linking-current-phone-display">
+                        <label>Current Phone Number:</label>
+                        <PhoneInput
+                            country={"in"}
+                            value={currentPhoneNumber}
+                            disabled={true}
+                            inputStyle={{ 
+                                width: '100%', 
+                                height: '40px',
+                                backgroundColor: '#e9ecef',
+                                cursor: 'not-allowed'
+                            }}
+                            containerStyle={{
+                                opacity: 0.8
+                            }}
+                        />
+                    </div>
+                )}
+
                 {!phoneLinked && !showPhoneVerification && (
-                    <div className="phone-link-form" style={{ marginTop: '12px' }}>
-                        <div style={{ marginBottom: '8px' }}>
+                    <div className="phone-linking-phone-link-form">
+                        <div>
                             <PhoneInput
                                 country={"in"}
                                 value={phoneForLinking}
@@ -494,14 +354,7 @@ function PhoneLinking() {
                             type="button"
                             onClick={handleLinkPhone}
                             disabled={isLinkingPhone}
-                            style={{
-                                padding: '8px 16px',
-                                backgroundColor: '#28a745',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer'
-                            }}
+                            className="phone-linking-phone-link-button"
                         >
                             {isLinkingPhone ? 'Sending Code...' : 'Link Phone Number'}
                         </button>
@@ -509,9 +362,9 @@ function PhoneLinking() {
                 )}
 
                 {showPhoneChangeForm && (
-                    <div className="phone-change-form" style={{ marginTop: '12px', padding: '12px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                        <h4 style={{ margin: '0 0 12px 0', fontSize: '14px' }}>Change Phone Number</h4>
-                        <div style={{ marginBottom: '8px' }}>
+                    <div className="phone-linking-phone-change-form">
+                        <h4>Change Phone Number</h4>
+                        <div>
                             <PhoneInput
                                 country={"in"}
                                 value={newPhoneNumber}
@@ -520,20 +373,12 @@ function PhoneLinking() {
                                 inputStyle={{ width: '100%', height: '40px' }}
                             />
                         </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div className="phone-linking-button-group">
                             <button
                                 type="button"
                                 onClick={handleChangePhone}
                                 disabled={isLinkingPhone}
-                                style={{
-                                    padding: '6px 12px',
-                                    backgroundColor: '#007bff',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    fontSize: '12px'
-                                }}
+                                className="phone-linking-send-code-button"
                             >
                                 {isLinkingPhone ? 'Sending...' : 'Send Code'}
                             </button>
@@ -543,15 +388,7 @@ function PhoneLinking() {
                                     setShowPhoneChangeForm(false);
                                     setNewPhoneNumber('');
                                 }}
-                                style={{
-                                    padding: '6px 12px',
-                                    backgroundColor: '#6c757d',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    fontSize: '12px'
-                                }}
+                                className="phone-linking-cancel-button"
                             >
                                 Cancel
                             </button>
@@ -560,40 +397,25 @@ function PhoneLinking() {
                 )}
 
                 {showPhoneVerification && (
-                    <div className="phone-verification-form" style={{ marginTop: '12px', padding: '12px', backgroundColor: '#e7f3ff', borderRadius: '4px' }}>
-                        <h4 style={{ margin: '0 0 12px 0', fontSize: '14px' }}>Enter Verification Code</h4>
-                        <p style={{ margin: '0 0 12px 0', fontSize: '12px', color: '#666' }}>
-                            We've sent a verification code to {showPhoneChangeForm ? newPhoneNumber : phoneForLinking}
-                        </p>
-                        <div style={{ marginBottom: '12px' }}>
+                    <div className="phone-linking-phone-verification-form">
+                        <h4>Enter Verification Code</h4>
+                        <p>We've sent a verification code to {showPhoneChangeForm ? newPhoneNumber : phoneForLinking}</p>
+                        <div>
                             <input
                                 type="text"
                                 value={verificationCode}
                                 onChange={(e) => setVerificationCode(e.target.value)}
                                 placeholder="Enter 6-digit code"
                                 maxLength="6"
-                                style={{
-                                    width: '100%',
-                                    padding: '8px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px'
-                                }}
+                                className="phone-linking-verification-input"
                             />
                         </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div className="phone-linking-button-group">
                             <button
                                 type="button"
                                 onClick={showPhoneChangeForm ? handleVerifyAndChangePhone : handleVerifyAndLinkPhone}
                                 disabled={isLinkingPhone}
-                                style={{
-                                    padding: '8px 16px',
-                                    backgroundColor: '#28a745',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    fontSize: '12px'
-                                }}
+                                className="phone-linking-verify-button"
                             >
                                 {isLinkingPhone ? 'Verifying...' : 'Verify & Continue'}
                             </button>
@@ -607,15 +429,7 @@ function PhoneLinking() {
                                     setNewPhoneNumber('');
                                     setConfirmationResult(null);
                                 }}
-                                style={{
-                                    padding: '8px 16px',
-                                    backgroundColor: '#6c757d',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    fontSize: '12px'
-                                }}
+                                className="phone-linking-cancel-verification-button"
                             >
                                 Cancel
                             </button>
@@ -628,15 +442,7 @@ function PhoneLinking() {
                         type="button"
                         onClick={handleUnlinkPhone}
                         disabled={isLinkingPhone || !getAuthMethodsInfo().canUnlink}
-                        style={{
-                            marginTop: '12px',
-                            padding: '8px 16px',
-                            backgroundColor: getAuthMethodsInfo().canUnlink ? '#dc3545' : '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: getAuthMethodsInfo().canUnlink ? 'pointer' : 'not-allowed'
-                        }}
+                        className="phone-linking-unlink-button"
                     >
                         {isLinkingPhone ? 'Unlinking...' : 'Disable Phone Authentication'}
                     </button>

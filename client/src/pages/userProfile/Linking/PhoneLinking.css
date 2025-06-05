@@ -1,0 +1,242 @@
+/* PhoneLinking.css */
+
+.phone-linking-edit-profile-field {
+    margin-bottom: 24px;
+}
+
+.phone-linking-edit-profile-label {
+    display: block;
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.phone-linking-phone-auth-container {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #ffffff;
+}
+
+.phone-linking-current-phone-display {
+    margin-top: 8px;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.phone-linking-current-phone-display label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.phone-linking-phone-link-form {
+    margin-top: 12px;
+}
+
+.phone-linking-phone-link-form > div {
+    margin-bottom: 8px;
+}
+
+.phone-linking-phone-link-button {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.phone-linking-phone-link-button:hover {
+    background-color: #218838;
+}
+
+.phone-linking-phone-link-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.phone-linking-phone-change-form {
+    margin-top: 12px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.phone-linking-phone-change-form h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+}
+
+.phone-linking-phone-change-form > div:first-of-type {
+    margin-bottom: 8px;
+}
+
+.phone-linking-button-group {
+    display: flex;
+    gap: 8px;
+}
+
+.phone-linking-send-code-button {
+    padding: 6px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.phone-linking-send-code-button:hover {
+    background-color: #0056b3;
+}
+
+.phone-linking-send-code-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.phone-linking-cancel-button {
+    padding: 6px 12px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.phone-linking-cancel-button:hover {
+    background-color: #545b62;
+}
+
+.phone-linking-phone-verification-form {
+    margin-top: 12px;
+    padding: 12px;
+    background-color: #e7f3ff;
+    border-radius: 4px;
+    border: 1px solid #b8daff;
+}
+
+.phone-linking-phone-verification-form h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+}
+
+.phone-linking-phone-verification-form p {
+    margin: 0 0 12px 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.phone-linking-verification-input {
+    width: 93%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.phone-linking-verification-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.phone-linking-verify-button {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.phone-linking-verify-button:hover {
+    background-color: #218838;
+}
+
+.phone-linking-verify-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.phone-linking-cancel-verification-button {
+    padding: 8px 16px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.phone-linking-cancel-verification-button:hover {
+    background-color: #545b62;
+}
+
+.phone-linking-unlink-button {
+    margin-top: 12px;
+    padding: 8px 16px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.phone-linking-unlink-button:hover {
+    background-color: #c82333;
+}
+
+.phone-linking-unlink-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* PhoneInput component styling overrides */
+.phone-linking-edit-profile-field .react-tel-input .form-control {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.phone-linking-edit-profile-field .react-tel-input .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.phone-linking-edit-profile-field .react-tel-input .flag-dropdown {
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+    background-color: #fff;
+}
+
+.phone-linking-edit-profile-field .react-tel-input .selected-flag {
+    padding: 0 8px;
+}
+
+.phone-linking-edit-profile-field .react-tel-input .selected-flag:hover {
+    background-color: #f8f9fa;
+}
