@@ -161,7 +161,7 @@ const normalizedHeight = {
     payableAmount: getTotalWithWalletAndDiscount().total,
     discount: getSelectedTotalAmount() - getTotalWithWalletAndDiscount().total,
     lushioCurrencyUsed: useWalletPoints && walletPoints,
-    couponCode: couponApplied?.couponCode,
+    couponCode: couponApplied?.couponCode || "",
     couponDiscount: getTotalWithWalletAndDiscount().couponDiscountAmount || 0,
     onlinePaymentDiscount:
       getTotalWithWalletAndDiscount().additionalDiscount || 0,

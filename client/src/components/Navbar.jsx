@@ -68,20 +68,30 @@ function Navbar() {
   });
 
   useEffect(() => {
-    const fetchSubcategories = async () => {
-      try {
+  const fetchSubcategories = async () => {
+    try {
+      const cachedData = localStorage.getItem("subcategories");
+
+      if (cachedData) {
+        // Use cached data if available
+        setSubcategories(JSON.parse(cachedData));
+      } else {
+        // If not cached, fetch from API
         const response = await axios.get(
           `${process.env.REACT_APP_API_URL}/subcategories`
-        ); // Update with the correct URL
+        );
+
         setSubcategories(response.data);
-
-      } catch (err) {
-        console.error(err);
+        localStorage.setItem("subcategories", JSON.stringify(response.data));
       }
-    };
+    } catch (err) {
+      console.error("Error fetching subcategories:", err);
+    }
+  };
 
-    fetchSubcategories();
-  }, []);
+  fetchSubcategories();
+}, []);
+;
   useEffect(() => {
     return () => {
       document.body.classList.remove("no-scroll");
