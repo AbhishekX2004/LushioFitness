@@ -58,6 +58,7 @@ router.get("/:id", async (req, res) => {
       lushioCoins,
       lushioCash,
       totalCredits,
+      transactionLength: coinsSnapshot.size || 0,
     });
   } catch (error) {
     logger.error("Error fetching user credits: ", error);

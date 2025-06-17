@@ -1,0 +1,77 @@
+.Facebook-Linking-edit-profile-field {
+  margin-bottom: 1.5rem;
+}
+
+.Facebook-Linking-edit-profile-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.Facebook-Linking-facebook-link-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.Facebook-Linking-facebook-link-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-width: 120px;
+}
+
+.Facebook-Linking-facebook-link-btn:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.Facebook-Linking-facebook-link-btn:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.Facebook-Linking-facebook-link-btn.Facebook-Linking-link {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+
+.Facebook-Linking-facebook-link-btn.Facebook-Linking-link:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.Facebook-Linking-facebook-link-btn.Facebook-Linking-unlink {
+  background-color: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+}
+
+.Facebook-Linking-facebook-link-btn.Facebook-Linking-unlink:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.Facebook-Linking-facebook-link-btn:disabled,
+.Facebook-Linking-facebook-link-btn.Facebook-Linking-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.Facebook-Linking-facebook-link-btn:disabled:hover,
+.Facebook-Linking-facebook-link-btn.Facebook-Linking-disabled:hover {
+  background-color: inherit;
+  border-color: inherit;
+}

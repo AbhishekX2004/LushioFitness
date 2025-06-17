@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 /* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
 /* eslint-disable new-cap */
@@ -7,7 +8,7 @@ const router = express.Router();
 const axios = require("axios");
 const crypto = require("crypto");
 const logger = require("firebase-functions/logger");
-const { getFirestore } = require("firebase-admin/firestore");
+const {getFirestore} = require("firebase-admin/firestore");
 const db = getFirestore();
 
 // ENVs
@@ -41,6 +42,9 @@ router.post("/", async (req, res) => {
       couponCode,
       address,
       orderedProducts,
+      onlinePaymentDiscount,
+      couponDiscount,
+      lushioCashBack,
     } = req.body;
 
     // Separate global order details
@@ -54,6 +58,9 @@ router.post("/", async (req, res) => {
       couponCode,
       address,
       orderedProducts,
+      onlinePaymentDiscount,
+      couponDiscount,
+      lushioCashBack,
     };
     const data = {
       merchantId: PHONEPE_MERCHANT_ID,
@@ -87,7 +94,7 @@ router.post("/", async (req, res) => {
       method: "POST",
       url: prod_URL,
       headers: {
-        accept: "application/json",
+        "accept": "application/json",
         "Content-Type": "application/json",
         "X-VERIFY": checksum,
       },
@@ -97,14 +104,14 @@ router.post("/", async (req, res) => {
     };
 
     axios
-      .request(option)
-      .then((response) => {
-        res.json(response.data);
-      })
-      .catch((error) => {
-        logger.log("Error in / route inner catch", error);
-        res.status(500).json({ error: error.message });
-      });
+        .request(option)
+        .then((response) => {
+          res.json(response.data);
+        })
+        .catch((error) => {
+          logger.log("Error in / route inner catch", error);
+          res.status(500).json({error: error.message});
+        });
   } catch (error) {
     logger.log("Error in / route outer catch", error);
   }
@@ -126,7 +133,7 @@ router.post("/status", async (req, res) => {
       method: "get",
       url: `${PHONEPE_URL}/status/${merchantId}/${merchantTransactionId}`,
       headers: {
-        accept: "application/json",
+        "accept": "application/json",
         "Content-Type": "application/json",
         "X-VERIFY": checksum,
         "X-MERCHANT-ID": merchantId,
@@ -153,18 +160,18 @@ router.post("/status", async (req, res) => {
         };
 
         logger.log(
-          "Combined Order and Payment Details:",
-          JSON.stringify(combinedDetails, null, 2)
+            "Combined Order and Payment Details:",
+            JSON.stringify(combinedDetails, null, 2),
         );
         // Await order creation API call
         const orderResponse = await axios.post(
-          `${API_URL}/orders/createOrder`,
-          combinedDetails
+            `${API_URL}/orders/createOrder`,
+            combinedDetails,
         );
         logger.log("Order Creation Response:", orderResponse.data);
         // Extracting productIds
         const selectedProductIds = globalOrderDetails.orderedProducts.map(
-          (product) => product.productId
+            (product) => product.productId,
         );
         console.log(selectedProductIds);
         try {
@@ -188,7 +195,7 @@ router.post("/status", async (req, res) => {
     }
   } catch (error) {
     logger.error("Error in /status route:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({error: "Internal Server Error"});
   }
 });
 
@@ -212,19 +219,19 @@ router.post("/refund", async (req, res) => {
     }
     const orderRef = db.collection("orders").doc(oid);
     const orderDoc = await orderRef.get();
-    //const userRef = db.collection("users").doc(uid);
+    // const userRef = db.collection("users").doc(uid);
 
     if (!orderDoc.exists) {
       return res
-        .status(404)
-        .json({ success: false, message: "Order not found." });
+          .status(404)
+          .json({success: false, message: "Order not found."});
     }
 
     const orderData = orderDoc.data();
     if (orderData.uid !== uid) {
       return res
-        .status(403)
-        .json({ success: false, message: "Unauthorized access." });
+          .status(403)
+          .json({success: false, message: "Unauthorized access."});
     }
     // Prepare payload
     const payload = {
@@ -246,17 +253,17 @@ router.post("/refund", async (req, res) => {
 
     // Make refund API call
     const refundResponse = await axios.post(
-      `${PHONEPE_URL}/refund`,
-      {
-        request: encode,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          accept: "application/json",
-          "X-VERIFY": xVerifyHeader,
+        `${PHONEPE_URL}/refund`,
+        {
+          request: encode,
         },
-      }
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "accept": "application/json",
+            "X-VERIFY": xVerifyHeader,
+          },
+        },
     );
 
     console.log("Refund API Response:", refundResponse.data);
