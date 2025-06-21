@@ -11,6 +11,38 @@ const db = getFirestore();
 // URLs
 const API_URL = process.env.REACT_APP_API_URL;
 
+function calculateTotalReturnAmount(returnItems, productDocs, items) {
+  let totalReturnAmount = 0;
+
+  // Create a Map for O(1) lookups
+  const productDocsMap = new Map(productDocs.map(doc => [doc.id, doc]));
+
+  for (const [id, item] of Object.entries(returnItems)) {
+    const doc = productDocsMap.get(id);
+    if (!doc) continue;
+
+    const itemData = items[doc.id];
+    if (itemData?.exchange) continue;
+
+    const units = Number(item.units || 0);
+    if (units <= 0) continue;
+
+    const productData = doc.data();
+    const productDetails = productData.productDetails || {};
+
+    const price = Number(productDetails.price || 0);
+    const discountedPrice = Number(productDetails.discountedPrice || price);
+    const perUnitDiscount = Number(productData.perUnitDiscount || 0);
+
+    const effectiveDiscountedPrice = discountedPrice - perUnitDiscount + (price - discountedPrice);
+    const itemReturnAmount = effectiveDiscountedPrice * units;
+
+    totalReturnAmount += itemReturnAmount;
+  }
+
+  return totalReturnAmount;
+}
+
 router.post("/process-return-exchange", async (req, res) => {
   try {
     const {uid, oid, items} = req.body;
@@ -98,8 +130,8 @@ router.post("/process-return-exchange", async (req, res) => {
         return_reason: itemData.reason,
         discount: productData.perUnitDiscount,
       };
-    });
-    // console.log({uid, oid, returnExchangedItems});
+    }); 
+const totalReturnAmount = calculateTotalReturnAmount(returnItems, productDocs, items);
 
     // console.log(sub_total);
     if (Object.keys(returnItems).length > 0) {
@@ -169,6 +201,19 @@ router.post("/process-return-exchange", async (req, res) => {
       returnExchangedItems: returnExchangedItems,
     });
 
+       if(totalReturnAmount > 0){
+        try {
+              await axios.post(`${API_URL}/payment/refund`, {
+              uid,
+              oid,
+              amount: Math.ceil(totalReturnAmount)
+            });
+          } 
+          catch (error) {
+    console.log(error?.data || error?.data?.message);
+          }
+}
+        
     return res.status(200).json({success: true, message: "Return/Exchange processed successfully."});
   } catch (error) {
     console.error("Error processing return/exchange:", error.data);
