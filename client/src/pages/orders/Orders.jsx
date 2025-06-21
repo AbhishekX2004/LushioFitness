@@ -238,9 +238,14 @@ const formatDate = (timestamp) =>{
           <div className="filters-info">
             <Calendar className="filters-info-icon" size={20} />
             <span className="filters-info-text">
-              Showing orders from {appliedFilters.startDate ? new Date(appliedFilters.startDate).toLocaleDateString() : 'start'} 
-              {' '}to {appliedFilters.endDate ? new Date(appliedFilters.endDate).toLocaleDateString() : 'now'}
-            </span>
+  Showing orders from {appliedFilters.startDate 
+    ? new Date(appliedFilters.startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) 
+    : 'start'} 
+  {' '}to {appliedFilters.endDate 
+    ? new Date(appliedFilters.endDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) 
+    : 'now'}
+</span>
+
           </div>
         )}
 

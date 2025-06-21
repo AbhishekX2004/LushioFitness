@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./address.css";
 import { useAddress } from "../../components/context/AddressContext";
-import AddressForm from "../cartItems/AddressForm";
+import AddressForm from "../cart/AddressForm";
 import {toast} from 'react-toastify';
 export default function Address() {
   const {

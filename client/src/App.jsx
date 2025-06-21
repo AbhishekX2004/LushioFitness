@@ -14,7 +14,7 @@ import ScrollToTop from "./components/ScrollToTop";
 // Pages
 import Home from "./pages/home/Home";
 import ProductDisplay from "./pages/productDisplay/ProductDisplay";
-import Cart from "./pages/cartItems/CartItems";
+import Cart from "./pages/cart/Cart";
 import WishList from "./pages/wishlist/WishList";
 import User from "./pages/userProfile/User";
 import EditProfile from "./pages/userProfile/EditProfile";
@@ -244,7 +244,7 @@ function App() {
             <Route path="/shippingPolicy" element={<ShippingPolicy />} />
 
             {/* Payment Status */}
-            <Route path="/paymentStatus" element={<PaymentSuccess />} />
+            <Route path="/paymentSuccess" element={<PaymentSuccess />} />
             <Route path="/paymentFailed" element={<PaymentFailed />} />
 
             {/* Admin Panel */}

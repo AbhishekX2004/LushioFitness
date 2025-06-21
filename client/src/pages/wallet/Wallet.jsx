@@ -41,7 +41,7 @@ export default function Wallet() {
     );
   return (
     <>
-      {userCoins?.totalCredits === 0 ? (
+      {userCoins?.transactionLength === 0 ? (
         <div className="empty-wallet">
           <p>Oh no! Looks like your wallet is empty :(</p>
           <h5>Start earning credits now!</h5>
