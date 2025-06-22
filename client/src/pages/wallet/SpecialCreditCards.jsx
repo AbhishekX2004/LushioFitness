@@ -1,9 +1,9 @@
 import React from 'react';
 import './SpecialCreditsCard.css';
-
+import { useNavigate } from "react-router-dom";
 const SpecialCreditsCard = ({ transaction }) => {
   // Determine which icon to show
-
+ const navigate = useNavigate();
   function formatDate(isoString) {
   const date = new Date(isoString);
   const options = { day: '2-digit', month: 'short', year: 'numeric' };
@@ -72,8 +72,13 @@ function formatDateWithTime(isoString) {
     </span>
   );
 };
+ const handleOrderClick = (orderId) => {
+    
+  navigate(`/orderInfo/${orderId}`);
+  };
 
   return (
+    <div className='summary-card-wrapper'>
     <div className={`summary-card ${transaction.isExpired ? 'expired-card' : ''}`}>
       {renderIcon()}
       <div className="summary-card-details">
@@ -91,7 +96,27 @@ function formatDateWithTime(isoString) {
           </span>
         )}
       </div>
+      
       {renderAmount()}
+      
+    </div>
+    {transaction.orders && transaction.orders.length > 0 && (
+              <div className="transaction-order-info">
+                <span className="transaction-order-label">Used in orders:</span>
+                {transaction.orders.map((order, index) => (
+                  <span key={order.oid} className="order-links">
+                    <button 
+                      className="order-id-link"
+                      onClick={() => handleOrderClick(order.oid)}
+                      title={`Order Amount: ₹${order.orderAmount}, Used: ₹${order.consumedAmount}`}
+                    >
+                      {order.oid}
+                    </button>
+                    {index < transaction.orders.length - 1 && ', '}
+                  </span>
+                ))}
+              </div>
+            )}
     </div>
   );
 };

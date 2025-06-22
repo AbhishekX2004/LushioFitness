@@ -174,15 +174,17 @@ function App() {
             position="top-center"
             autoClose={3000}
             hideProgressBar
-           // closeOnClick={false}
-           // pauseOnHover
-            draggable
+          draggable
+             pauseOnHover={false} 
+             pauseOnFocusLoss={false} 
             theme="light"
             transition={Flip}
             toastClassName="custom-toast-success"
             bodyClassName="custom-toast-body"
             closeButton={false}
           />
+            
+             
 
           <Routes>
             {/* Home and Categories */}
@@ -235,6 +237,8 @@ function App() {
               element={<Transaction />}
             />
             <Route path="/orderInfo/:orderId" element={<OrderInfo />} />
+            
+            
             <Route path="/buyNow" element={<BuyNow />} />
 
             {/* Policies */}
