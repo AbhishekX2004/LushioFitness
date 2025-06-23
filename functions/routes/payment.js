@@ -6,7 +6,7 @@ const router = express.Router();
 const axios = require("axios");
 const crypto = require("crypto");
 const logger = require("firebase-functions/logger");
-const { getFirestore, FieldValue, admin,Timestamp } = require("firebase-admin/firestore");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const db = getFirestore();
 
 // ENVs
@@ -104,7 +104,7 @@ if (req.query && req.query.id) {
           selectedProductIds
         );
         try {
-          const response = await axios.post(`${API_URL}/cart/batch-delete`, {
+          await axios.post(`${API_URL}/cart/batch-delete`, {
             uid: globalOrderDetails.uid,
             itemIds: selectedProductIds,
           });
@@ -203,7 +203,7 @@ if (req.query && req.query.id) {
 
     logger.log("backend order", globalOrderDetails);
     logger.log("data", data);
-    const KeyIndex = 1;
+   
 
     // Base64 encode the payload
     const payload = JSON.stringify(data);
@@ -238,6 +238,7 @@ if (req.query && req.query.id) {
 
 // Route: Refund Transaction
 router.post("/refund", async (req, res) => {
+    const merchantTransactionId = "R" + Date.now();
   try {
     const {
       uid,
@@ -245,7 +246,7 @@ router.post("/refund", async (req, res) => {
       // merchantTransactionId,
       amount,
     } = req.body;
-    const merchantTransactionId = "R" + Date.now();
+  
     // merchantTransactionId is R+Date.now()
     // Validate required fields
     if (!oid || !uid || !amount) {
