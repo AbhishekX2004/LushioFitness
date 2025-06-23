@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Accordion.css";
 import "./ReturnExchange.css";
 import { toast } from "react-toastify";
+
 const ReturnExchange = ({
   title,
   canReturn,
@@ -14,14 +15,19 @@ const ReturnExchange = ({
   const [state, setState] = useState({
     isOpen: false,
     selectedOption: "exchange",
-    selectedReason: "size issue",
+    selectedReason: "Wrong size selected", // Combined reason state
     selectedSize: "",
     selectedQuantity: 1,
     otherReason: "",
-    exchangeReason: "Wrong size selected",
   });
 
   const toggleAccordion = () => {
+      if (!canReturn) {
+      toast.error("This product is not eligible for Return/exchange.", {
+        className: "custom-toast-error",
+      });
+      return;
+    }
     setState((prev) => ({ ...prev, isOpen: !prev.isOpen }));
   };
 
@@ -29,10 +35,9 @@ const ReturnExchange = ({
     setState((prev) => ({
       ...prev,
       selectedOption: option,
-      selectedReason: option === "exchange" ? "Wrong size selected" : "",
+      selectedReason: option === "exchange" ? "Wrong size selected" : "size issue",
       selectedSize: "",
       otherReason: "",
-      exchangeReason: option === "exchange" ? "Wrong size selected" : "",
     }));
   };
 
@@ -40,20 +45,12 @@ const ReturnExchange = ({
     setState((prev) => ({
       ...prev,
       selectedReason: reason,
-      otherReason: reason === "other" ? prev.otherReason : "",
+      otherReason: reason === "other" || reason === "Other" ? prev.otherReason : "",
     }));
   };
 
   const handleOtherReasonChange = (value) => {
     setState((prev) => ({ ...prev, otherReason: value }));
-  };
-
-  const handleExchangeReasonChange = (reason) => {
-    setState((prev) => ({
-      ...prev,
-      exchangeReason: reason,
-      otherReason: reason === "Other" ? "" : prev.otherReason,
-    }));
   };
 
   const handleQuantityChange = (e) => {
@@ -70,7 +67,7 @@ const ReturnExchange = ({
 
     if (
       !state.selectedReason ||
-      (state.selectedReason === "other" && !state.otherReason.trim())
+      ((state.selectedReason === "other" || state.selectedReason === "Other") && !state.otherReason.trim())
     ) {
       toast.error(`Please provide a reason for ${title}.`, {
         className: "custom-toast-error",
@@ -78,32 +75,21 @@ const ReturnExchange = ({
       return;
     }
 
+    const finalReason =
+      state.selectedReason === "other" || state.selectedReason === "Other"
+        ? state.otherReason
+        : state.selectedReason;
+
     const itemData = {
       [identifier]: {
         exchange: state.selectedOption === "exchange",
         units: state.selectedQuantity,
-        reason:
-          state.selectedReason === "other"
-            ? state.otherReason
-            : state.selectedReason,
-        exchangeReason:
-          state.selectedOption === "exchange"
-            ? state.exchangeReason === "Other"
-              ? state.otherReason
-              : state.exchangeReason
-            : "",
+        reason: finalReason,
+       // exchangeReason: state.selectedOption === "exchange" ? finalReason : "",
       },
     };
-    const finalReason =
-      state.selectedOption === "exchange"
-        ? state.exchangeReason === "Other"
-          ? state.otherReason
-          : state.exchangeReason
-        : state.selectedReason === "other"
-        ? state.otherReason
-        : state.selectedReason;
 
-    // 👇 Update the new payloadForMail state
+    // Update the new payloadForMail state
     const payloadItem = {
       identifier: identifier,
       exchange: state.selectedOption === "exchange",
@@ -227,12 +213,8 @@ const ReturnExchange = ({
                       type="radio"
                       name={`exchangeReason-${identifier}`}
                       value="Wrong product received"
-                      checked={
-                        state.exchangeReason === "Wrong product received"
-                      }
-                      onChange={() =>
-                        handleExchangeReasonChange("Wrong product received")
-                      }
+                      checked={state.selectedReason === "Wrong product received"}
+                      onChange={() => handleReasonChange("Wrong product received")}
                     />
                     Wrong product received
                   </label>
@@ -241,10 +223,8 @@ const ReturnExchange = ({
                       type="radio"
                       name={`exchangeReason-${identifier}`}
                       value="Product defective"
-                      checked={state.exchangeReason === "Product defective"}
-                      onChange={() =>
-                        handleExchangeReasonChange("Product defective")
-                      }
+                      checked={state.selectedReason === "Product defective"}
+                      onChange={() => handleReasonChange("Product defective")}
                     />
                     Product defective
                   </label>
@@ -253,14 +233,14 @@ const ReturnExchange = ({
                       type="radio"
                       name={`exchangeReason-${identifier}`}
                       value="Other"
-                      checked={state.exchangeReason === "Other"}
-                      onChange={() => handleExchangeReasonChange("Other")}
+                      checked={state.selectedReason === "Other"}
+                      onChange={() => handleReasonChange("Other")}
                     />
                     Other
                   </label>
                 </div>
 
-                {state.exchangeReason === "Other" && (
+                {state.selectedReason === "Other" && (
                   <textarea
                     placeholder="Specify exchange reason"
                     value={state.otherReason}

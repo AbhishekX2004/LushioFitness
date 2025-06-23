@@ -1,11 +1,15 @@
+.summary-card-wrapper{
+ border: 1px solid rgb(235, 232, 232);
+    padding-bottom: 18px;
+}
 .summary-card {
   display: flex;
   gap: 10px;
-  padding-bottom: 18px;
+  padding-bottom: 8px;
   align-items: center;
   padding-left: 1rem;
   padding-right: 1rem;
-  border: 1px solid rgb(235, 232, 232);
+ 
 }
 
 .credit-icon {
@@ -70,3 +74,46 @@
   margin-top: 30px;
   margin-inline: 10px;
 }
+        .transaction-order-info {
+        
+
+          padding-left: 2.5rem;
+         padding-right: 1rem;
+  
+          font-size: 11px;
+          color: #6366f1;
+  
+          margin-bottom: 6px;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .transaction-order-label {
+          font-weight: 600;
+          color: #4b5563;
+        }
+  .order-id-link {
+          background: none;
+          border: none;
+          color: #2563eb;
+          text-decoration: underline;
+          cursor: pointer;
+          font-size: 11px;
+          font-weight: 500;
+          padding: 0;
+          margin: 0;
+          font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .order-id-link:hover {
+          color: #1d4ed8;
+          text-decoration: none;
+          background-color: #eff6ff;
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+
+        .order-id-link:active {
+          color: #1e40af;
+        }

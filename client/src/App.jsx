@@ -14,7 +14,7 @@ import ScrollToTop from "./components/ScrollToTop";
 // Pages
 import Home from "./pages/home/Home";
 import ProductDisplay from "./pages/productDisplay/ProductDisplay";
-import Cart from "./pages/cartItems/CartItems";
+import Cart from "./pages/cart/Cart";
 import WishList from "./pages/wishlist/WishList";
 import User from "./pages/userProfile/User";
 import EditProfile from "./pages/userProfile/EditProfile";
@@ -174,15 +174,17 @@ function App() {
             position="top-center"
             autoClose={3000}
             hideProgressBar
-           // closeOnClick={false}
-           // pauseOnHover
-            draggable
+          draggable
+             pauseOnHover={false} 
+             pauseOnFocusLoss={false} 
             theme="light"
             transition={Flip}
             toastClassName="custom-toast-success"
             bodyClassName="custom-toast-body"
             closeButton={false}
           />
+            
+             
 
           <Routes>
             {/* Home and Categories */}
@@ -235,6 +237,8 @@ function App() {
               element={<Transaction />}
             />
             <Route path="/orderInfo/:orderId" element={<OrderInfo />} />
+            
+            
             <Route path="/buyNow" element={<BuyNow />} />
 
             {/* Policies */}
@@ -244,7 +248,7 @@ function App() {
             <Route path="/shippingPolicy" element={<ShippingPolicy />} />
 
             {/* Payment Status */}
-            <Route path="/paymentStatus" element={<PaymentSuccess />} />
+            <Route path="/paymentSuccess" element={<PaymentSuccess />} />
             <Route path="/paymentFailed" element={<PaymentFailed />} />
 
             {/* Admin Panel */}

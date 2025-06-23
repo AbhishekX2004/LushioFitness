@@ -339,7 +339,7 @@ const getTotalForCOD = () => {
     payableAmount: getTotalWithWalletAndDiscount().total,
     discount: getSelectedTotalAmount() - getTotalWithWalletAndDiscount().total,
     lushioCurrencyUsed: useWalletPoints && walletPoints,
-    couponCode: couponApplied?.couponCode,
+    couponCode: couponApplied?.couponCode || "",
     couponDiscount: getTotalWithWalletAndDiscount().couponDiscountAmount || 0,
     onlinePaymentDiscount: getTotalWithWalletAndDiscount().additionalDiscount || 0,
     address: selectedAddress,
@@ -357,8 +357,8 @@ const getTotalForCOD = () => {
       name,
       mobile,
       amount: getTotalWithWalletAndDiscount().total,
-      MUID: "MUIDW" + Date.now(),
-      transactionId: "T" + Date.now(),
+   //   MUID: "MUIDW" + Date.now(),
+      merchantTransactionId: "T" + Date.now(),
     };
      // Combine orderDetails with paymentData
   const combinedData = {
@@ -368,7 +368,7 @@ const getTotalForCOD = () => {
 
     await axios
       .post(
-        `${process.env.REACT_APP_API_URL}/payment/`,
+        `${process.env.REACT_APP_API_URL}/payment`,
         combinedData
       )
       .then((response) => {

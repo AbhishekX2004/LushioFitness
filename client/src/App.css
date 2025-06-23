@@ -118,6 +118,7 @@ height: 50px;
   /* min-width: fit-content; */
   /* max-width: 90vw; */
   max-width: 90vw;
+   pointer-events: none; 
   padding: 17px;
   margin: 20px auto;
   border-radius: 10px;

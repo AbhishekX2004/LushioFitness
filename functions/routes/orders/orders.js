@@ -667,7 +667,17 @@ router.post("/cancel", async (req, res) => {
       await userRef.update({
         updatedAt: new Date(),
       });
-
+      
+    try {
+            await axios.post(`${API_URL}/payment/refund`, {
+            uid,
+            oid,
+            amount: orderData.payableAmount
+          });
+        } 
+        catch (error) {
+  console.log(error?.data || error?.data?.message);
+        }
       res.status(200).json({
         message: "Order cancelled successfully",
       });

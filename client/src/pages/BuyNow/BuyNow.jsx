@@ -1,12 +1,12 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAddress } from "../../components/context/AddressContext";
-import PriceDetails from "../cartItems/PriceDetails";
+import PriceDetails from "../cart/PriceDetails";
 import CartRow from "./CartRow";
 import { UserContext } from "../../components/context/UserContext";
-import { renderCartMessages } from "../cartItems/cartUtils";
-import Success from "../cartItems/Success";
-import AddressModal from "../cartItems/AddressModal";
+import { renderCartMessages } from "../cart/cartUtils";
+import Success from "../cart/Success";
+import AddressModal from "../cart/AddressModal";
 import axios from "axios";
 import { toast } from "react-toastify";
 const BuyNow = ({ product, selectedHeight, selectedColor, selectedSize,isActive,setIsActive }) => {
@@ -161,7 +161,7 @@ const normalizedHeight = {
     payableAmount: getTotalWithWalletAndDiscount().total,
     discount: getSelectedTotalAmount() - getTotalWithWalletAndDiscount().total,
     lushioCurrencyUsed: useWalletPoints && walletPoints,
-    couponCode: couponApplied?.couponCode,
+    couponCode: couponApplied?.couponCode || "",
     couponDiscount: getTotalWithWalletAndDiscount().couponDiscountAmount || 0,
     onlinePaymentDiscount:
       getTotalWithWalletAndDiscount().additionalDiscount || 0,
@@ -188,8 +188,7 @@ const normalizedHeight = {
       name,
       mobile,
       amount: getTotalWithWalletAndDiscount().total,
-      MUID: "MUIDW" + Date.now(),
-      transactionId: "T" + Date.now(),
+      merchantTransactionId: "T" + Date.now(),
     };
     // Combine orderDetails with paymentData
     const combinedData = {
@@ -198,7 +197,7 @@ const normalizedHeight = {
     };
 
     await axios
-      .post(`${process.env.REACT_APP_API_URL}/payment/`, combinedData)
+      .post(`${process.env.REACT_APP_API_URL}/payment`, combinedData)
       .then((response) => {
         // setPaymentData(response.data);
         if (

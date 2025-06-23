@@ -1,7 +1,7 @@
 import React, { useState,useEffect,useContext} from 'react';
 import axios from 'axios';
 import { useAddress } from '../../components/context/AddressContext';
-import AddressForm from '../cartItems/AddressForm';
+import AddressForm from '../cart/AddressForm';
 import { UserContext } from "../../components/context/UserContext";
 import { toast,ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

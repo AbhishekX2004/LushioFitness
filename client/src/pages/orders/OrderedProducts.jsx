@@ -29,6 +29,7 @@ const OrderedProducts = ({ orderedProducts, canReturn, orderId }) => {
       };
 
       await axios.post(`${process.env.REACT_APP_API_URL}/sendEmail`, payload);
+      setPayloadForMail([]);
     } catch (err) {
       console.error("Error:", err);
     }
@@ -45,7 +46,6 @@ const OrderedProducts = ({ orderedProducts, canReturn, orderId }) => {
       oid: orderId,
       items,
     };
-
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/returnExchange/process-return-exchange`,

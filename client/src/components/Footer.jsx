@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./footer.css";
-import { HashLink as Link } from "react-router-hash-link";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 //import { UserContext } from "./context/UserContext";
 import axios from "axios";
