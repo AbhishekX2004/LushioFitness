@@ -12,6 +12,9 @@ const PaymentStatus = () => {
         <FaCheckCircle className="success-icon" />
         <h1 className="order-success-text">Order Placed Successfully!</h1>
       </div>
+        <p >
+              You'll receive a confirmation email shortly
+            </p>
       <div className="button-group">
       
         <button className="view-order-button" onClick={() => navigate("/user/orders")}>

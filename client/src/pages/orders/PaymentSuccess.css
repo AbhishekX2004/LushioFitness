@@ -87,7 +87,9 @@
       opacity: 1;
     }
   }
-  
+  .payment-status-container p{
+    margin-block: 20px;
+  }
   /* Responsive Styles */
   @media (max-width: 768px) {
     .order-success-text {
@@ -113,7 +115,7 @@
   
     .order-success-text {
       font-size: 1.8rem; /* Further reduce text size */
-      margin-bottom: 20px;
+      margin-bottom: 2px;
     }
   
     .button-group {
