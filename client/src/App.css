@@ -115,14 +115,14 @@ height: 50px;
     background: linear-gradient(135deg, #4ade80, #16a34a);
   color: white;
   font-family: "Assistant";
-  /* min-width: fit-content; */
-  /* max-width: 90vw; */
+  width: fit-content;
   max-width: 90vw;
    pointer-events: none; 
   padding: 17px;
   margin: 20px auto;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+   word-break: break-word;
 }
 .custom-toast-error{
    background: linear-gradient(to right, #ef4444, #dc2626);
