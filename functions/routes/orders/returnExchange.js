@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 /* eslint-disable no-unused-vars */
 /* eslint-disable new-cap */
 /* eslint-disable camelcase */
@@ -15,7 +16,7 @@ function calculateTotalReturnAmount(returnItems, productDocs, items) {
   let totalReturnAmount = 0;
 
   // Create a Map for O(1) lookups
-  const productDocsMap = new Map(productDocs.map(doc => [doc.id, doc]));
+  const productDocsMap = new Map(productDocs.map((doc) => [doc.id, doc]));
 
   for (const [id, item] of Object.entries(returnItems)) {
     const doc = productDocsMap.get(id);
@@ -130,8 +131,8 @@ router.post("/process-return-exchange", async (req, res) => {
         return_reason: itemData.reason,
         discount: productData.perUnitDiscount,
       };
-    }); 
-const totalReturnAmount = calculateTotalReturnAmount(returnItems, productDocs, items);
+    });
+    const totalReturnAmount = calculateTotalReturnAmount(returnItems, productDocs, items);
 
     // console.log(sub_total);
     if (Object.keys(returnItems).length > 0) {
@@ -201,19 +202,18 @@ const totalReturnAmount = calculateTotalReturnAmount(returnItems, productDocs, i
       returnExchangedItems: returnExchangedItems,
     });
 
-       if(totalReturnAmount > 0){
-        try {
-              await axios.post(`${API_URL}/payment/refund`, {
-              uid,
-              oid,
-              amount: Math.ceil(totalReturnAmount)
-            });
-          } 
-          catch (error) {
-    console.log(error?.data || error?.data?.message);
-          }
-}
-        
+    if (totalReturnAmount > 0) {
+      try {
+        await axios.post(`${API_URL}/payment/refund`, {
+          uid,
+          oid,
+          amount: Math.ceil(totalReturnAmount),
+        });
+      } catch (error) {
+        console.log(error?.data || error?.data?.message);
+      }
+    }
+
     return res.status(200).json({success: true, message: "Return/Exchange processed successfully."});
   } catch (error) {
     console.error("Error processing return/exchange:", error.data);
