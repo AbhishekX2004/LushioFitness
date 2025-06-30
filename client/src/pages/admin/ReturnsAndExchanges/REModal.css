@@ -1,0 +1,442 @@
+/* REModal.css */
+
+.admin-reModal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.admin-reModal-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.admin-reModal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 12px 12px 0 0;
+}
+
+.admin-reModal-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.admin-reModal-close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.admin-reModal-close-btn:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.admin-reModal-content {
+  padding: 32px;
+}
+
+.admin-reModal-loading {
+  text-align: center;
+  padding: 60px 0;
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.admin-reModal-error {
+  text-align: center;
+  padding: 60px 0;
+  font-size: 18px;
+  color: #dc2626;
+}
+
+.admin-reModal-section {
+  margin-bottom: 32px;
+}
+
+.admin-reModal-section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.admin-reModal-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.admin-reModal-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-reModal-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-reModal-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.admin-reModal-products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-reModal-product-card {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  transition: all 0.2s ease;
+}
+
+.admin-reModal-product-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+.admin-reModal-product-image {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.admin-reModal-product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-reModal-product-details {
+  flex: 1;
+}
+
+.admin-reModal-product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.admin-reModal-product-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  flex: 1;
+  margin-right: 16px;
+}
+
+.admin-reModal-status-badge {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-reModal-status-returned {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.admin-reModal-status-exchanged {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.admin-reModal-status-partial-return {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.admin-reModal-status-partial-exchange {
+  background-color: #ede9fe;
+  color: #7c3aed;
+}
+
+.admin-reModal-status-default {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.admin-reModal-product-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.admin-reModal-product-spec {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-reModal-spec-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-reModal-spec-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.admin-reModal-reason {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.admin-reModal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 24px 32px;
+  border-top: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 0 0 12px 12px;
+}
+
+.admin-reModal-btn {
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-reModal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-reModal-btn-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.admin-reModal-btn-primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.admin-reModal-btn-secondary {
+  background-color: #10b981;
+  color: white;
+}
+
+.admin-reModal-btn-secondary:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.admin-reModal-btn-outline {
+  background-color: transparent;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.admin-reModal-btn-outline:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Cash Modal Styles */
+.admin-reModal-cash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  padding: 20px;
+}
+
+.admin-reModal-cash-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+}
+
+.admin-reModal-cash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-reModal-cash-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.admin-reModal-cash-content {
+  padding: 24px;
+}
+
+.admin-reModal-input-group {
+  margin-bottom: 20px;
+}
+
+.admin-reModal-input-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.admin-reModal-input,
+.admin-reModal-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.admin-reModal-input:focus,
+.admin-reModal-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.admin-reModal-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.admin-reModal-cash-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-reModal-container {
+    margin: 0;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+  
+  .admin-reModal-header,
+  .admin-reModal-content,
+  .admin-reModal-footer {
+    padding: 16px;
+  }
+  
+  .admin-reModal-product-card {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .admin-reModal-product-image {
+    width: 100%;
+    height: 200px;
+  }
+  
+  .admin-reModal-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-reModal-product-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-reModal-footer {
+    flex-direction: column;
+  }
+  
+  .admin-reModal-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-reModal-overlay {
+    padding: 0;
+  }
+  
+  .admin-reModal-title {
+    font-size: 20px;
+  }
+  
+  .admin-reModal-section-title {
+    font-size: 18px;
+  }
+  
+  .admin-reModal-product-name {
+    font-size: 16px;
+  }
+}

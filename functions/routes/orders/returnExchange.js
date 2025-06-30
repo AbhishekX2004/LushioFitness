@@ -96,7 +96,9 @@ router.post("/process-return-exchange", async (req, res) => {
     let sub_discount = 0;
     const returnItems = {};
     const exchangeItems = [];
-    const returnExchangedItems = items; // Use the original items as they already have the structure we want
+    const returnExchangedItems = items;
+
+    let returnAmount = 0;
 
     const order_items = productDocs.map((doc) => {
       const productData = doc.data();
@@ -107,9 +109,13 @@ router.post("/process-return-exchange", async (req, res) => {
         return_reason: itemData.reason,
       };
 
+      const price = Number(productData.productDetails.price);
+      const perUnitDiscount = Number(productData.perUnitDiscount || 0);
+      const units = itemData.units;
+
       if (itemData.exchange) {
-        sub_total += (Number(productData.productDetails.price)) * itemData.units;
-        sub_discount += Number((productData.perUnitDiscount) - (productData.productDetails.price-productData.productDetails.discountedPrice)) * itemData.units;
+        sub_total += price * units;
+        sub_discount += (perUnitDiscount - (price - productData.productDetails.discountedPrice)) * units;
         exchangeItems.push({
           productId: productData.productId,
           productName: productData.productName,
@@ -121,6 +127,8 @@ router.post("/process-return-exchange", async (req, res) => {
           colorCode: productData.colorCode,
           heightType: productData.heightType,
         });
+      } else {
+        returnAmount += (price - perUnitDiscount) * units;
       }
 
       return {
@@ -136,7 +144,7 @@ router.post("/process-return-exchange", async (req, res) => {
 
     // console.log(sub_total);
     if (Object.keys(returnItems).length > 0) {
-      await axios.post(`${API_URL}/returns/create`, {uid, oid, returnItems});
+      await axios.post(`${API_URL}/returns/create`, {uid, oid, returnItems, returnAmount});
     }
     // console.log("RETURN INITIATED SUCCESS \n\n");
     if (exchangeItems.length > 0) {
