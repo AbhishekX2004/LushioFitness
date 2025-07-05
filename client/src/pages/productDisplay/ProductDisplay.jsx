@@ -29,6 +29,7 @@ import HeightBasedSelection from "./HeightBasedSelection";
 import SizeChart from "./SizeChart";
 import BuyNowModal from "../BuyNow/BuyNowModal";
 import Reviews from "./Reviews"
+import { toast } from "react-toastify";
 //import SingleStar from "./SingleStar";
 const formatDateTime = (timestamp) => {
   if (!timestamp || !timestamp._seconds || !timestamp._nanoseconds) {
@@ -122,8 +123,6 @@ function ProductDisplay() {
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState(null);
-  const [reviews, setReviews] = useState([]);
-  const [showNotification, setShowNotification] = useState(false);
   //  const [isLoadingWishlist, setIsLoadingWishlist] = useState(false);
   const [isLoadingCart, setIsLoadingCart] = useState(false);
   const navigate = useNavigate();
@@ -254,8 +253,7 @@ function ProductDisplay() {
       await axios.post(`${process.env.REACT_APP_API_URL}/cart/add`, cartItem);
 
       fetchCartCount();
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 3000); // Show notification for 3 seconds
+toast.success("Product added to cart");
       setSelectedSize(null);
     } catch (error) {
       console.error("Error adding item to cart:", error);
@@ -303,13 +301,6 @@ function ProductDisplay() {
   return (
     <>
       <div className="productDisplay">
-        {showNotification && (
-          <div className="notification-container">
-            <div className="notification" style={{ aspectRatio: 180 / 25 }}>
-              Product added to cart!
-            </div>
-          </div>
-        )}
         <div className="productDisplay-left">
           <div className="productDisplay-img-list">
             {product.allImages.map((img) => (

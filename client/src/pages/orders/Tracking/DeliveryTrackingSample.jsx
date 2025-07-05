@@ -12,22 +12,14 @@ import './DeliveryTracking.css';
 // Status mapping functions
 
 
-const DeliveryTrackingUI = ({trackingInfo}) => {
+const DeliveryTrackingUI = () => {
   const [trackingNumber, setTrackingNumber] = useState('TRK001234567890');
   const [selectedOrder, setSelectedOrder] = useState(0);
+  
   // Enhanced sample tracking data using your status codes
- //const shipmentId = trackingInfo?.shipment_id;
-  const currentTrackingData2 = sampleTrackingData[selectedOrder];
-  const currentTrackingData = trackingInfo?.tracking_data[trackingInfo?.shipment_id]?.tracking_data;
-if (currentTrackingData) {
-  currentTrackingData.shipment_track_activities ??= [];
-}
-console.log("CurrentTracking Data", currentTrackingData);
-console.log("CurrentTracking Data2", currentTrackingData2);
-//console.log("Shipment id",shipmentId);
-//console.log("Inside", trackingInfo?.tracking_data[shipmentId]); 
-
-
+ 
+  const currentTrackingData = sampleTrackingData[selectedOrder];
+  
 const [expanded, setExpanded] = useState(false);
   const [maxHeight, setMaxHeight] = useState('300px'); // default collapsed height
   const containerRef = useRef(null);
@@ -46,15 +38,15 @@ const [expanded, setExpanded] = useState(false);
   
   const getCurrentStatus = () => {
     if (currentTrackingData.shipment_track_activities.length > 0) {
-      const latestActivity = currentTrackingData?.shipment_track_activities[0];
+      const latestActivity = currentTrackingData.shipment_track_activities[0];
       return getStatusDescription(Number(latestActivity['sr-status']));
     }
     return 'Unknown';
   };
 
   const getProgressPercentage = () => {
-    if (currentTrackingData?.shipment_track_activities.length > 0) {
-      const latestStatus = currentTrackingData?.shipment_track_activities[0]['sr-status'];
+    if (currentTrackingData.shipment_track_activities.length > 0) {
+      const latestStatus = currentTrackingData.shipment_track_activities[0]['sr-status'];
       const appStatus = getOrderStatus(Number(latestStatus));
       
       switch (appStatus) {
@@ -74,14 +66,7 @@ const [expanded, setExpanded] = useState(false);
     return 0;
   };
 
-if(currentTrackingData?.shipment_track_activities==null){
-  return (
-<p style={{ color: "red" }}>
-        No tracking activities found yet. Please check back later.
-      </p>
-  )
-   
-}
+
 
   return (
     <div className="tracking-container">
@@ -91,7 +76,7 @@ if(currentTrackingData?.shipment_track_activities==null){
     
 
         {/* Sample Tracking IDs */}
-        {/* <div className="tracking-sample-ids">
+        <div className="tracking-sample-ids">
           <p className="tracking-sample-text">Try these sample tracking IDs:</p>
           <div className="tracking-sample-buttons">
             {sampleTrackingData.map((data, index) => (
@@ -107,10 +92,10 @@ if(currentTrackingData?.shipment_track_activities==null){
               </button>
             ))}
           </div>
-        </div> */}
+        </div>
 
         {/* Order Summary */}
-        {/* <div className="tracking-order-summary">
+        <div className="tracking-order-summary">
           <div className="tracking-order-info">
             <h3 className="tracking-order-title">Order #{currentTrackingData.orderNumber}</h3>
             <p className="tracking-customer-name">Customer: {currentTrackingData.customerName}</p>
@@ -120,7 +105,7 @@ if(currentTrackingData?.shipment_track_activities==null){
             <span className="tracking-estimated-label">Est. Delivery:</span>
             <span className="tracking-estimated-date">{currentTrackingData.estimatedDelivery}</span>
           </div>
-        </div> */}
+        </div>
 
         {/* Current Status */}
         <div className="tracking-status-card">
@@ -140,7 +125,7 @@ if(currentTrackingData?.shipment_track_activities==null){
           </div>
           
           <p className="tracking-id-display">
-            Tracking ID: <span className="tracking-id-code">{currentTrackingData.trackinId}</span>
+            Tracking ID: <span className="tracking-id-code">{currentTrackingData.trackingId}</span>
           </p>
         </div>
       </div>

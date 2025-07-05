@@ -31,6 +31,7 @@ import BuyNow from "./pages/BuyNow/BuyNow";
 import Search from "./pages/search/Search";
 import About from "./pages/about/About";
 import Contact from "./pages/contact/Contact";
+import DeliverTrackingSample from "./pages/orders/Tracking/DeliveryTrackingSample"
 
 // Admin Panel
 import AdminPanel from "./pages/admin/AdminPanel";
@@ -237,6 +238,7 @@ function App() {
               element={<Transaction />}
             />
             <Route path="/orderInfo/:orderId" element={<OrderInfo />} />
+             <Route path="/trackingSample" element={<DeliverTrackingSample/>} />
             
             
             <Route path="/buyNow" element={<BuyNow />} />

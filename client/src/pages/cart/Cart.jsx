@@ -49,8 +49,6 @@ const [cartAddress, setCartAddress] = useState(null);
 // UI and Interaction States
 const [open, setOpen] = useState(false);
 const [successOpen, setSuccessOpen] = useState(false);
-const [showNotification, setShowNotification] = useState(false);
-const [showNotification1, setShowNotification1] = useState(false);
 const [isActive, setIsActive] = useState(false);
 const [loading, setLoading] = useState(false);
 
@@ -425,9 +423,15 @@ const getTotalForCOD = () => {
       setIsActive(false);
       setSuccessOpen(true);
       await deleteCartItems();
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   if(response.status===200 && user.email){
+    try{
 await sendEmail(response.data.orderId);
+    }
+    catch(e){
+console.log(e);
+    }
+
   }
   setSuccessOpen(false);
      
@@ -440,13 +444,17 @@ await sendEmail(response.data.orderId);
   };
   const handleCreateOrder = async () => {
     if (!selectedAddress) {
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 3000);
+      
+           toast.error("Select Address to proceed", {
+             className: "custom-toast-error",
+           });
       return;
     }
      if (getTotalWithWalletAndDiscount().total<=0) {
-      setShowNotification1(true);
-      setTimeout(() => setShowNotification1(false), 3000);
+       
+            toast.error("Amount must be greater than zero.", {
+              className: "custom-toast-error",
+            });
       return;
     }
     if(getTotalWithWalletAndDiscount().total < couponApplied?.minPurchaseOf){
@@ -498,22 +506,6 @@ fetchCartCount();
 
   return (
     <>
-      {showNotification && (
-        <div className="notification-container">
-   <div className="cart-notification" style={{ aspectRatio: 180 / 25 }}>
-          Select Address to Proceed
-        </div>
-        </div>
-     
-      )}
-       {showNotification1 && (
-        <div className="notification-container">
-   <div className="cart-notification amount-notification" style={{ aspectRatio: 180 / 25 }}>
-         Amount Must be greater than zero
-        </div>
-        </div>
-     
-      )}
       {isActive && (
         <div className="spinner-overlay">
           <div></div>
