@@ -38,63 +38,97 @@ const [bankDetails, setBankDetails] = useState(null);
       console.error("Error:", err);
     }
   };
-  const handleSubmit = async () => {
-     if (modeOfPayment === "cashOnDelivery" && !bankDetails) {
-    setShowBankDetailsPopup(true);
-    return;
-  }
-    if (Object.keys(items).length === 0) {
-             toast.error("No items selected for Return/Exchange.",{className:"custom-toast-error"})
 
-      return;
+  const processReturnRequest = async () => {
+  setLoading(true);
+
+  const requestBody = {
+    uid: user?.uid,
+    oid: orderId,
+    items,
     }
-   
-    const requestBody = {
-      uid: user?.uid,
-      oid: orderId,
-      items,
-      ...(modeOfPayment === "cashOnDelivery" && bankDetails && {
-      refundDetails: bankDetails
-    })
-    };
-    try {
-       setLoading(true);
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/returnExchange/process-return-exchange`,
-        requestBody
-      );
-      console.log("Response:", response.data);
+  
+
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/returnExchange/process-return-exchange`,
+      requestBody
+    );
+
+     console.log("Response:", response.data);
       if (response.status === 200 && user.email) {
         await sendEmail();
       }
       toast.success("Return/Exchange request submitted successfully!");
       setItems({});
       setBankDetails(null);
-    } catch (error) {
-      if (error.response && error.response.status === 403) {
-        toast.error("Return already initiated", {
-          className: "custom-toast-error",
-        });
-      } else {
-        toast.error("Failed to submit request. Try again.", {
-          className: "custom-toast-error",
-        });
-      }
-    } finally {
-      setLoading(false);
+  } catch (error) {
+    if (error.response?.status === 403) {
+      toast.error("Return already initiated", {
+        className: "custom-toast-error",
+      });
+    } else {
+      toast.error("Failed to submit request. Try again.", {
+        className: "custom-toast-error",
+      });
     }
-  };
-
-  const handleBankDetailsSubmit = (details) => {
-  setBankDetails(details);
-  setShowBankDetailsPopup(false);
-  setTimeout(() => {
-    handleSubmit();
-  }, 100);
+  } finally {
+    setLoading(false);
+  }
 };
+
+ const handleSubmit = async () => {
+  if (Object.keys(items).length === 0) {
+    toast.error("No items selected for Return/Exchange.", {
+      className: "custom-toast-error",
+    });
+    return;
+  }
+
+  if (modeOfPayment === "cashOnDelivery") {
+    // COD: show bank popup if no details submitted yet
+    if (!bankDetails) {
+      setShowBankDetailsPopup(true);
+      return;
+    }
+
+    // If bank details already set → it means popup was submitted
+    await processReturnRequest();
+  } else {
+    // For prepaid etc., no need for bank info
+    await processReturnRequest();
+  }
+};
+
+const handleBankDetailsSubmit = async (details) => {
+  try {
+    setLoading(true);
+    setShowBankDetailsPopup(false);
+
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/returns/payDetails`, {
+      uid: user?.uid,
+      oid: orderId,
+      details,
+    });
+
+    if (res.data.success) {
+      setBankDetails(details);
+      await processReturnRequest(); // continue with return
+    } else {
+      toast.error("Failed to save refund details. Try again.");
+    }
+  } catch (err) {
+    console.error("Error submitting bank details:", err);
+    toast.error("Could not submit bank details.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
 const handleBankDetailsClose = () => {
   setShowBankDetailsPopup(false);
+  setBankDetails(null);
 };
   return (
     <div className="ordered-products-container">
