@@ -4,8 +4,12 @@ import ReturnExchange from "./ReturnExchange";
 import axios from "axios";
 import { UserContext } from "../../components/context/UserContext";
 import { toast } from "react-toastify";
-const OrderedProducts = ({ orderedProducts, canReturn, orderId }) => {
+import BankDetailsPopup from './BankDetailsPopUp'; 
+const OrderedProducts = ({ orderedProducts, canReturn, orderId, modeOfPayment }) => {
   const [items, setItems] = useState({});
+  const [showBankDetailsPopup, setShowBankDetailsPopup] = useState(false);
+const [bankDetails, setBankDetails] = useState(null);
+
   const [payloadForMail, setPayloadForMail] = useState([]);
   const [loading, setLoading] = useState(false);
   const { user } = useContext(UserContext);
@@ -35,18 +39,26 @@ const OrderedProducts = ({ orderedProducts, canReturn, orderId }) => {
     }
   };
   const handleSubmit = async () => {
+     if (modeOfPayment === "cashOnDelivery" && !bankDetails) {
+    setShowBankDetailsPopup(true);
+    return;
+  }
     if (Object.keys(items).length === 0) {
              toast.error("No items selected for Return/Exchange.",{className:"custom-toast-error"})
 
       return;
     }
-    setLoading(true);
+   
     const requestBody = {
       uid: user?.uid,
       oid: orderId,
       items,
+      ...(modeOfPayment === "cashOnDelivery" && bankDetails && {
+      refundDetails: bankDetails
+    })
     };
     try {
+       setLoading(true);
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/returnExchange/process-return-exchange`,
         requestBody
@@ -57,6 +69,7 @@ const OrderedProducts = ({ orderedProducts, canReturn, orderId }) => {
       }
       toast.success("Return/Exchange request submitted successfully!");
       setItems({});
+      setBankDetails(null);
     } catch (error) {
       if (error.response && error.response.status === 403) {
         toast.error("Return already initiated", {
@@ -71,6 +84,18 @@ const OrderedProducts = ({ orderedProducts, canReturn, orderId }) => {
       setLoading(false);
     }
   };
+
+  const handleBankDetailsSubmit = (details) => {
+  setBankDetails(details);
+  setShowBankDetailsPopup(false);
+  setTimeout(() => {
+    handleSubmit();
+  }, 100);
+};
+
+const handleBankDetailsClose = () => {
+  setShowBankDetailsPopup(false);
+};
   return (
     <div className="ordered-products-container">
        {loading && (
@@ -142,6 +167,11 @@ const OrderedProducts = ({ orderedProducts, canReturn, orderId }) => {
             />
           </div>
         ))}
+         <BankDetailsPopup
+      isOpen={showBankDetailsPopup}
+      onClose={handleBankDetailsClose}
+      onSubmit={handleBankDetailsSubmit}
+    />
         <button className="final-submit-button" onClick={handleSubmit}>
           Submit Return/Exchange Request
         </button>

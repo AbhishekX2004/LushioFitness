@@ -131,7 +131,7 @@ function OrderInfo() {
       </div>
 
       <ReturnExchangeNotice/>
-      <OrderedProducts orderedProducts={orderDetails?.orderedProducts || []} canReturn={canReturn} orderId={orderId}/>
+      <OrderedProducts orderedProducts={orderDetails?.orderedProducts || []} canReturn={canReturn} orderId={orderId} modeOfPayment={orderDetails?.modeOfPayment}/>
      
       <div className="orderId-container downloadInvoicePdf" onClick={()=>handledownloadInvoice(orderDetails)}>
         <div className="orderId-left" >
