@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 /* eslint-disable no-unused-vars */
 /* eslint-disable new-cap */
 /* eslint-disable camelcase */
@@ -15,7 +16,7 @@ function calculateTotalReturnAmount(returnItems, productDocs, items) {
   let totalReturnAmount = 0;
 
   // Create a Map for O(1) lookups
-  const productDocsMap = new Map(productDocs.map(doc => [doc.id, doc]));
+  const productDocsMap = new Map(productDocs.map((doc) => [doc.id, doc]));
 
   for (const [id, item] of Object.entries(returnItems)) {
     const doc = productDocsMap.get(id);
@@ -95,7 +96,9 @@ router.post("/process-return-exchange", async (req, res) => {
     let sub_discount = 0;
     const returnItems = {};
     const exchangeItems = [];
-    const returnExchangedItems = items; // Use the original items as they already have the structure we want
+    const returnExchangedItems = items;
+
+    let returnAmount = 0;
 
     const order_items = productDocs.map((doc) => {
       const productData = doc.data();
@@ -106,9 +109,13 @@ router.post("/process-return-exchange", async (req, res) => {
         return_reason: itemData.reason,
       };
 
+      const price = Number(productData.productDetails.price);
+      const perUnitDiscount = Number(productData.perUnitDiscount || 0);
+      const units = itemData.units;
+
       if (itemData.exchange) {
-        sub_total += (Number(productData.productDetails.price)) * itemData.units;
-        sub_discount += Number((productData.perUnitDiscount) - (productData.productDetails.price-productData.productDetails.discountedPrice)) * itemData.units;
+        sub_total += price * units;
+        sub_discount += (perUnitDiscount - (price - productData.productDetails.discountedPrice)) * units;
         exchangeItems.push({
           productId: productData.productId,
           productName: productData.productName,
@@ -120,6 +127,8 @@ router.post("/process-return-exchange", async (req, res) => {
           colorCode: productData.colorCode,
           heightType: productData.heightType,
         });
+      } else {
+        returnAmount += (price - perUnitDiscount) * units;
       }
 
       return {
@@ -130,12 +139,12 @@ router.post("/process-return-exchange", async (req, res) => {
         return_reason: itemData.reason,
         discount: productData.perUnitDiscount,
       };
-    }); 
-const totalReturnAmount = calculateTotalReturnAmount(returnItems, productDocs, items);
+    });
+    const totalReturnAmount = calculateTotalReturnAmount(returnItems, productDocs, items);
 
     // console.log(sub_total);
     if (Object.keys(returnItems).length > 0) {
-      await axios.post(`${API_URL}/returns/create`, {uid, oid, returnItems});
+      await axios.post(`${API_URL}/returns/create`, {uid, oid, returnItems, returnAmount});
     }
     // console.log("RETURN INITIATED SUCCESS \n\n");
     if (exchangeItems.length > 0) {
@@ -201,19 +210,18 @@ const totalReturnAmount = calculateTotalReturnAmount(returnItems, productDocs, i
       returnExchangedItems: returnExchangedItems,
     });
 
-       if(totalReturnAmount > 0){
-        try {
-              await axios.post(`${API_URL}/payment/refund`, {
-              uid,
-              oid,
-              amount: Math.ceil(totalReturnAmount)
-            });
-          } 
-          catch (error) {
-    console.log(error?.data || error?.data?.message);
-          }
-}
-        
+    if (totalReturnAmount > 0) {
+      try {
+        await axios.post(`${API_URL}/payment/refund`, {
+          uid,
+          oid,
+          amount: Math.ceil(totalReturnAmount),
+        });
+      } catch (error) {
+        console.log(error?.data || error?.data?.message);
+      }
+    }
+
     return res.status(200).json({success: true, message: "Return/Exchange processed successfully."});
   } catch (error) {
     console.error("Error processing return/exchange:", error.data);

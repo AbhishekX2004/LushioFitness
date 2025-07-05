@@ -13,6 +13,7 @@ import Coupons from "./Coupons/Coupons";
 import OrderLogistics from "./Orders/Logistics/OrderLogistics.jsx"
 import OrderManagement from "./Orders/Management/OrderManagement";
 import MaintenanceManager from "./Maintenance/MaintenanceManager";
+import ReturnExchange from "./ReturnsAndExchanges/RE"
 
 const AdminComponent = () => {
   const [selectedComponent, setSelectedComponent] = useState(null);
@@ -21,7 +22,7 @@ const AdminComponent = () => {
   const adminMenuItems = [
     { key: "AddProducts", label: "Add Products", icon: "+" },
     { key: "EditProducts", label: "Edit Products", icon: "✎" },
-     { key: "OrderLogistics", label: "Order Logistics", icon: "📦" },
+    { key: "OrderLogistics", label: "Order Logistics", icon: "📦" },
     { key: "OrderManagement", label: "Order Management", icon: "📋" },
     { key: "ReviewReviews", label: "Review Reviews", icon: "★" },
     { key: "Coupons", label: "Coupons", icon: "%" },
@@ -29,8 +30,8 @@ const AdminComponent = () => {
     { key: "SendTokens", label: "Send Tokens", icon: "◆" },
     { key: "ViewComplaints", label: "View Complaints", icon: "!" },
     { key: "MaintenanceManager", label: "Maintenance", icon: "⚙" },
-    { key: "AdminControls", label: "Admin Controls", icon: "⚡" }
-   
+    { key: "AdminControls", label: "Admin Controls", icon: "⚡" },
+    { key: "ReturnExchange", label: "Reutrns and Exchanges", icon: " 🔄 " }
   ];
 
   const handleLogout = async () => {
@@ -77,6 +78,8 @@ const AdminComponent = () => {
         return <OrderManagement />;
       case "MaintenanceManager":
         return <MaintenanceManager />;
+      case "ReturnExchange":
+        return <ReturnExchange />
       default:
         return (
           <div className="admin-welcome">
