@@ -1,11 +1,14 @@
 
 /* Container */
+.tracking-container *{
+  font-family: "Assistant";
+}
 .tracking-container {
   max-width: 440px;
   margin: 0 auto;
   padding: 1.5rem;
   background-color: #f9fafb;
-  min-height: 100vh;
+  /* min-height: 100vh; */
 }
 
 /* Header Card */

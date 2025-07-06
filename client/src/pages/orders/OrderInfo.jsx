@@ -7,6 +7,7 @@ import AddressModal from "./AddressModal";
 import "./orderinfo.css";
 import DeliveryTrackingUI from "./Tracking/DeliveryTrackingUi";
 import OrderTracking from "./OrderTracking";
+import { Link,useNavigate } from "react-router-dom";
 //import { FaCopy, FaCheck } from "react-icons/fa";
 import { FiCopy } from "react-icons/fi";
 //import { AiOutlineCheckCircle } from "react-icons/ai";
@@ -21,9 +22,11 @@ import { doc, getDoc } from 'firebase/firestore';
 function OrderInfo() {
   const [copied, setCopied] = useState(false);
   const { orderId } = useParams();
+    const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const [orderDetails, setOrderDetails] = useState(null);
-  const [trackingData, setTrackingData] = useState(null);
+ // const [trackingData, setTrackingData] = useState(null);
+  const [trackingInfo, setTrackingInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [canReturn,setCanReturn] = useState(true);
   const steps = ["Order Placed", "Shipped", "Out for Delivery", "Delivered"];
@@ -34,7 +37,23 @@ function OrderInfo() {
       // setTimeout(() => setCopied(false), 2000);
     });
   };
- 
+ const fetchTrackingInfo = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/track/${orderId}`, {
+        params: { uid: user.uid },
+      });
+
+      setTrackingInfo(res.data);
+      console.log("tracking info", res.data);
+    } catch (err) {
+      console.error("Tracking error:", err);
+
+    } 
+  };
+
+  useEffect(() => {
+    fetchTrackingInfo();
+  }, [orderId, user?.uid]);
   useEffect(() => {
     const fetchData = async () => {
       if (!orderId) return;
@@ -131,7 +150,7 @@ function OrderInfo() {
       </div>
 
       <ReturnExchangeNotice/>
-      <OrderedProducts orderedProducts={orderDetails?.orderedProducts || []} canReturn={canReturn} orderId={orderId}/>
+      <OrderedProducts orderedProducts={orderDetails?.orderedProducts || []} canReturn={canReturn} orderId={orderId} modeOfPayment={orderDetails?.modeOfPayment}/>
      
       <div className="orderId-container downloadInvoicePdf" onClick={()=>handledownloadInvoice(orderDetails)}>
         <div className="orderId-left" >
@@ -141,7 +160,7 @@ function OrderInfo() {
           <FaChevronRight />
         </div>
       </div>
-      <DeliveryTrackingUI/>
+      <DeliveryTrackingUI trackingInfo={trackingInfo}/>
       <div className="order-price-details-container">
         {/* <h2 className="order-price-details-heading">Order Details</h2> */}
         <h4 className="order-price-details-heading">Price Details ({orderDetails?.orderedProducts.length || 0} Items)</h4>
@@ -200,7 +219,11 @@ function OrderInfo() {
         </div>
       
         <AddressModal orderId={orderId}/>
+        
       </div>
+       <button className="final-submit-button" onClick={()=>navigate('/trackingSample')}>
+          View Sample Delivery tracking
+        </button>
     </div>
   );
 }

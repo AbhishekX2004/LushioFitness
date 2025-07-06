@@ -1,7 +1,7 @@
 /* PaymentMethod.css */
 
 .payment-method-container {
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
     border-radius: 8px;
     padding: 20px;
     max-width: 400px;
@@ -9,7 +9,10 @@
     background-color: #fffefe;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
-  
+  .payment-method-container h2{
+    margin-block: 10px;
+    color: #535766;
+  }
   .payment-method-options {
     display: flex;
     flex-direction: column;
